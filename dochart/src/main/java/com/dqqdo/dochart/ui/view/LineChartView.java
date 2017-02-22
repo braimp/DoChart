@@ -3,7 +3,10 @@ package com.dqqdo.dochart.ui.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PathEffect;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.Build;
@@ -159,10 +162,33 @@ public class LineChartView extends View implements View.OnTouchListener{
         textPaint.setTextSize(26);
         textPaint.setColor(Color.GREEN);
 
+        pathEffect = new DashPathEffect(new float[]{1,5},1.0f);
+
     }
 
 
     private int downIndex = -1;
+
+    /**
+     * 判断触点是否点击了相关的点
+     * @param pointF  响应点
+     * @param x       触点x坐标
+     * @param y       触点y坐标
+     * @return        是否是触点
+     */
+    private boolean isTouchPoint(PointF pointF,float x,float y){
+
+        if(Math.abs(pointF.x - x) > 30){
+            return false;
+        }
+
+        if(Math.abs(pointF.y - y) > 30){
+            return false;
+        }
+
+        return true;
+
+    }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -171,17 +197,17 @@ public class LineChartView extends View implements View.OnTouchListener{
 
             case MotionEvent.ACTION_DOWN:
 
-//                float eventX = event.getX();
-//                float eventY = event.getY();
-//
-//                int rectNum = rectFs.size();
-//                for(int i = 0;i < rectNum;i++){
-//                    RectF rectF = rectFs.get(i);
-//                    if(rectF.contains(eventX,eventY)){
-//                        downIndex = i;
-//                        break;
-//                    }
-//                }
+                float eventX = event.getX();
+                float eventY = event.getY();
+
+                int pointNum = pointFs.size();
+                for(int i = 0;i < pointNum;i++){
+                    PointF pointF = pointFs.get(i);
+                    if(isTouchPoint(pointF,eventX,eventY)){
+                        downIndex = i;
+                        break;
+                    }
+                }
 
 
 
@@ -191,11 +217,11 @@ public class LineChartView extends View implements View.OnTouchListener{
 
             case MotionEvent.ACTION_UP:
 
-//                if(downIndex > -1){
-//                    String name = beans.get(downIndex).getName();
-//                    DoToast.shortToast(this.getContext(),name);
-//                    downIndex = -1;
-//                }
+                if(downIndex > -1){
+                    String name = beans.get(downIndex).getName();
+                    DoToast.shortToast(this.getContext(),name);
+                    downIndex = -1;
+                }
 
                 break;
 
@@ -216,6 +242,8 @@ public class LineChartView extends View implements View.OnTouchListener{
     private float perUnitSpace = 100;
     // 步长
     private float perNumHeight = 3;
+    // 每个单元的宽度
+    private float perUnitWidth = 50;
 
     // 当前刻度
     private float currentMark = -1;
@@ -233,7 +261,7 @@ public class LineChartView extends View implements View.OnTouchListener{
         height = getHeight();
 
         mPaint.setXfermode(null);
-        mPaint.setColor(Color.YELLOW);
+        mPaint.setColor(Color.BLACK);
 
         center[0] = width / 2;
         center[1] = height / 2;
@@ -252,8 +280,16 @@ public class LineChartView extends View implements View.OnTouchListener{
 
         // 计算步长，宽度等信息
         perUnitSpace = contentWidth / (dataNum + 1);
-
         perNumHeight = (float) (maxContentMark / maxDataValue);
+
+        // 计算步长，宽度等信息
+        perUnitWidth = contentWidth / (dataNum * 2 + 1);
+        perUnitSpace = perUnitWidth;
+
+        float perPixelValue = (float) (maxDataValue / maxContentMark);
+        perUnitYHeight = contentHeight / yLineNum;
+        perUnitYValue = perUnitYHeight * perPixelValue;
+
 
         if(currentMark == -1){
             currentMark = maxContentMark;
@@ -262,8 +298,11 @@ public class LineChartView extends View implements View.OnTouchListener{
         // 绘制背景
         canvas.drawRect(bigRect,mPaint);
         // 绘制坐标轴
+        drawAxis(canvas);
 
+        mPaint.reset();
         pointFs.clear();
+
         int dataSize = beans.size();
 
         for(int i = 0; i < dataSize;i++){
@@ -273,7 +312,7 @@ public class LineChartView extends View implements View.OnTouchListener{
 
             PointF pointF = new PointF();
             float valueX;
-            valueX = left + (i + 1) * perUnitSpace;
+            valueX = left + (i + 1) * (perUnitSpace + perUnitWidth);
             float valueY;
             valueY = (float) (top + contentHeight - beanValue * perNumHeight);
             pointF.set(valueX,valueY);
@@ -285,98 +324,108 @@ public class LineChartView extends View implements View.OnTouchListener{
                 textPaint.setColor(Color.BLUE);
                 canvas.drawLine(prePoint.x,prePoint.y,valueX,valueY,textPaint);
                 textPaint.setColor(Color.RED);
-                canvas.drawCircle(prePoint.x,prePoint.y,20,textPaint);
-                textPaint.setColor(Color.BLACK);
+
+                int pointSize;
+                if(i - 1== downIndex){
+                    pointSize = 30;
+                }else{
+                    pointSize = 20;
+                }
+
+                canvas.drawCircle(prePoint.x,prePoint.y,pointSize,textPaint);
+
+                String descText = valueBean.getValue() + "万元";
+                float textWidth = textPaint.measureText(descText);
+
+                if(i == dataSize - 1){
+
+                    if(i == downIndex){
+                        pointSize = 30;
+                    }else{
+                        pointSize = 20;
+                    }
+                    canvas.drawCircle(valueX,valueY,pointSize,textPaint);
+                }
+
+                textPaint.setColor(Color.YELLOW);
                 textPaint.setTextSize(35);
-                canvas.drawText("i" + i,prePoint.x,prePoint.y,textPaint);
+
+                canvas.drawText(descText,prePoint.x  - textWidth / 2,prePoint.y - 30,textPaint);
+
+
+                if(i == dataSize - 1){
+
+
+                    canvas.drawText(descText,valueX - textWidth / 2,valueY - 30,textPaint);
+                }
             }
 
         }
 
 
 
-        for(int i = 0; i < dataSize;i++){
-
-        }
-
-//        rectFs.clear();
-//        int dataSize = beans.size();
-//
-//
-//        for(int i = 0; i < dataSize ;i++){
-//
-//
-//            RectF rectF = new RectF();
-//
-//            ChartValueBean valueBean = beans.get(i);
-//            double beanValue = valueBean.getValue();
-//
-//            float valueTop;
-//            float valueLeft;
-//            float valueRight;
-//            float valueBottom;
-//
-//            if(i == downIndex){
-//
-//
-//                valueTop = (float) (top + contentHeight - beanValue * perNumHeight + currentMark);
-//
-//                valueTop -= 5;
-//                valueLeft = left + (perUnitSpace + perUnitWidth) * i + perUnitSpace;
-//                valueLeft -= 5;
-//                valueRight = valueLeft + perUnitWidth;
-//                valueRight += 10;
-//                valueBottom = bottom;
-//
-//                rectF.set(valueLeft,valueTop ,valueRight ,valueBottom);
-//
-//            }else {
-//
-//                valueTop = (float) (top + contentHeight - beanValue * perNumHeight  + currentMark);
-//                valueLeft = left + (perUnitSpace + perUnitWidth) * i + perUnitSpace;
-//                valueRight = valueLeft + perUnitWidth;
-//                valueBottom = bottom;
-//
-//                rectF.set(valueLeft,valueTop,valueRight ,valueBottom);
-//
-//            }
-//
-//            rectFs.add(rectF);
-//
-//            int unitColor = colors.get(i);
-//            mPaint.setColor(unitColor);
-//            canvas.drawRect(rectF,mPaint);
-//
-//            if(currentMark == 0){
-//                // 绘制描述文字
-//
-//                String desc = valueBean.getName() + valueBean.getValue();
-//                float textX = valueLeft;
-//                float descTextLength = textPaint.measureText(desc);
-//                textX -= descTextLength / 2;
-//                textX += perUnitWidth / 2;
-//
-//                float textY = valueTop - 30;
-//
-//                drawDescText(canvas,desc,textX,textY);
-//
-//            }
-//
-//
-//        }
-//
-//        // 播放动画的步长
-//        currentMark -= 3;
-//        // 动画刻度的极限控制
-//        if(currentMark < 0){
-//            currentMark = 0;
-//        }
-//
-//        // 更新界面
-//        invalidate();
+        // 更新界面
+        invalidate();
 
     }
 
+    // 每单位代表的数值
+    private float perUnitYValue = 0;
+    // 每个单元代表的高度
+    private float perUnitYHeight = 0;
+    // 数值单元数量
+    private final int yLineNum = 5;
+
+    PathEffect pathEffect;
+
+
+    /**
+     * 绘制坐标轴
+     * @param canvas 画板
+     */
+    private void drawAxis(Canvas canvas){
+
+        mPaint.setColor(Color.RED);
+        mPaint.setStrokeWidth(10);
+
+        canvas.drawLine(left,bottom,left,top - 50,mPaint);
+        canvas.drawLine(left,bottom,right + 50,bottom,mPaint);
+
+        mPaint.setTextSize(25);
+        mPaint.setTextSkewX((float) -0.5);
+        mPaint.setColor(Color.WHITE);
+
+        for(int i = 0;i < dataNum;i++){
+            String xDesc = beans.get(i).getName();
+            float textLength = mPaint.measureText(xDesc);
+            float unitDescX = left + (i + 1) * (perUnitSpace + perUnitWidth) -  perUnitWidth / 2 - textLength / 2;
+            canvas.drawText(xDesc,unitDescX,bottom + 50,mPaint);
+        }
+
+        mPaint.setColor(Color.YELLOW);
+        mPaint.setStrokeWidth(5);
+        mPaint.setPathEffect(pathEffect);
+        mPaint.setStyle(Paint.Style.STROKE);
+
+        for(int i = 1; i <= yLineNum;i++){
+
+            float lineY = bottom - i * perUnitYHeight;
+
+            Path linePath = new Path();
+            linePath.moveTo(left,lineY);
+            linePath.lineTo(right,lineY);
+            canvas.drawPath(linePath,mPaint);
+
+            float descValue = i * perUnitYValue;
+            String descValueStr = descValue + "(单位)";
+            float textLength = textPaint.measureText(descValueStr);
+            canvas.drawText(descValueStr,left - textLength,lineY,textPaint);
+
+        }
+
+
+
+    }
 
     /**
      * 绘制单元描述文字的函数实现

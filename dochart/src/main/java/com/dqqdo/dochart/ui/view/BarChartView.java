@@ -44,7 +44,6 @@ public class BarChartView extends View implements View.OnTouchListener{
 
     private ArrayList<RectF> rectFs = new ArrayList<>();
 
-
     // 每个绘制单元的颜色
     private ArrayList<Integer> colors = new ArrayList<>();
 
@@ -263,7 +262,7 @@ public class BarChartView extends View implements View.OnTouchListener{
         bigRect.set(left, top, right, bottom);
 
         float perPixelValue = (float) (maxDataValue / maxContentMark);
-        perUnitYHeight = contentHeight / 5;
+        perUnitYHeight = contentHeight / yLineNum;
         perUnitYValue = perUnitYHeight * perPixelValue;
 
 
@@ -388,10 +387,8 @@ public class BarChartView extends View implements View.OnTouchListener{
         mPaint.setStyle(Paint.Style.STROKE);
 
         for(int i = 1; i <= yLineNum;i++){
-            DoLog.d("perUnitYHeight  ===  " + perUnitYHeight);
             float lineY = bottom - i * perUnitYHeight;
 
-//            canvas.drawLine(left,lineY,right,lineY,mPaint);
             Path linePath = new Path();
             linePath.moveTo(left,lineY);
             linePath.lineTo(right,lineY);
