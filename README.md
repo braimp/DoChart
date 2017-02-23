@@ -5,10 +5,10 @@ www.dqqdo.com
 演示图
 
 效果如图  
-![演示图1](https://github.com/zmobs/DoChart/blob/master/image/demo.gif) 
+![演示图1](https://github.com/zmobs/DoChart/blob/master/image/1.gif) 
 
-![演示图2](https://github.com/zmobs/DoChart/blob/master/image/Screenshot_2017-02-21-18-38-32-746_com.dqqdo.doch.png) 
+![演示图2](https://github.com/zmobs/DoChart/blob/master/image/2.webm) 
 
-![演示图3](https://github.com/zmobs/DoChart/blob/master/image/Screenshot_2017-02-21-18-38-36-839_com.dqqdo.doch.png) 
+![演示图3](https://github.com/zmobs/DoChart/blob/master/image/3.png) 
 
-![演示图4](https://github.com/zmobs/DoChart/blob/master/image/Screenshot_2017-02-21-18-38-44-340_com.dqqdo.doch.png) 
+![演示图4](https://github.com/zmobs/DoChart/blob/master/image/4.png) 
