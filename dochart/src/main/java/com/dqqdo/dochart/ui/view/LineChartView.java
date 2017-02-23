@@ -338,7 +338,6 @@ public class LineChartView extends View implements View.OnTouchListener{
                 float textWidth = textPaint.measureText(descText);
 
                 if(i == dataSize - 1){
-
                     if(i == downIndex){
                         pointSize = 30;
                     }else{
