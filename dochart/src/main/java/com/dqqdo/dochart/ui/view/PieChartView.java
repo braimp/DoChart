@@ -14,7 +14,6 @@ import android.view.MotionEvent;
 import android.view.View;
 
 
-import com.dqqdo.dobase.DoLog;
 import com.dqqdo.dobase.DoToast;
 import com.dqqdo.dochart.data.ChartValueBean;
 
@@ -25,59 +24,72 @@ import java.util.ArrayList;
  * 作者：duqingquan
  * 时间：2017/2/14 14:36
  */
-public class PieChartView extends View implements View.OnTouchListener{
+public class PieChartView extends View implements View.OnTouchListener {
 
-    // 绘图使用的画笔对象
-    Paint mPaint;
+
+    // 绘图使用的主画笔对象
+    private Paint mPaint;
+    // 绘制背景区域
+    private RectF bigRect = new RectF();
+    // 带圆点线上圆点的半径
+    private float textLineCircleR = 6f;
+    // 绘制描述用到的line画笔对象
+    private Paint mPaintLine;
+    // 绘制圆心，分割线用到的画笔
+    private Paint mClearPaint;
+    // 擦除模式
+    private PorterDuffXfermode clearMode;
+
+
     // 当前组件宽高.
     private int width, height;
-
-    private RectF bigRect = new RectF();
-
     // 主绘制区域的边距控制
     private float left, top, right, bottom;
     // 圆心坐标
     private float[] center = new float[2];
-    // 每次绘制圆 的绘制进度
-    private float mSweep = 0;
+    // 圆半径数值
+    private float pr = 0f;
+    // 有效绘制区域半径
+    private float fr = 0f;
+    // 外圆半径（这里的外圆是用来绘制描述文字用到的虚拟圆）
+    private float tr = 0f;
 
+
+    // 圆的绘制进度
+    private float mSweep = 0;
     // 绘制单元下标
     private int index = 0;
     // 每次绘制圆的 开始弧度数值
     private float startPercent = 0;
     // 当前正在绘制单元百分比，如果动画已经绘制完完成，则为0.
     private float nowUnitPercent = 0;
+    // 单元下标最大值
+    private int maxIndex;
+
 
     // 每个绘制单元的百分比
     private ArrayList<Float> percents = new ArrayList<>();
     // 每个绘制单元的颜色
     private ArrayList<Integer> colors = new ArrayList<>();
-
-    // 单元下标最大值
-    private int maxIndex;
-
     // 近圆点坐标
-    private float[][] cicleLineF ;
+    private float[][] circleLineF;
     // 近圆点转折处坐标
-    private float[][] cicleLineT ;
+    private float[][] circleLineT;
     // 分割线切点坐标
-    private float[][] cicleLineStart ;
-
-    /**
-     * 文字底部  靠近圆环 短线的 长度
-     */
+    private float[][] circleLineStart;
+    //文字底部靠近圆环短线的长度
     private float textLineByCircleW = 60;
-
-    /**
-     * 绘制动画，每次绘制的圆环的弧度长
-     */
-    private static final float SWEEP_INC = 5;
+    // 描述文本线段宽度
+    private float textLineWidth = 170;
 
 
+    // 响应点击事件 down事件下标
     private int downIndex = -1;
-
+    // 响应点击事件 up事件下标
     private int upIndex = -1;
 
+    // 对应的数据实体类
+    private ArrayList<ChartValueBean> beans = new ArrayList<>();
 
 
     @Override
@@ -85,26 +97,25 @@ public class PieChartView extends View implements View.OnTouchListener{
 
         int eventType = event.getAction();
 
-        switch (eventType){
+        switch (eventType) {
+
             case MotionEvent.ACTION_DOWN:
-
-                downIndex = getCoorPos(event.getX(),event.getY());
-
+                downIndex = getPointUnitIndex(event.getX(), event.getY());
                 break;
+
             case MotionEvent.ACTION_MOVE:
 
                 break;
+
             case MotionEvent.ACTION_UP:
 
-                upIndex = getCoorPos(event.getX(),event.getY());
+                upIndex = getPointUnitIndex(event.getX(), event.getY());
 
-                if (downIndex == upIndex && upIndex >= 0){
+                if (downIndex == upIndex && upIndex >= 0) {
                     // 给出提示
                     String name = beans.get(upIndex).getName();
-                    DoToast.shortToast(getContext(),"name === " + name);
-
+                    DoToast.shortToast(getContext(), name);
                 }
-
 
                 downIndex = -1;
 
@@ -117,46 +128,45 @@ public class PieChartView extends View implements View.OnTouchListener{
 
     /**
      * 获取坐标对应的单元下标
-     * @return
+     *
+     * @return 单元下标
      */
-    private int getCoorPos(float x,float y){
+    private int getPointUnitIndex(float x, float y) {
 
         // 第一步，判断当前点是否位于圆内
         double absX = (int) Math.abs((center[0] - x));
         double absY = (int) Math.abs((center[1] - y));
 
-        double result =  Math.hypot(absX,absY);
-        if(result > fr){
+        double result = Math.hypot(absX, absY);
+        if (result > fr) {
             // 大于半径，在圆外不作处理
             return -1;
         }
 
         // 小于半径，在圆内部，进一步判断角度
-        double num = 0;
+        double num;
         double degrees = 0;
-        int quadrant = quadrant(x,y);
-        if(quadrant == 1){
-            num = Math.atan2(absY,absX);
-            degrees =  Math.toDegrees(num);
-        }else if(quadrant == 2){
-            num = Math.atan2(absX,absY);
+        int quadrant = getPointQuadrant(x, y);
+        if (quadrant == 1) {
+            num = Math.atan2(absY, absX);
+            degrees = Math.toDegrees(num);
+        } else if (quadrant == 2) {
+            num = Math.atan2(absX, absY);
             degrees = 90 + Math.toDegrees(num);
-        }else if(quadrant == 3){
-            num = Math.atan2(absX,absY);
-            degrees = 270 -  Math.toDegrees(num);
-        }else if(quadrant == 4){
-            num = Math.atan2(absY,absX);
-            degrees = 360 -  Math.toDegrees(num);
+        } else if (quadrant == 3) {
+            num = Math.atan2(absX, absY);
+            degrees = 270 - Math.toDegrees(num);
+        } else if (quadrant == 4) {
+            num = Math.atan2(absY, absX);
+            degrees = 360 - Math.toDegrees(num);
         }
 
-
-
         float totalDegrees = 0;
-        for(int i = 0;i < percents.size();i++){
+        for (int i = 0; i < percents.size(); i++) {
             float nowDegrees = percents.get(i);
             totalDegrees += nowDegrees;
-            if(degrees <= totalDegrees){
-               return i;
+            if (degrees <= totalDegrees) {
+                return i;
             }
         }
 
@@ -164,24 +174,26 @@ public class PieChartView extends View implements View.OnTouchListener{
 
     }
 
+
     /**
-     * 返回象限 这里返回的是几何象限，不是数学象限
+     * 返回象限 (这里返回的是几何象限，不是数学象限)
+     *
      * @param x 坐标x
      * @param y 坐标y
      * @return 象限名称
      */
-    private int quadrant(float x,float y){
+    private int getPointQuadrant(float x, float y) {
 
-        if(x > center[0]){
-            if(y > center[1]){
+        if (x > center[0]) {
+            if (y > center[1]) {
                 return 1;
-            }else{
+            } else {
                 return 4;
             }
-        }else{
-            if(y > center[1]){
+        } else {
+            if (y > center[1]) {
                 return 2;
-            }else{
+            } else {
                 return 3;
             }
         }
@@ -189,12 +201,9 @@ public class PieChartView extends View implements View.OnTouchListener{
     }
 
 
-
-
-    // 对应的数据实体类
-    private ArrayList<ChartValueBean> beans = new ArrayList<>();
-
-
+    /**
+     * 组件初始化方法
+     */
     private void init() {
 
         // 初始化组件相关
@@ -209,16 +218,28 @@ public class PieChartView extends View implements View.OnTouchListener{
     /**
      * 初始化组件相关
      */
-    private void initView(){
+    private void initView() {
         this.setOnTouchListener(this);
     }
 
+    /**
+     * 初始化绘制相关属性
+     */
     private void initPaint() {
         mPaint = new Paint();
         mPaint.setColor(Color.RED);
+
+        clearMode = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
+
+        mClearPaint = new Paint();
+        mClearPaint.setStrokeWidth(20);
+
     }
 
 
+    /**
+     * 初始化数据对象
+     */
     private void initData() {
 
         // 模拟假数据
@@ -254,15 +275,12 @@ public class PieChartView extends View implements View.OnTouchListener{
 
         calcPercent();
 
-        cicleLineF = new float[percents.size()][2];
-        cicleLineT = new float[percents.size()][2];
-        cicleLineStart  = new float[percents.size()][2];
+        circleLineF = new float[percents.size()][2];
+        circleLineT = new float[percents.size()][2];
+        circleLineStart = new float[percents.size()][2];
 
 
     }
-
-
-
 
 
     /**
@@ -271,12 +289,11 @@ public class PieChartView extends View implements View.OnTouchListener{
     private void calcPercent() {
 
         double total = 0;
+
         for (ChartValueBean ChartValueBean : beans) {
             total += ChartValueBean.getValue();
         }
-
         float availableDegree = 360;
-
 
         for (ChartValueBean ChartValueBean : beans) {
             double perValue = ChartValueBean.getValue();
@@ -323,13 +340,6 @@ public class PieChartView extends View implements View.OnTouchListener{
         init();
     }
 
-    private float pr = 0f;
-    private float fr = 0f;
-    private float tr = 0f;
-
-
-
-
 
     @Override
     public void onDraw(Canvas canvas) {
@@ -350,7 +360,7 @@ public class PieChartView extends View implements View.OnTouchListener{
         right = center[0] + fr;
         bottom = center[1] + fr;
 
-        pr = (right - left)/2;
+        pr = (right - left) / 2;
 
         bigRect.set(left, top, right, bottom);
 
@@ -364,38 +374,37 @@ public class PieChartView extends View implements View.OnTouchListener{
         for (int i = 0; i < percentNum; i++) {
 
             // 计算相关数据
-            if(index < percentNum){
+            if (index < percentNum) {
 
 
                 nowUnitPercent = percents.get(i);
                 circle += nowUnitPercent / 2;
 
                 // 绘制单元内部圆半径
-                cicleLineF[i][0] = center[0] + (float)(fr * Math.cos(circle * Math.PI/180));
-                cicleLineF[i][1] = center[1] + (float)(fr * Math.sin(circle * Math.PI/180));
+                circleLineF[i][0] = center[0] + (float) (fr * Math.cos(circle * Math.PI / 180));
+                circleLineF[i][1] = center[1] + (float) (fr * Math.sin(circle * Math.PI / 180));
 
                 // 虚拟外圈圆半径
                 tr = pr + textLineByCircleW;
-                cicleLineT[i][0] = center[0] + (float) (tr * Math.cos(circle * Math.PI/180));
-                cicleLineT[i][1] = center[1] + (float) (tr * Math.sin(circle * Math.PI/180));
+                circleLineT[i][0] = center[0] + (float) (tr * Math.cos(circle * Math.PI / 180));
+                circleLineT[i][1] = center[1] + (float) (tr * Math.sin(circle * Math.PI / 180));
 
                 // 刻度转回起点度数
-                circle -= nowUnitPercent/2;
+                circle -= nowUnitPercent / 2;
                 circle += nowUnitPercent;
 
                 // 计算分割线切点
-                cicleLineStart[i][0] = center[0] + (float)(fr * Math.cos(circle * Math.PI/180));
-                cicleLineStart[i][1] = center[1] + (float)(fr * Math.sin(circle * Math.PI/180));
+                circleLineStart[i][0] = center[0] + (float) (fr * Math.cos(circle * Math.PI / 180));
+                circleLineStart[i][1] = center[1] + (float) (fr * Math.sin(circle * Math.PI / 180));
 
 
-            }else{
+            } else {
                 nowUnitPercent = 0;
             }
 
 
             // 进行绘制
             if (i < index) {
-
                 // 已经绘制过的部分
                 float postPercent = percents.get(i);
 
@@ -406,83 +415,66 @@ public class PieChartView extends View implements View.OnTouchListener{
                 startPercent += postPercent;
 
                 // 绘制完成，绘制描述信息
-                drawLine(canvas,i);
-
-
+                drawDescLine(canvas, i);
 
             } else {
-
+                // 设置单元对应的颜色
                 mPaint.setColor(colors.get(index));
-
                 if (mSweep <= (nowUnitPercent)) {
-
                     // 尚未绘制完毕当前单元，则继续按照进度绘制动画
                     canvas.drawArc(bigRect, startPercent, mSweep, true, mPaint);
                     mSweep += 1;
-
-                }else{
+                } else {
                     break;
                 }
             }
 
         }
 
+        // 点击导致的左侧影响单元下标
+        int leftDownEffect;
+        // 点击导致的右侧影响单元下标
+        int rightDownEffect;
 
-        int leftDownEffect = 0;
-        int rightDownEffect = 0;
-
-        if(downIndex == 0){
+        if (downIndex == 0) {
             leftDownEffect = beans.size() - 1;
             rightDownEffect = 0;
-        }else{
+        } else {
             leftDownEffect = downIndex - 1;
             rightDownEffect = downIndex;
         }
 
-
+        //mPaintLine.reset();
 
         // 绘制分割线，因为要绘制在最上层，所有要在每帧最后绘制
         for (int i = 0; i < percentNum; i++) {
 
-
-            if(i == 0){
+            if (i == 0) {
                 // 第一个绘制单元会与最后一个绘制单元重叠，所以要绘制最后的间隔
-                drawSplitLine(canvas,cicleLineStart[maxIndex - 1][0],cicleLineStart[maxIndex - 1][1],-1);
+                drawSplitLine(canvas, circleLineStart[maxIndex - 1][0], circleLineStart[maxIndex - 1][1], -1);
             }
 
             // 根据单元下标分割线
-            if(i < index){
+            if (i < index) {
 
-
-
-                if(index == -1){
-                    //drawSplitLine(canvas,cicleLineStart[i][0],cicleLineStart[i][1],-1);
-                }else{
-
-                    if(i == leftDownEffect || i == rightDownEffect){
-                        // 增加点击效果
-                        drawSplitLine(canvas,cicleLineStart[i][0],cicleLineStart[i][1],colors.get(downIndex));
-                    }else{
-                        drawSplitLine(canvas,cicleLineStart[i][0],cicleLineStart[i][1],-1);
-
-                    }
-
+                if (i == leftDownEffect || i == rightDownEffect) {
+                    // 增加点击效果
+                    drawSplitLine(canvas, circleLineStart[i][0], circleLineStart[i][1], colors.get(downIndex));
+                } else {
+                    drawSplitLine(canvas, circleLineStart[i][0], circleLineStart[i][1], -1);
                 }
-
 
             }
         }
-
-
 
 
         // 调整数据，并判断数据有效性
         if (mSweep > nowUnitPercent) {
             // 绘制单元下标增加
             // 已经超过了限制
-            if(index >= maxIndex){
+            if (index >= maxIndex) {
                 index = maxIndex;
-            }else{
+            } else {
                 index += 1;
             }
             // 单元内部绘制动画角度重置
@@ -493,9 +485,10 @@ public class PieChartView extends View implements View.OnTouchListener{
         startPercent = 0;
 
         mPaint.setColor(Color.WHITE);
+
         // 绘制圆心
-        mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        canvas.drawCircle(center[0],center[1],80,mPaint);
+        mPaint.setXfermode(clearMode);
+        canvas.drawCircle(center[0], center[1], 80, mPaint);
 
 
         // 通知界面更新
@@ -506,70 +499,56 @@ public class PieChartView extends View implements View.OnTouchListener{
 
     /**
      * 绘制单元之间的分割线
+     *
      * @param canvas
      * @param stopX
      * @param stopY
      */
-    private void drawSplitLine(Canvas canvas,float stopX,float stopY,int writeColor){
+    private void drawSplitLine(Canvas canvas, float stopX, float stopY, int writeColor) {
 
-
-        Paint linePaint = new Paint();
-        linePaint.setStrokeWidth(20);
-
-        if(writeColor == -1){
-            linePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        }else{
-            linePaint.setColor(writeColor);
+        if (writeColor == -1) {
+            mClearPaint.setXfermode(clearMode);
+        } else {
+            mClearPaint.setColor(writeColor);
         }
 
-
-        canvas.drawLine(center[0],center[1],stopX,stopY,linePaint);
+        canvas.drawLine(center[0], center[1], stopX, stopY, mClearPaint);
 
     }
 
 
-
-
-
     /**
-     * 带圆点线上  圆点的半径
+     * 绘制描述线段
+     * @param canvas 画布对象
+     * @param index  当前描述单元下标
      */
-    private float textLineCircleR = 6f;
-    private Paint mPaintLine;
+    private void drawDescLine(Canvas canvas, int index) {
 
-    /**
-     * 文字底部  带圆点线的  长度
-     */
-    private float textLineWidth = 170;
-
-    private void drawLine(Canvas canvas,int index){
-
-        float fx = cicleLineF[index][0];
-        float fy = cicleLineF[index][1];
-        float tx = cicleLineT[index][0];
-        float ty = cicleLineT[index][1];
+        float fx = circleLineF[index][0];
+        float fy = circleLineF[index][1];
+        float tx = circleLineT[index][0];
+        float ty = circleLineT[index][1];
 
 
-        if(percents.get(index) == 0){
+        if (percents.get(index) == 0) {
             return;
         }
 
         canvas.drawCircle(fx, fy, textLineCircleR, mPaintLine);
-        canvas.drawLine(fx,fy,tx,ty,mPaintLine);
+        canvas.drawLine(fx, fy, tx, ty, mPaintLine);
         float temp;
-        if(tx > center[0]){
+        if (tx > center[0]) {
             temp = textLineWidth;
-        }else{
+        } else {
             temp = -textLineWidth;
         }
-        canvas.drawLine(tx,ty,tx+temp,ty, mPaintLine);
+        canvas.drawLine(tx, ty, tx + temp, ty, mPaintLine);
         canvas.drawCircle(tx + temp, ty, textLineCircleR, mPaintLine);
         // 绘制单元描述文字
         ChartValueBean nowBean = beans.get(index);
-        canvas.drawText(nowBean.getName() + "-" +nowBean.getValue(),tx + temp / 2,ty - 20,mPaintLine);
+        canvas.drawText(nowBean.getName() + "-" + nowBean.getValue(), tx + temp / 2, ty - 20, mPaintLine);
 
     }
-
 
 
 }
