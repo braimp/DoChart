@@ -14,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 
+import com.dqqdo.dobase.DoLog;
 import com.dqqdo.dobase.DoToast;
 import com.dqqdo.dochart.data.ChartValueBean;
 
@@ -442,11 +443,20 @@ public class PieChartView extends View implements View.OnTouchListener{
 
         // 绘制分割线，因为要绘制在最上层，所有要在每帧最后绘制
         for (int i = 0; i < percentNum; i++) {
-            // 计算相关数据
+
+
+            if(i == 0){
+                // 第一个绘制单元会与最后一个绘制单元重叠，所以要绘制最后的间隔
+                drawSplitLine(canvas,cicleLineStart[maxIndex - 1][0],cicleLineStart[maxIndex - 1][1],-1);
+            }
+
+            // 根据单元下标分割线
             if(i < index){
 
+
+
                 if(index == -1){
-                    drawSplitLine(canvas,cicleLineStart[i][0],cicleLineStart[i][1],-1);
+                    //drawSplitLine(canvas,cicleLineStart[i][0],cicleLineStart[i][1],-1);
                 }else{
 
                     if(i == leftDownEffect || i == rightDownEffect){
@@ -454,11 +464,10 @@ public class PieChartView extends View implements View.OnTouchListener{
                         drawSplitLine(canvas,cicleLineStart[i][0],cicleLineStart[i][1],colors.get(downIndex));
                     }else{
                         drawSplitLine(canvas,cicleLineStart[i][0],cicleLineStart[i][1],-1);
+
                     }
 
                 }
-
-
 
 
             }
