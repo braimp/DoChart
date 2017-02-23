@@ -7,7 +7,7 @@ www.dqqdo.com
 效果如图  
 ![演示图1](https://github.com/zmobs/DoChart/blob/master/image/1.gif) 
 
-![演示图2](https://github.com/zmobs/DoChart/blob/master/image/2.webm) 
+![演示图2](https://github.com/zmobs/DoChart/blob/master/image/2.gif) 
 
 ![演示图3](https://github.com/zmobs/DoChart/blob/master/image/3.png) 
 
