@@ -9,6 +9,6 @@ www.dqqdo.com
 
 ![演示图2](https://github.com/zmobs/DoChart/blob/master/image/2.webm) 
 
-![演示图3](https://github.com/zmobs/DoChart/blob/master/image/3.png) 
+![演示图3](https://github.com/zmobs/DoChart/blob/master/image/3.png =100x100) 
 
-![演示图4](https://github.com/zmobs/DoChart/blob/master/image/4.png) 
+![演示图4](https://github.com/zmobs/DoChart/blob/master/image/4.png =100x100) 
