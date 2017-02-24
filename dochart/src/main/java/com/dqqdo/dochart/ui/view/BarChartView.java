@@ -28,24 +28,59 @@ import java.util.ArrayList;
  */
 public class BarChartView extends View implements View.OnTouchListener{
 
-    // 绘图使用的画笔对象
-    Paint mPaint;
+    // 绘图使用的主画笔对象
+    private Paint mPaint;
+    // 文本绘制画笔对象
+    private Paint textPaint;
 
     // 当前组件宽高.
     private int width, height;
-
     // 主绘制区域的边距控制
     private float left, top, right, bottom;
     // 圆心坐标
     private float[] center = new float[2];
+    // 绘图有效区域半径
+    private float halfContentWidth = 0f;
+    // 有效区域宽度
+    private float contentWidth = 0f;
+    // 有效区域高度
+    private float contentHeight = 0f;
+    // 绘制的有效区域 矩形对象
+    private RectF bigRect = new RectF();
 
 
-    private ArrayList<Float> percents = new ArrayList<>();
+    // 每个单元之间的间隔
+    private float perUnitSpace = 100;
+    // 每个单元的宽度
+    private float perUnitWidth = 50;
+    // 步长
+    private float perNumHeight = 3;
+    // 当前刻度
+    private float currentMark = -1;
+    // 最大的展示刻度
+    private float maxContentMark;
+    // 每单位代表的数值
+    private float perUnitYValue = 0;
+    // 每个单元代表的高度
+    private float perUnitYHeight = 0;
+    // 数值单元数量
+    private final int yLineNum = 5;
 
+    // 所有绘制单元的矩形对象
     private ArrayList<RectF> rectFs = new ArrayList<>();
-
     // 每个绘制单元的颜色
     private ArrayList<Integer> colors = new ArrayList<>();
+    // 对应的数据实体类
+    private ArrayList<ChartValueBean> beans = new ArrayList<>();
+    // 总体的数据数量
+    private int dataNum = 0;
+    // 最大可以展示的数值
+    private double maxDataValue = 0;
+
+    // 点击时的单元下标
+    private int downIndex = -1;
+    // 虚线路径对象
+    private PathEffect pathEffect;
 
     public BarChartView(Context context) {
         super(context);
@@ -69,6 +104,9 @@ public class BarChartView extends View implements View.OnTouchListener{
     }
 
 
+    /**
+     * 初始化组件
+     */
     private void init() {
 
         // 初始化组件相关
@@ -80,11 +118,7 @@ public class BarChartView extends View implements View.OnTouchListener{
 
     }
 
-    // 对应的数据实体类
-    private ArrayList<ChartValueBean> beans = new ArrayList<>();
 
-    private int dataNum = 0;
-    private double maxDataValue = 0;
 
     private void initData() {
 
@@ -136,8 +170,6 @@ public class BarChartView extends View implements View.OnTouchListener{
         colors.add(Color.GREEN);
 
 
-
-
     }
 
 
@@ -151,7 +183,7 @@ public class BarChartView extends View implements View.OnTouchListener{
         this.setOnTouchListener(this);
     }
 
-    private Paint textPaint;
+
 
     private void initPaint() {
 
@@ -166,8 +198,7 @@ public class BarChartView extends View implements View.OnTouchListener{
 
     }
 
-    // 点击时的单元下标
-    private int downIndex = -1;
+
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -207,33 +238,7 @@ public class BarChartView extends View implements View.OnTouchListener{
         return true;
     }
 
-    // 绘图有效区域半径
-    private float halfContentWidth = 0f;
-    // 有效区域宽度
-    private float contentWidth = 0f;
-    // 有效区域高度
-    private float contentHeight = 0f;
-    // 绘制的有效区域 矩形对象
-    private RectF bigRect = new RectF();
 
-    // 每个单元之间的间隔
-    private float perUnitSpace = 100;
-    // 每个单元的宽度
-    private float perUnitWidth = 50;
-    // 步长
-    private float perNumHeight = 3;
-
-    // 当前刻度
-    private float currentMark = -1;
-    // 最大的展示刻度
-    private float maxContentMark;
-
-    // 每单位代表的数值
-    private float perUnitYValue = 0;
-    // 每个单元代表的高度
-    private float perUnitYHeight = 0;
-    // 数值单元数量
-    private final int yLineNum = 5;
 
 
     @Override
@@ -354,7 +359,7 @@ public class BarChartView extends View implements View.OnTouchListener{
     }
 
 
-    PathEffect pathEffect;
+
 
 
 

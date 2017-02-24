@@ -226,13 +226,23 @@ public class PieChartView extends View implements View.OnTouchListener {
      * 初始化绘制相关属性
      */
     private void initPaint() {
+
         mPaint = new Paint();
         mPaint.setColor(Color.RED);
 
-        clearMode = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
-
         mClearPaint = new Paint();
         mClearPaint.setStrokeWidth(20);
+
+        mPaintLine = new Paint();
+        mPaintLine.setStyle(Paint.Style.FILL);
+        mPaintLine.setStrokeWidth(5);
+        mPaintLine.setColor(Color.WHITE);
+        mPaintLine.setTextAlign(Paint.Align.CENTER);
+        mPaintLine.setTextSize(30);
+
+        clearMode = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
+
+
 
     }
 
@@ -309,12 +319,7 @@ public class PieChartView extends View implements View.OnTouchListener {
         colors.add(Color.GREEN);
 
 
-        mPaintLine = new Paint();
-        mPaintLine.setStyle(Paint.Style.FILL);
-        mPaintLine.setStrokeWidth(5);
-        mPaintLine.setColor(Color.WHITE);
-        mPaintLine.setTextAlign(Paint.Align.CENTER);
-        mPaintLine.setTextSize(30);
+
 
 
     }
@@ -509,6 +514,7 @@ public class PieChartView extends View implements View.OnTouchListener {
         if (writeColor == -1) {
             mClearPaint.setXfermode(clearMode);
         } else {
+            mClearPaint.setXfermode(null);
             mClearPaint.setColor(writeColor);
         }
 
