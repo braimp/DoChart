@@ -33,7 +33,7 @@ public class BarChartView extends View implements View.OnTouchListener{
     // 文本绘制画笔对象
     private Paint textPaint;
 
-    // 当前组件宽高.
+    // 当前组件宽高
     private int width, height;
     // 主绘制区域的边距控制
     private float left, top, right, bottom;
@@ -82,6 +82,11 @@ public class BarChartView extends View implements View.OnTouchListener{
     // 虚线路径对象
     private PathEffect pathEffect;
 
+
+    /***************************** 配置开关 ******************************/
+    // 是否开启标签说明
+    private boolean hasLabel;
+
     public BarChartView(Context context) {
         super(context);
         init();
@@ -119,7 +124,15 @@ public class BarChartView extends View implements View.OnTouchListener{
     }
 
 
+    public boolean isHasLabel() {
+        return hasLabel;
+    }
 
+    public void setHasLabel(boolean hasLabel) {
+        this.hasLabel = hasLabel;
+    }
+
+    
     private void initData() {
 
         // 模拟假数据

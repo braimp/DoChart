@@ -14,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 
+import com.dqqdo.dobase.DoLog;
 import com.dqqdo.dobase.DoToast;
 import com.dqqdo.dochart.data.ChartValueBean;
 
@@ -69,8 +70,6 @@ public class PieChartView extends View implements View.OnTouchListener {
 
     // 每个绘制单元的百分比
     private ArrayList<Float> percents = new ArrayList<>();
-    // 每个绘制单元的颜色
-    private ArrayList<Integer> colors = new ArrayList<>();
     // 近圆点坐标
     private float[][] circleLineF;
     // 近圆点转折处坐标
@@ -90,6 +89,19 @@ public class PieChartView extends View implements View.OnTouchListener {
 
     // 对应的数据实体类
     private ArrayList<ChartValueBean> beans = new ArrayList<>();
+
+    /***************************** 配置开关 ******************************/
+    // 是否开启标签说明
+    private boolean hasLabel;
+
+
+    public boolean isHasLabel() {
+        return hasLabel;
+    }
+
+    public void setHasLabel(boolean hasLabel) {
+        this.hasLabel = hasLabel;
+    }
 
 
     @Override
@@ -202,6 +214,34 @@ public class PieChartView extends View implements View.OnTouchListener {
 
 
     /**
+     * 绘制单元标签
+     * @param canvas 画板对象
+     */
+    private void drawLabel(Canvas canvas){
+
+        mPaint.setXfermode(null);
+        int colorSize = beans.size();
+        for(int i = 0; i < colorSize;i++){
+
+            ChartValueBean valueBean = beans.get(i);
+
+            RectF rectF = new RectF();
+            int perNowY = (i + 1) * 50;
+            rectF.set(200,perNowY,500,perNowY + 30);
+            mPaint.setColor(valueBean.getColor());
+            canvas.drawRect(rectF,mPaint);
+
+//            Paint.FontMetrics fm = mPaintLine.getFontMetrics();
+//            float fontHeight = fm.bottom - fm.top;
+//            DoLog.d("fontHeight  ====  " + fontHeight);
+
+            canvas.drawText(valueBean.getName(),600,perNowY + 25,mPaintLine);
+        }
+
+    }
+
+
+    /**
      * 组件初始化方法
      */
     private void init() {
@@ -256,23 +296,27 @@ public class PieChartView extends View implements View.OnTouchListener {
         ChartValueBean ChartValueBean1 = new ChartValueBean();
         ChartValueBean1.setName("百度贴吧");
         ChartValueBean1.setValue(35);
+        ChartValueBean1.setColor(Color.RED);
         beans.add(ChartValueBean1);
 
 
         ChartValueBean ChartValueBean2 = new ChartValueBean();
         ChartValueBean2.setName("QQ空间");
         ChartValueBean2.setValue(166);
+        ChartValueBean2.setColor(Color.BLUE);
         beans.add(ChartValueBean2);
 
 
         ChartValueBean ChartValueBean3 = new ChartValueBean();
         ChartValueBean3.setName("新浪微博");
         ChartValueBean3.setValue(115);
+        ChartValueBean3.setColor(Color.YELLOW);
         beans.add(ChartValueBean3);
 
 
         ChartValueBean ChartValueBean4 = new ChartValueBean();
         ChartValueBean4.setName("微信");
+        ChartValueBean4.setColor(Color.GRAY);
         ChartValueBean4.setValue(135);
         beans.add(ChartValueBean4);
 
@@ -280,6 +324,7 @@ public class PieChartView extends View implements View.OnTouchListener {
         ChartValueBean ChartValueBean5 = new ChartValueBean();
         ChartValueBean5.setName("FaceBook");
         ChartValueBean5.setValue(155);
+        ChartValueBean5.setColor(Color.GREEN);
         beans.add(ChartValueBean5);
 
 
@@ -311,14 +356,6 @@ public class PieChartView extends View implements View.OnTouchListener {
         }
 
         maxIndex = percents.size();
-
-        colors.add(Color.RED);
-        colors.add(Color.BLUE);
-        colors.add(Color.YELLOW);
-        colors.add(Color.GRAY);
-        colors.add(Color.GREEN);
-
-
 
 
 
@@ -414,7 +451,7 @@ public class PieChartView extends View implements View.OnTouchListener {
                 float postPercent = percents.get(i);
 
                 // 已经超过当前绘制进度，则绘制整体单元，并继续绘制下一个单元动画
-                mPaint.setColor(colors.get(i));
+                mPaint.setColor(beans.get(i).getColor());
                 canvas.drawArc(bigRect, startPercent, postPercent, true, mPaint);
 
                 startPercent += postPercent;
@@ -424,7 +461,7 @@ public class PieChartView extends View implements View.OnTouchListener {
 
             } else {
                 // 设置单元对应的颜色
-                mPaint.setColor(colors.get(index));
+                mPaint.setColor(beans.get(index).getColor());
                 if (mSweep <= (nowUnitPercent)) {
                     // 尚未绘制完毕当前单元，则继续按照进度绘制动画
                     canvas.drawArc(bigRect, startPercent, mSweep, true, mPaint);
@@ -464,7 +501,7 @@ public class PieChartView extends View implements View.OnTouchListener {
 
                 if (i == leftDownEffect || i == rightDownEffect) {
                     // 增加点击效果
-                    drawSplitLine(canvas, circleLineStart[i][0], circleLineStart[i][1], colors.get(downIndex));
+                    drawSplitLine(canvas, circleLineStart[i][0], circleLineStart[i][1], beans.get(downIndex).getColor());
                 } else {
                     drawSplitLine(canvas, circleLineStart[i][0], circleLineStart[i][1], -1);
                 }
@@ -495,6 +532,10 @@ public class PieChartView extends View implements View.OnTouchListener {
         mPaint.setXfermode(clearMode);
         canvas.drawCircle(center[0], center[1], 80, mPaint);
 
+        // 绘制文字标签
+        if(hasLabel){
+            drawLabel(canvas);
+        }
 
         // 通知界面更新
         invalidate();

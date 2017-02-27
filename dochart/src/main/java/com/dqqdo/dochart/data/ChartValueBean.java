@@ -8,6 +8,7 @@ public class ChartValueBean {
 
     private String name;
     private double value;
+    private int color;
 
     public String getName() {
         return name;
@@ -25,4 +26,11 @@ public class ChartValueBean {
         this.value = value;
     }
 
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
 }
