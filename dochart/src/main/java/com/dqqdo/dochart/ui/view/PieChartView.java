@@ -101,6 +101,12 @@ public class PieChartView extends View implements View.OnTouchListener {
     private int descTextColor = Color.WHITE;
     // 描述文本线段宽度
     private float descTextLineWidth = 170;
+    // 圆心宽度
+    private int circleCenterRadius = 20;
+    // 描述文本线段宽度
+    private int descTextLineStroke = 5;
+    // 描述文本字体大小
+    private int descTextSize = 30;
 
     public IPieClickListener getPieClickListener() {
         return pieClickListener;
@@ -162,6 +168,32 @@ public class PieChartView extends View implements View.OnTouchListener {
     public void setDescTextLineWidth(float descTextLineWidth) {
         this.descTextLineWidth = descTextLineWidth;
     }
+
+
+    public int getDescTextLineStroke() {
+        return descTextLineStroke;
+    }
+
+    public void setDescTextLineStroke(int descTextLineStroke) {
+        this.descTextLineStroke = descTextLineStroke;
+    }
+
+    public int getCircleCenterRadius() {
+        return circleCenterRadius;
+    }
+
+    public void setCircleCenterRadius(int circleCenterRadius) {
+        this.circleCenterRadius = circleCenterRadius;
+    }
+
+    public int getDescTextSize() {
+        return descTextSize;
+    }
+
+    public void setDescTextSize(int descTextSize) {
+        this.descTextSize = descTextSize;
+    }
+
 
     /***************************** 内部实现 ******************************/
 
@@ -273,7 +305,6 @@ public class PieChartView extends View implements View.OnTouchListener {
                 return 3;
             }
         }
-
     }
 
 
@@ -334,17 +365,16 @@ public class PieChartView extends View implements View.OnTouchListener {
         mPaint.setColor(Color.RED);
 
         mClearPaint = new Paint();
-        mClearPaint.setStrokeWidth(20);
+        mClearPaint.setStrokeWidth(circleCenterRadius);
 
         mPaintLine = new Paint();
         mPaintLine.setStyle(Paint.Style.FILL);
-        mPaintLine.setStrokeWidth(5);
+        mPaintLine.setStrokeWidth(descTextLineStroke);
         mPaintLine.setColor(descTextColor);
         mPaintLine.setTextAlign(Paint.Align.CENTER);
-        mPaintLine.setTextSize(30);
+        mPaintLine.setTextSize(descTextSize);
 
         clearMode = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
-
 
 
     }
@@ -451,9 +481,7 @@ public class PieChartView extends View implements View.OnTouchListener {
         width = getWidth();
         height = getHeight();
 
-        mPaint.setXfermode(null);
 
-        DoLog.d("dqqdo","index  ---  " + index);
 
         center[0] = width / 2;
         center[1] = height / 2;
@@ -465,15 +493,15 @@ public class PieChartView extends View implements View.OnTouchListener {
         bottom = center[1] + radius;
 
         circleRadius = (right - left) / 2;
-
         bigRect.set(left, top, right, bottom);
 
 
+
+
+        mPaint.setXfermode(null);
+
         // 判断是否当前单元下标位置是否有已经绘制过的区域
         float circle = 0;
-
-
-
 
         for (int i = 0; i < maxIndex; i++) {
 
