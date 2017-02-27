@@ -21,11 +21,9 @@ import java.util.List;
  */
 public class BarChartActivity extends BaseActivity {
 
-    private PieChartView pieChartView;
 
     @Override
     protected void initView() {
-        pieChartView = (PieChartView) findViewById(R.id.pie_chart_view);
 
     }
 

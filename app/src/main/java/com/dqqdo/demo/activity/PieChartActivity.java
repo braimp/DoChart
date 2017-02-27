@@ -8,7 +8,9 @@ import android.support.annotation.RequiresApi;
 import com.dqqdo.demo.R;
 import com.dqqdo.dobase.BaseActivity;
 import com.dqqdo.dobase.DoLog;
+import com.dqqdo.dobase.DoToast;
 import com.dqqdo.dochart.ui.view.PieChartView;
+import com.dqqdo.dochart.ui.view.listener.IPieClickListener;
 
 import java.util.List;
 
@@ -24,7 +26,15 @@ public class PieChartActivity extends BaseActivity {
     @Override
     protected void initView() {
         pieChartView = (PieChartView) findViewById(R.id.pie_chart_view);
-        pieChartView.setHasLabel(true);
+        pieChartView.setHasLabel(false);
+        pieChartView.setAnim(true);
+        pieChartView.setTextLineCircleRadius(6);
+        pieChartView.setPieClickListener(new IPieClickListener() {
+            @Override
+            public void onItemClick(int index) {
+                DoToast.shortToast(PieChartActivity.this,"当前位置:" + index);
+            }
+        });
     }
 
     @Override

@@ -17,6 +17,7 @@ import android.view.View;
 import com.dqqdo.dobase.DoLog;
 import com.dqqdo.dobase.DoToast;
 import com.dqqdo.dochart.data.ChartValueBean;
+import com.dqqdo.dochart.ui.view.listener.IPieClickListener;
 
 import java.util.ArrayList;
 
@@ -32,8 +33,7 @@ public class PieChartView extends View implements View.OnTouchListener {
     private Paint mPaint;
     // 绘制背景区域
     private RectF bigRect = new RectF();
-    // 带圆点线上圆点的半径
-    private float textLineCircleR = 6f;
+
     // 绘制描述用到的line画笔对象
     private Paint mPaintLine;
     // 绘制圆心，分割线用到的画笔
@@ -49,11 +49,11 @@ public class PieChartView extends View implements View.OnTouchListener {
     // 圆心坐标
     private float[] center = new float[2];
     // 圆半径数值
-    private float pr = 0f;
+    private float circleRadius = 0f;
     // 有效绘制区域半径
-    private float fr = 0f;
+    private float radius = 0f;
     // 外圆半径（这里的外圆是用来绘制描述文字用到的虚拟圆）
-    private float tr = 0f;
+    private float bigRadius = 0f;
 
 
     // 圆的绘制进度
@@ -81,7 +81,6 @@ public class PieChartView extends View implements View.OnTouchListener {
     // 描述文本线段宽度
     private float textLineWidth = 170;
 
-
     // 响应点击事件 down事件下标
     private int downIndex = -1;
     // 响应点击事件 up事件下标
@@ -93,7 +92,20 @@ public class PieChartView extends View implements View.OnTouchListener {
     /***************************** 配置开关 ******************************/
     // 是否开启标签说明
     private boolean hasLabel;
+    // 是否展示动画
+    private boolean isAnim;
+    // 带圆指示线上圆点的半径
+    private float textLineCircleRadius = 6f;
+    // 饼状图点击事件监听器
+    private IPieClickListener pieClickListener;
 
+    public IPieClickListener getPieClickListener() {
+        return pieClickListener;
+    }
+
+    public void setPieClickListener(IPieClickListener pieClickListener) {
+        this.pieClickListener = pieClickListener;
+    }
 
     public boolean isHasLabel() {
         return hasLabel;
@@ -102,6 +114,29 @@ public class PieChartView extends View implements View.OnTouchListener {
     public void setHasLabel(boolean hasLabel) {
         this.hasLabel = hasLabel;
     }
+
+    public boolean isAnim() {
+        return isAnim;
+    }
+
+    public void setAnim(boolean anim) {
+        isAnim = anim;
+        if(isAnim){
+            index = 0;
+        }else{
+            index = maxIndex;
+        }
+    }
+
+    public float getTextLineCircleRadius() {
+        return textLineCircleRadius;
+    }
+
+    public void setTextLineCircleRadius(float textLineCircleRadius) {
+        this.textLineCircleRadius = textLineCircleRadius;
+    }
+
+    /***************************** 内部实现 ******************************/
 
 
     @Override
@@ -124,9 +159,11 @@ public class PieChartView extends View implements View.OnTouchListener {
                 upIndex = getPointUnitIndex(event.getX(), event.getY());
 
                 if (downIndex == upIndex && upIndex >= 0) {
-                    // 给出提示
-                    String name = beans.get(upIndex).getName();
-                    DoToast.shortToast(getContext(), name);
+
+                    if(pieClickListener != null){
+                        pieClickListener.onItemClick(upIndex);
+                    }
+
                 }
 
                 downIndex = -1;
@@ -150,7 +187,7 @@ public class PieChartView extends View implements View.OnTouchListener {
         double absY = (int) Math.abs((center[1] - y));
 
         double result = Math.hypot(absX, absY);
-        if (result > fr) {
+        if (result > radius) {
             // 大于半径，在圆外不作处理
             return -1;
         }
@@ -230,10 +267,6 @@ public class PieChartView extends View implements View.OnTouchListener {
             rectF.set(200,perNowY,500,perNowY + 30);
             mPaint.setColor(valueBean.getColor());
             canvas.drawRect(rectF,mPaint);
-
-//            Paint.FontMetrics fm = mPaintLine.getFontMetrics();
-//            float fontHeight = fm.bottom - fm.top;
-//            DoLog.d("fontHeight  ====  " + fontHeight);
 
             canvas.drawText(valueBean.getName(),600,perNowY + 25,mPaintLine);
         }
@@ -357,8 +390,6 @@ public class PieChartView extends View implements View.OnTouchListener {
 
         maxIndex = percents.size();
 
-
-
     }
 
     public PieChartView(Context context) {
@@ -392,17 +423,18 @@ public class PieChartView extends View implements View.OnTouchListener {
 
         mPaint.setXfermode(null);
 
+        DoLog.d("dqqdo","index  ---  " + index);
 
         center[0] = width / 2;
         center[1] = height / 2;
 
-        fr = width / 4.5f;
-        left = center[0] - fr;
-        top = center[1] - fr;
-        right = center[0] + fr;
-        bottom = center[1] + fr;
+        radius = width / 4.5f;
+        left = center[0] - radius;
+        top = center[1] - radius;
+        right = center[0] + radius;
+        bottom = center[1] + radius;
 
-        pr = (right - left) / 2;
+        circleRadius = (right - left) / 2;
 
         bigRect.set(left, top, right, bottom);
 
@@ -410,34 +442,33 @@ public class PieChartView extends View implements View.OnTouchListener {
         // 判断是否当前单元下标位置是否有已经绘制过的区域
         float circle = 0;
 
-        int percentNum = percents.size();
 
 
-        for (int i = 0; i < percentNum; i++) {
+
+        for (int i = 0; i < maxIndex; i++) {
 
             // 计算相关数据
-            if (index < percentNum) {
-
+            if (index < maxIndex || !isAnim) {
 
                 nowUnitPercent = percents.get(i);
                 circle += nowUnitPercent / 2;
 
                 // 绘制单元内部圆半径
-                circleLineF[i][0] = center[0] + (float) (fr * Math.cos(circle * Math.PI / 180));
-                circleLineF[i][1] = center[1] + (float) (fr * Math.sin(circle * Math.PI / 180));
+                circleLineF[i][0] = center[0] + (float) (radius * Math.cos(circle * Math.PI / 180));
+                circleLineF[i][1] = center[1] + (float) (radius * Math.sin(circle * Math.PI / 180));
 
                 // 虚拟外圈圆半径
-                tr = pr + textLineByCircleW;
-                circleLineT[i][0] = center[0] + (float) (tr * Math.cos(circle * Math.PI / 180));
-                circleLineT[i][1] = center[1] + (float) (tr * Math.sin(circle * Math.PI / 180));
+                bigRadius = circleRadius + textLineByCircleW;
+                circleLineT[i][0] = center[0] + (float) (bigRadius * Math.cos(circle * Math.PI / 180));
+                circleLineT[i][1] = center[1] + (float) (bigRadius * Math.sin(circle * Math.PI / 180));
 
                 // 刻度转回起点度数
                 circle -= nowUnitPercent / 2;
                 circle += nowUnitPercent;
 
                 // 计算分割线切点
-                circleLineStart[i][0] = center[0] + (float) (fr * Math.cos(circle * Math.PI / 180));
-                circleLineStart[i][1] = center[1] + (float) (fr * Math.sin(circle * Math.PI / 180));
+                circleLineStart[i][0] = center[0] + (float) (radius * Math.cos(circle * Math.PI / 180));
+                circleLineStart[i][1] = center[1] + (float) (radius * Math.sin(circle * Math.PI / 180));
 
 
             } else {
@@ -489,7 +520,7 @@ public class PieChartView extends View implements View.OnTouchListener {
         //mPaintLine.reset();
 
         // 绘制分割线，因为要绘制在最上层，所有要在每帧最后绘制
-        for (int i = 0; i < percentNum; i++) {
+        for (int i = 0; i < maxIndex; i++) {
 
             if (i == 0) {
                 // 第一个绘制单元会与最后一个绘制单元重叠，所以要绘制最后的间隔
@@ -569,19 +600,19 @@ public class PieChartView extends View implements View.OnTouchListener {
      * @param canvas 画布对象
      * @param index  当前描述单元下标
      */
-    private void drawDescLine(Canvas canvas, int index) {
+    private void drawDescLine(Canvas canvas, int pos) {
 
-        float fx = circleLineF[index][0];
-        float fy = circleLineF[index][1];
-        float tx = circleLineT[index][0];
-        float ty = circleLineT[index][1];
+        float fx = circleLineF[pos][0];
+        float fy = circleLineF[pos][1];
+        float tx = circleLineT[pos][0];
+        float ty = circleLineT[pos][1];
 
 
-        if (percents.get(index) == 0) {
+        if (percents.get(pos) == 0) {
             return;
         }
 
-        canvas.drawCircle(fx, fy, textLineCircleR, mPaintLine);
+        canvas.drawCircle(fx, fy, textLineCircleRadius, mPaintLine);
         canvas.drawLine(fx, fy, tx, ty, mPaintLine);
         float temp;
         if (tx > center[0]) {
@@ -590,9 +621,9 @@ public class PieChartView extends View implements View.OnTouchListener {
             temp = -textLineWidth;
         }
         canvas.drawLine(tx, ty, tx + temp, ty, mPaintLine);
-        canvas.drawCircle(tx + temp, ty, textLineCircleR, mPaintLine);
+        canvas.drawCircle(tx + temp, ty, textLineCircleRadius, mPaintLine);
         // 绘制单元描述文字
-        ChartValueBean nowBean = beans.get(index);
+        ChartValueBean nowBean = beans.get(pos);
         canvas.drawText(nowBean.getName() + "-" + nowBean.getValue(), tx + temp / 2, ty - 20, mPaintLine);
 
     }
