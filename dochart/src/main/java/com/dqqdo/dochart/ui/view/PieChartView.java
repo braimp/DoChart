@@ -15,7 +15,6 @@ import android.view.View;
 
 
 import com.dqqdo.dobase.DoLog;
-import com.dqqdo.dobase.DoToast;
 import com.dqqdo.dochart.data.ChartValueBean;
 import com.dqqdo.dochart.ui.view.listener.IPieClickListener;
 
@@ -76,10 +75,8 @@ public class PieChartView extends View implements View.OnTouchListener {
     private float[][] circleLineT;
     // 分割线切点坐标
     private float[][] circleLineStart;
-    //文字底部靠近圆环短线的长度
-    private float textLineByCircleW = 60;
-    // 描述文本线段宽度
-    private float textLineWidth = 170;
+
+
 
     // 响应点击事件 down事件下标
     private int downIndex = -1;
@@ -98,6 +95,12 @@ public class PieChartView extends View implements View.OnTouchListener {
     private float textLineCircleRadius = 6f;
     // 饼状图点击事件监听器
     private IPieClickListener pieClickListener;
+    //文字底部靠近圆环短线的长度
+    private float textLineCircleDistance = 60;
+    // 描述文本颜色
+    private int descTextColor = Color.WHITE;
+    // 描述文本线段宽度
+    private float descTextLineWidth = 170;
 
     public IPieClickListener getPieClickListener() {
         return pieClickListener;
@@ -134,6 +137,30 @@ public class PieChartView extends View implements View.OnTouchListener {
 
     public void setTextLineCircleRadius(float textLineCircleRadius) {
         this.textLineCircleRadius = textLineCircleRadius;
+    }
+
+    public float getTextLineCircleDistance() {
+        return textLineCircleDistance;
+    }
+
+    public void setTextLineCircleDistance(float textLineCircleDistance) {
+        this.textLineCircleDistance = textLineCircleDistance;
+    }
+
+    public int getDescTextColor() {
+        return descTextColor;
+    }
+
+    public void setDescTextColor(int descTextColor) {
+        this.descTextColor = descTextColor;
+    }
+
+    public float getDescTextLineWidth() {
+        return descTextLineWidth;
+    }
+
+    public void setDescTextLineWidth(float descTextLineWidth) {
+        this.descTextLineWidth = descTextLineWidth;
     }
 
     /***************************** 内部实现 ******************************/
@@ -295,6 +322,9 @@ public class PieChartView extends View implements View.OnTouchListener {
         this.setOnTouchListener(this);
     }
 
+
+
+
     /**
      * 初始化绘制相关属性
      */
@@ -309,7 +339,7 @@ public class PieChartView extends View implements View.OnTouchListener {
         mPaintLine = new Paint();
         mPaintLine.setStyle(Paint.Style.FILL);
         mPaintLine.setStrokeWidth(5);
-        mPaintLine.setColor(Color.WHITE);
+        mPaintLine.setColor(descTextColor);
         mPaintLine.setTextAlign(Paint.Align.CENTER);
         mPaintLine.setTextSize(30);
 
@@ -458,7 +488,7 @@ public class PieChartView extends View implements View.OnTouchListener {
                 circleLineF[i][1] = center[1] + (float) (radius * Math.sin(circle * Math.PI / 180));
 
                 // 虚拟外圈圆半径
-                bigRadius = circleRadius + textLineByCircleW;
+                bigRadius = circleRadius + textLineCircleDistance;
                 circleLineT[i][0] = center[0] + (float) (bigRadius * Math.cos(circle * Math.PI / 180));
                 circleLineT[i][1] = center[1] + (float) (bigRadius * Math.sin(circle * Math.PI / 180));
 
@@ -616,9 +646,9 @@ public class PieChartView extends View implements View.OnTouchListener {
         canvas.drawLine(fx, fy, tx, ty, mPaintLine);
         float temp;
         if (tx > center[0]) {
-            temp = textLineWidth;
+            temp = descTextLineWidth;
         } else {
-            temp = -textLineWidth;
+            temp = -descTextLineWidth;
         }
         canvas.drawLine(tx, ty, tx + temp, ty, mPaintLine);
         canvas.drawCircle(tx + temp, ty, textLineCircleRadius, mPaintLine);

@@ -26,9 +26,10 @@ public class PieChartActivity extends BaseActivity {
     @Override
     protected void initView() {
         pieChartView = (PieChartView) findViewById(R.id.pie_chart_view);
-        pieChartView.setHasLabel(false);
+        pieChartView.setHasLabel(true);
         pieChartView.setAnim(true);
         pieChartView.setTextLineCircleRadius(6);
+        pieChartView.setTextLineCircleDistance(50);
         pieChartView.setPieClickListener(new IPieClickListener() {
             @Override
             public void onItemClick(int index) {
