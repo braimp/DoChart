@@ -4,12 +4,15 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.FloatMath;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -17,8 +20,10 @@ import android.view.View;
 import com.dqqdo.dobase.DoLog;
 import com.dqqdo.dochart.data.ChartValueBean;
 import com.dqqdo.dochart.ui.view.listener.IPieClickListener;
+import com.dqqdo.dochart.util.MatrixUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * 绘制饼状图的自定义组件
@@ -77,7 +82,6 @@ public class PieChartView extends View implements View.OnTouchListener {
     private float[][] circleLineStart;
 
 
-
     // 响应点击事件 down事件下标
     private int downIndex = -1;
     // 响应点击事件 up事件下标
@@ -86,7 +90,9 @@ public class PieChartView extends View implements View.OnTouchListener {
     // 对应的数据实体类
     private ArrayList<ChartValueBean> beans = new ArrayList<>();
 
-    /***************************** 配置开关 ******************************/
+    /*****************************
+     * 配置开关
+     ******************************/
     // 是否开启标签说明
     private boolean hasLabel;
     // 是否展示动画
@@ -130,9 +136,9 @@ public class PieChartView extends View implements View.OnTouchListener {
 
     public void setAnim(boolean anim) {
         isAnim = anim;
-        if(isAnim){
+        if (isAnim) {
             index = 0;
-        }else{
+        } else {
             index = maxIndex;
         }
     }
@@ -195,8 +201,50 @@ public class PieChartView extends View implements View.OnTouchListener {
     }
 
 
-    /***************************** 内部实现 ******************************/
+    /*****************************
+     * 内部实现
+     ******************************/
 
+/*---放大所需要的变量---*/
+
+    /*定义三种状态分别是拖拽，放大和none*/
+    static final int NONE = 0;
+    static final int DRAG = 1;
+    static final int ZOOM = 2;
+    int mode = NONE;
+
+    /*绘制需要的两个矩阵，交替用于保存和数值变换*/
+    Matrix matrix = new Matrix();
+    Matrix savedMatrix = new Matrix();
+
+    /*放大过程中需要使用到的变量*/
+    PointF start = new PointF();
+    PointF mid = new PointF();
+    float oldDist = 1f;
+
+    float globalZoomNum;
+
+
+    /*确定两个指头之间的距离*/
+    private float spacing(MotionEvent event) {
+
+        float x = event.getX(0) - event.getX(1);
+        float y = event.getY(0) - event.getY(1);
+
+        return (float) Math.sqrt(x * x + y * y);
+    }
+
+
+    /*计算两个手指之间的中点*/
+    private void midPoint(PointF point, MotionEvent event) {
+
+        float x = event.getX(0) + event.getX(1);
+        float y = event.getY(0) + event.getY(1);
+        point.set(x / 2, y / 2);
+
+    }
+
+    float[] matrixValue = new float[9];
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -204,14 +252,80 @@ public class PieChartView extends View implements View.OnTouchListener {
         int eventType = event.getAction();
         index = maxIndex;
 
-        switch (eventType) {
+
+        int pointerCount = event.getPointerCount();
+
+
+        switch (eventType & MotionEvent.ACTION_MASK) {
 
             case MotionEvent.ACTION_DOWN:
+
+
                 downIndex = getPointUnitIndex(event.getX(), event.getY());
 
                 break;
 
+            case MotionEvent.ACTION_POINTER_DOWN:
+
+                /*获取当前矩阵的反向矩阵*/
+                float zoom = 1 / MatrixUtil.getScale(matrix);
+                float tx = MatrixUtil.getTransX(matrix);
+                float ty = MatrixUtil.getTransY(matrix);
+
+
+                start.set(event.getX(), event.getY());
+                oldDist = spacing(event);
+
+                if (oldDist > 10f) {
+                    savedMatrix.set(matrix);
+                    midPoint(mid, event);
+                    /*手指之间的间距大于10则进入放大模式*/
+                    mode = ZOOM;
+                }
+
+
+                break;
+
             case MotionEvent.ACTION_MOVE:
+
+                //if (pointerCount > 1) {
+                    if (mode == DRAG) {
+                        /*拖拽模式下，正常的矩阵平移*/
+                        matrix.set(savedMatrix);
+                        matrix.postTranslate(event.getX() - start.x, event.getY() - start.y);
+
+                    } else if (mode == ZOOM) {
+
+                        float newDist = spacing(event);
+
+                        if (newDist > 10f) {
+                            matrix.set(savedMatrix);
+                            float scale = newDist / oldDist;
+                            matrix.postScale(scale, scale, mid.x, mid.y);
+                        }
+
+                        matrix.postTranslate(event.getX() - start.x, event.getY() - start.y);
+                        globalZoomNum = MatrixUtil.getScale(matrix);
+
+                        matrix.getValues(matrixValue);
+                        DoLog.d("pointerCount  ====  " + Arrays.toString(matrixValue) );
+
+
+                        if (globalZoomNum < 1.0f) {
+                            //缩放动作，限制使用者无法缩放
+                            //resetMatrix(matrix);
+                            globalZoomNum = 1.0f;
+                        }
+
+
+                        if (globalZoomNum > 5.0f) {
+                            matrix.postScale(5 / globalZoomNum, 5 / globalZoomNum, mid.x, mid.y);
+                            globalZoomNum = 5.0f;
+                        }
+
+                    }
+                //}
+
 
                 break;
 
@@ -222,7 +336,7 @@ public class PieChartView extends View implements View.OnTouchListener {
 
                 if (downIndex == upIndex && upIndex >= 0) {
 
-                    if(pieClickListener != null){
+                    if (pieClickListener != null) {
                         pieClickListener.onItemClick(upIndex);
                     }
 
@@ -231,6 +345,20 @@ public class PieChartView extends View implements View.OnTouchListener {
                 downIndex = -1;
 
                 break;
+
+
+            case MotionEvent.ACTION_POINTER_UP:
+
+                if (event.getPointerCount() > 1) {
+                    /*将模式还原*/
+                    mode = NONE;
+                   // resetMatrix(matrix);
+
+                }
+
+
+                break;
+
         }
 
         invalidate();
@@ -315,23 +443,24 @@ public class PieChartView extends View implements View.OnTouchListener {
 
     /**
      * 绘制单元标签
+     *
      * @param canvas 画板对象
      */
-    private void drawLabel(Canvas canvas){
+    private void drawLabel(Canvas canvas) {
 
         mPaint.setXfermode(null);
         int colorSize = beans.size();
-        for(int i = 0; i < colorSize;i++){
+        for (int i = 0; i < colorSize; i++) {
 
             ChartValueBean valueBean = beans.get(i);
 
             RectF rectF = new RectF();
             int perNowY = (i + 1) * 50;
-            rectF.set(200,perNowY,500,perNowY + 30);
+            rectF.set(200, perNowY, 500, perNowY + 30);
             mPaint.setColor(valueBean.getColor());
-            canvas.drawRect(rectF,mPaint);
+            canvas.drawRect(rectF, mPaint);
 
-            canvas.drawText(valueBean.getName(),600,perNowY + 25,mPaintLine);
+            canvas.drawText(valueBean.getName(), 600, perNowY + 25, mPaintLine);
         }
 
     }
@@ -357,8 +486,6 @@ public class PieChartView extends View implements View.OnTouchListener {
     private void initView() {
         this.setOnTouchListener(this);
     }
-
-
 
 
     /**
@@ -482,6 +609,8 @@ public class PieChartView extends View implements View.OnTouchListener {
     @Override
     public void onDraw(Canvas canvas) {
 
+        canvas.setMatrix(matrix);
+
         // 准备数据
         width = getWidth();
         height = getHeight();
@@ -589,8 +718,6 @@ public class PieChartView extends View implements View.OnTouchListener {
             if (i < index) {
 
                 if (i == leftDownEffect || i == rightDownEffect) {
-
-                    DoLog.d("i ===  " + i);
                     // 增加点击效果
                     drawSplitLine(canvas, circleLineStart[i][0], circleLineStart[i][1], beans.get(downIndex).getColor());
                 } else {
@@ -601,16 +728,16 @@ public class PieChartView extends View implements View.OnTouchListener {
         }
 
 
-
-
         mPaint.setColor(Color.WHITE);
 
         // 绘制圆心
         mPaint.setXfermode(clearMode);
         canvas.drawCircle(center[0], center[1], 80, mPaint);
 
+
+
         // 绘制文字标签
-        if(hasLabel){
+        if (hasLabel) {
             drawLabel(canvas);
         }
 
@@ -630,9 +757,7 @@ public class PieChartView extends View implements View.OnTouchListener {
 
         startPercent = 0;
 
-        DoLog.d("index === " + index);
-
-        if(index <= maxIndex){
+        if (index <= maxIndex) {
             // 通知界面更新
             invalidate();
         }
@@ -663,6 +788,7 @@ public class PieChartView extends View implements View.OnTouchListener {
 
     /**
      * 绘制描述线段
+     *
      * @param canvas 画布对象
      * @param index  当前描述单元下标
      */
