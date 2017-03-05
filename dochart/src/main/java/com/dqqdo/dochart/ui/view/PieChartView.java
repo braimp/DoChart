@@ -202,11 +202,13 @@ public class PieChartView extends View implements View.OnTouchListener {
     public boolean onTouch(View v, MotionEvent event) {
 
         int eventType = event.getAction();
+        index = maxIndex;
 
         switch (eventType) {
 
             case MotionEvent.ACTION_DOWN:
                 downIndex = getPointUnitIndex(event.getX(), event.getY());
+
                 break;
 
             case MotionEvent.ACTION_MOVE:
@@ -214,6 +216,7 @@ public class PieChartView extends View implements View.OnTouchListener {
                 break;
 
             case MotionEvent.ACTION_UP:
+
 
                 upIndex = getPointUnitIndex(event.getX(), event.getY());
 
@@ -229,6 +232,8 @@ public class PieChartView extends View implements View.OnTouchListener {
 
                 break;
         }
+
+        invalidate();
 
         return true;
     }
@@ -584,6 +589,8 @@ public class PieChartView extends View implements View.OnTouchListener {
             if (i < index) {
 
                 if (i == leftDownEffect || i == rightDownEffect) {
+
+                    DoLog.d("i ===  " + i);
                     // 增加点击效果
                     drawSplitLine(canvas, circleLineStart[i][0], circleLineStart[i][1], beans.get(downIndex).getColor());
                 } else {
