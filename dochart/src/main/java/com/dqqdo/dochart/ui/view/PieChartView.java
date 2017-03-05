@@ -626,8 +626,10 @@ public class PieChartView extends View implements View.OnTouchListener {
             drawLabel(canvas);
         }
 
-        // 通知界面更新
-        invalidate();
+        if(index < maxIndex){
+            // 通知界面更新
+            invalidate();
+        }
 
 
     }

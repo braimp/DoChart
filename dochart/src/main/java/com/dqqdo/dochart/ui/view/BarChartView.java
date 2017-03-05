@@ -365,9 +365,11 @@ public class BarChartView extends View implements View.OnTouchListener{
             currentMark = 0;
         }
 
+        if(currentMark > 0){
+            // 更新界面
+            invalidate();
+        }
 
-        // 更新界面
-        invalidate();
 
     }
 
