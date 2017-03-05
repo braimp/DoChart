@@ -10,7 +10,7 @@ www.dqqdo.com
 演示图
 
 效果如图  
-![演示图1](https://github.com/zmobs/DoChart/blob/master/image/1.gif) 
+![演示图1](https://github.com/zmobs/DoChart/blob/master/image/scale.gif) 
 
 ![演示图2](https://github.com/zmobs/DoChart/blob/master/image/2.gif) 
 
