@@ -481,8 +481,6 @@ public class PieChartView extends View implements View.OnTouchListener {
         width = getWidth();
         height = getHeight();
 
-
-
         center[0] = width / 2;
         center[1] = height / 2;
 
@@ -494,9 +492,6 @@ public class PieChartView extends View implements View.OnTouchListener {
 
         circleRadius = (right - left) / 2;
         bigRect.set(left, top, right, bottom);
-
-
-
 
         mPaint.setXfermode(null);
 
@@ -599,21 +594,7 @@ public class PieChartView extends View implements View.OnTouchListener {
         }
 
 
-        // 调整数据，并判断数据有效性
-        if (mSweep > nowUnitPercent) {
-            // 绘制单元下标增加
-            // 已经超过了限制
-            if (index >= maxIndex) {
-                index = maxIndex;
-            } else {
-                index += 1;
-            }
-            // 单元内部绘制动画角度重置
-            mSweep = 1;
 
-        }
-
-        startPercent = 0;
 
         mPaint.setColor(Color.WHITE);
 
@@ -626,7 +607,25 @@ public class PieChartView extends View implements View.OnTouchListener {
             drawLabel(canvas);
         }
 
-        if(index < maxIndex){
+        // 调整数据，并判断数据有效性
+        if (mSweep > nowUnitPercent) {
+            // 绘制单元下标增加
+            // 已经超过了限制
+            if (index >= maxIndex) {
+                index = maxIndex + 1;
+            } else {
+                index += 1;
+            }
+            // 单元内部绘制动画角度重置
+            mSweep = 1;
+
+        }
+
+        startPercent = 0;
+
+        DoLog.d("index === " + index);
+
+        if(index <= maxIndex){
             // 通知界面更新
             invalidate();
         }
