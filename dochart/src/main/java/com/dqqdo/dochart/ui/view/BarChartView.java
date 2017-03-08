@@ -86,6 +86,51 @@ public class BarChartView extends View implements View.OnTouchListener{
     /***************************** 配置开关 ******************************/
     // 是否开启标签说明
     private boolean hasLabel;
+    // 坐标轴颜色
+    private int axisColor = Color.RED;
+    // 坐标轴宽度
+    private int axisStroke = 10;
+    // 坐标轴文字颜色
+    private int axisDescColor = Color.WHITE;
+
+    private String axisYUnit = "(单位)";
+
+    public String getAxisYUnit() {
+        return axisYUnit;
+    }
+
+    public void setAxisYUnit(String axisYUnit) {
+        this.axisYUnit = axisYUnit;
+    }
+
+    public int getAxisDescColor() {
+        return axisDescColor;
+    }
+
+    public void setAxisDescColor(int axisDescColor) {
+        this.axisDescColor = axisDescColor;
+    }
+
+    public int getAxisStroke() {
+        return axisStroke;
+    }
+
+    public void setAxisStroke(int axisStroke) {
+        this.axisStroke = axisStroke;
+    }
+
+    public int getAxisColor() {
+        return axisColor;
+    }
+
+    public void setAxisColor(int axisColor) {
+        this.axisColor = axisColor;
+    }
+
+    /***************************** end of 配置开关 ******************************/
+
+
+
 
     public BarChartView(Context context) {
         super(context);
@@ -384,15 +429,15 @@ public class BarChartView extends View implements View.OnTouchListener{
      */
     private void drawAxis(Canvas canvas){
 
-        mPaint.setColor(Color.RED);
-        mPaint.setStrokeWidth(10);
+        mPaint.setColor(axisColor);
+        mPaint.setStrokeWidth(axisStroke);
 
         canvas.drawLine(left,bottom,left,top - 50,mPaint);
         canvas.drawLine(left,bottom,right + 50,bottom,mPaint);
 
         mPaint.setTextSize(25);
         mPaint.setTextSkewX((float) -0.5);
-        mPaint.setColor(Color.WHITE);
+        mPaint.setColor(axisDescColor);
 
         for(int i = 0;i < dataNum;i++){
             String xDesc = beans.get(i).getName();
@@ -407,16 +452,16 @@ public class BarChartView extends View implements View.OnTouchListener{
         mPaint.setStyle(Paint.Style.STROKE);
 
         for(int i = 1; i <= yLineNum;i++){
+
             float lineY = bottom - i * perUnitYHeight;
 
             Path linePath = new Path();
             linePath.moveTo(left,lineY);
             linePath.lineTo(right,lineY);
-            //linePath.close();
             canvas.drawPath(linePath,mPaint);
 
             float descValue = i * perUnitYValue;
-            String descValueStr = descValue + "(单位)";
+            String descValueStr = descValue + axisYUnit;
             float textLength = textPaint.measureText(descValueStr);
             canvas.drawText(descValueStr,left - textLength,lineY,textPaint);
 
