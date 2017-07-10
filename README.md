@@ -9,11 +9,14 @@ www.dqqdo.com
 
 演示图
 
-效果如图  
+效果如图
+
+![演示图5](https://github.com/zmobs/DoChart/blob/master/image/5.gif)
+
 ![演示图1](https://github.com/zmobs/DoChart/blob/master/image/scale.gif) 
 
 ![演示图2](https://github.com/zmobs/DoChart/blob/master/image/2.gif) 
 
 ![演示图3](https://github.com/zmobs/DoChart/blob/master/image/3.png) 
 
-![演示图4](https://github.com/zmobs/DoChart/blob/master/image/4.png) 
+
