@@ -17,6 +17,8 @@ www.dqqdo.com
 
 效果如图
 
+![演示图6](https://github.com/zmobs/DoChart/blob/master/image/6.gif)
+
 ![演示图5](https://github.com/zmobs/DoChart/blob/master/image/5.gif)
 
 ![演示图1](https://github.com/zmobs/DoChart/blob/master/image/scale.gif) 

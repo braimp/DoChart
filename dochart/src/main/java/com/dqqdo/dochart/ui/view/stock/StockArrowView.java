@@ -1,4 +1,4 @@
-package com.dqqdo.dochart.ui.view;
+package com.dqqdo.dochart.ui.view.stock;
 
 import android.content.Context;
 import android.graphics.Canvas;
