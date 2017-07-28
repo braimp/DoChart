@@ -25,6 +25,8 @@ www.dqqdo.com
 
 ![演示图2](https://github.com/zmobs/DoChart/blob/master/image/2.gif) 
 
-![演示图3](https://github.com/zmobs/DoChart/blob/master/image/3.png) 
+![演示图3](https://github.com/zmobs/DoChart/blob/master/image/3.png)
+
+![演示图3](https://github.com/zmobs/DoChart/blob/master/image/vol.png)
 
 
