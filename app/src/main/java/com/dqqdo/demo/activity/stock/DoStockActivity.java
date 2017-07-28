@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dqqdo.demo.R;
+import com.dqqdo.dochart.ui.view.index.StockIndexView;
 import com.dqqdo.dochart.ui.view.stock.CandleBean;
 import com.dqqdo.dochart.ui.view.stock.KLineView;
 
@@ -22,14 +23,15 @@ import java.util.ArrayList;
  */
 public class DoStockActivity extends Activity {
 
-    private KLineView kline_view;
+//    private KLineView kline_view;
+    private StockIndexView stockIndexView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stock);
 
-        kline_view = (KLineView) findViewById(R.id.kline_view);
+        stockIndexView = (StockIndexView) findViewById(R.id.kline_view);
 
 
         InputStream is = null;
@@ -150,8 +152,8 @@ public class DoStockActivity extends Activity {
         }
 
 
-        kline_view.setBeans(beans);
-        kline_view.invalidate();
+        stockIndexView.setBeans(beans);
+        stockIndexView.invalidate();
 
 
     }
