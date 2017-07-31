@@ -17,9 +17,18 @@ import java.util.List;
 public interface IndexStrategy {
 
 
+    /**
+     * 设置集合数据
+     * @param candles 数据集合
+     */
     void setData(ArrayList<CandleBean> candles);
 
-    int getDataSize();
+    /**
+     * 获取数据集合
+     * @return 数据集合
+     */
+    ArrayList<CandleBean> getData();
+
 
     /**
      * 计算公式关键点
@@ -32,6 +41,18 @@ public interface IndexStrategy {
      * @return 字符串描述数组
      */
     String[] getDescYStr();
+
+    /**
+     * 获取x轴描述文本
+     * @return 文本数字
+     */
+    String[] getDescXStr();
+
+    /**
+     * 获取x轴描述文本对应坐标
+     * @return x坐标数组
+     */
+    Float[] getDescX();
 
 
     /**
@@ -54,6 +75,8 @@ public interface IndexStrategy {
      * @return 指标公式
      */
     String getIndexFormula();
+
+
 
 
 }

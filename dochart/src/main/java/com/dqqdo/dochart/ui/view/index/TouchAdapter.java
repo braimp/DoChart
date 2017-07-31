@@ -14,7 +14,7 @@ import com.dqqdo.dochart.util.LogUtil;
 public class TouchAdapter {
 
     // 当前的策略对象
-    private IndexStrategy indexStrategy;
+    private VolIndexStrategy indexStrategy;
 
     // 手势滑动过程中最小移动量
     private static final int minMoveNum = 10;
@@ -70,15 +70,12 @@ public class TouchAdapter {
                 // 浏览模式
                 if (viewModel == StockIndexView.ViewModel.SHOW_MODEL) {
 
-                    LogUtil.d("moveX  ---  " + moveX);
-                    LogUtil.d("startCandleIndex  ---  " + startCandleIndex);
 
                     if (moveX > minMoveNum) {
 
                         if (startCandleIndex <= 0) {
                             // 已经最大了。不做处理
                             startCandleIndex = 0;
-                            return true;
                         } else {
                             startCandleIndex -= 1;
                             endCandleIndex -= 1;
@@ -87,21 +84,22 @@ public class TouchAdapter {
 
                         callback.onCandleIndexChanged(startCandleIndex,endCandleIndex);
 
+
                     } else if (moveX < -minMoveNum) {
+
 
                         int dataSize = indexStrategy.getDataSize();
                         if (endCandleIndex >= dataSize) {
                             // 已经最大了。不做处理
                             endCandleIndex = dataSize;
-                            callback.onCandleIndexChanged(startCandleIndex,endCandleIndex);
-                            return true;
+
                         } else {
                             startCandleIndex += 1;
                             endCandleIndex += 1;
                             lastX = event.getX();
                         }
-                        LogUtil.d("startCandleIndex  ---  " + startCandleIndex);
-                        LogUtil.d("endCandleIndex  ---  " + endCandleIndex);
+
+                        callback.onCandleIndexChanged(startCandleIndex,endCandleIndex);
 
                     } else {
                         // 未形成有效动作

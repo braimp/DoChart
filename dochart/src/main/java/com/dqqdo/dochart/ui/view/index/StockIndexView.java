@@ -50,8 +50,7 @@ public class StockIndexView extends View {
     private float leftHeightNum;
 
 
-    // 绘制KLine的主画笔
-    Paint mPaint = new Paint();
+
 
     // status左上角坐标点
     PointF statusLeftTopPoint;
@@ -163,7 +162,6 @@ public class StockIndexView extends View {
         }
 
         if (beans != null && beans.size() > 0) {
-            initPaint();
             initPoint();
         }
 
@@ -175,7 +173,7 @@ public class StockIndexView extends View {
             startCandleIndex = startIndex;
             endCandleIndex = endIndex;
 
-            updateAreaCandle();
+            updateByFrameChange();
             invalidate();
         }
 
@@ -196,22 +194,11 @@ public class StockIndexView extends View {
         @Override
         public void onSelectChange(PointF pointF) {
             clickPoint = pointF;
-            updateAreaCandle();
+            updateByFrameChange();
             invalidate();
         }
     };
 
-    /**
-     * 初始化画笔相关
-     */
-    private void initPaint() {
-
-        mPaint = new Paint();
-        mPaint.setStrokeWidth(5);
-        mPaint.setColor(Color.BLUE);
-
-
-    }
 
 
 
@@ -262,7 +249,7 @@ public class StockIndexView extends View {
         indexAdapter.updateViewPort(viewport);
         axisAdapter.updateViewPort(axisRectF,statusRectF);
 
-        updateAreaCandle();
+        updateByFrameChange();
 
     }
 
@@ -280,9 +267,9 @@ public class StockIndexView extends View {
 
 
     /**
-     * 更新展示窗口的蜡烛图
+     * 更新展示窗口
      */
-    private void updateAreaCandle() {
+    private void updateByFrameChange() {
         indexAdapter.updateByFrameChange(startCandleIndex,endCandleIndex);
         axisAdapter.updateByFrameChange();
     }
@@ -304,12 +291,12 @@ public class StockIndexView extends View {
         axisAdapter.drawAxis(canvas);
         axisAdapter.drawAxisDesc(canvas);
         // 绘制指标
-        indexAdapter.drawIndex(canvas,mPaint);
+        indexAdapter.drawIndex(canvas);
 
 
         // 绘制模式反馈
         if (viewModel == ViewModel.CHOOSE_MODEL) {
-            indexAdapter.drawSelectIndex(canvas,mPaint,clickPoint);
+            indexAdapter.drawSelectIndex(canvas,clickPoint);
         }
 
 

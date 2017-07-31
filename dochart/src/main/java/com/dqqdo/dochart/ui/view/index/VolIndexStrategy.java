@@ -26,18 +26,28 @@ public class VolIndexStrategy implements IndexStrategy {
     private long maxHigh;
     // 当前选中区域的最小数值
     private long minLow;
+
     // 指标数据集合，保留一屏幕
     private List<VolDO> vols;
+    // 窗口绘制信息
+    private RectF mViewPort;
+    // 数据集合
+    private ArrayList<CandleBean> candles;
+
 
     // Y轴描述的五档 文本
     private String[] descYStr = new String[5];
-
-    // Y轴描述的五档 文本
+    // X轴描述的五档 文本
     private String[] arrayDescXStr;
+    // 五档文本的X坐标
     private Float[] arrayDescX;
 
+    // 文本绘制画笔
     Paint textPaint;
+    // 背景绘制画笔
     Paint bgPaint;
+
+
 
     VolIndexStrategy(){
         textPaint = new Paint();
@@ -49,7 +59,9 @@ public class VolIndexStrategy implements IndexStrategy {
     }
 
 
-
+    /**
+     * 指标绘制过程中需要用到的DataObject类
+     */
     class VolDO {
 
         private long volValue;
@@ -82,16 +94,16 @@ public class VolIndexStrategy implements IndexStrategy {
         }
     }
 
+
     @Override
     public String[] getDescYStr() {
         return descYStr;
     }
-
-
+    @Override
     public String[] getDescXStr() {
         return arrayDescXStr;
     }
-
+    @Override
     public Float[] getDescX() {
         return arrayDescX;
     }
@@ -113,10 +125,13 @@ public class VolIndexStrategy implements IndexStrategy {
 
         }
 
-
     }
 
-
+    /**
+     * 判断其是否是对选中的指标
+     * @param pointF
+     * @return
+     */
     public int getSelectIndex(PointF pointF) {
         int perUnitWidth = StockIndexView.candleWidth + StockIndexView.candleSpace;
         float viewDistance = pointF.x - mViewPort.left;
@@ -125,6 +140,12 @@ public class VolIndexStrategy implements IndexStrategy {
     }
 
 
+    /**
+     * 绘制已经选中的指标
+     * @param canvas
+     * @param paint
+     * @param index
+     */
     public void drawSelectIndex(Canvas canvas, Paint paint, int index) {
 
         if(index < 0){
@@ -189,9 +210,7 @@ public class VolIndexStrategy implements IndexStrategy {
     }
 
 
-    private RectF mViewPort;
 
-    private ArrayList<CandleBean> candles;
 
 
     @Override
@@ -199,14 +218,8 @@ public class VolIndexStrategy implements IndexStrategy {
         this.candles = data;
     }
 
-    @Override
-    public int getDataSize() {
-        if(candles == null){
-            return 0;
-        }
-        return candles.size();
-    }
 
+    @Override
     public ArrayList<CandleBean> getData(){
         return candles;
     }
@@ -321,5 +334,16 @@ public class VolIndexStrategy implements IndexStrategy {
     public String getIndexFormula() {
         return "VOL = 当天成交量";
     }
+
+
+    public int getDataSize(){
+
+        if(candles == null){
+            return 0;
+        }
+
+        return candles.size();
+    }
+
 
 }
