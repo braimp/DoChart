@@ -14,7 +14,7 @@ import java.util.List;
 
 
 /**
- * 指标适配器
+ * 指标数据 适配器
  * 作者：duqingquan
  * 时间：2017/7/21 16:44
  */
@@ -26,6 +26,7 @@ public class IndexAdapter {
     private List<CandleBean> portData;
 
     RectF mViewPort;
+
 
     public IndexAdapter(VolIndexStrategy strategy){
         this.volIndexStrategy = strategy;

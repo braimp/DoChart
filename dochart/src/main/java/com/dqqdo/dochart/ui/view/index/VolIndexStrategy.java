@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * vol 指标策略
+ * vol 指标策略，负责核心计算部分
  * 作者：duqingquan
  * 时间：2017/7/21 16:23
  */
@@ -47,7 +47,6 @@ public class VolIndexStrategy implements IndexStrategy {
         bgPaint = new Paint();
         bgPaint.setColor(Color.RED);
     }
-
 
 
 

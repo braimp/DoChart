@@ -1,17 +1,10 @@
 package com.dqqdo.dochart.ui.view.index;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.PointF;
-import android.graphics.RectF;
 import android.view.MotionEvent;
-import android.widget.Toast;
 
-import com.dqqdo.dochart.ui.view.stock.CandleBean;
 import com.dqqdo.dochart.util.LogUtil;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * touch事件 适配器
@@ -30,10 +23,9 @@ public class TouchAdapter {
     // 用来判断点击手势，记录本地点击动作的落下坐标
     private float downX;
     private float downY;
-
-
-
+    // 发生点击事件时点对象
     private PointF clickPoint;
+
 
     TouchAdapter(VolIndexStrategy strategy){
         indexStrategy = strategy;
@@ -50,6 +42,15 @@ public class TouchAdapter {
     }
 
 
+    /**
+     * 响应点击事件
+     * @param event
+     * @param viewModel
+     * @param startCandleIndex
+     * @param endCandleIndex
+     * @param callback
+     * @return
+     */
     public boolean doTouchEvent(MotionEvent event,StockIndexView.ViewModel viewModel,int startCandleIndex,int endCandleIndex,TouchCallback callback){
 
         clickPoint = new PointF();

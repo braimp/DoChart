@@ -286,7 +286,6 @@ public class StockIndexView extends View {
 
         return touchAdapter.doTouchEvent(event,viewModel,startCandleIndex,endCandleIndex,touchCallback);
 
-
     }
 
 
@@ -296,10 +295,8 @@ public class StockIndexView extends View {
      * 更新展示窗口的蜡烛图
      */
     private void updateAreaCandle() {
-
         indexAdapter.updateArea(startCandleIndex,endCandleIndex);
         axisAdapter.updateByFrameChange();
-
     }
 
 
