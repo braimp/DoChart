@@ -79,27 +79,24 @@ public class StockIndexView extends View {
 
 
 
-    // Y轴描述的五档 坐标
-    private float descY[];
-    // Y轴描述的五档 文本
-    private String descYStr[];
-
-    // Y轴描述的五档 坐标
-    private Float descX[];
-    // Y轴描述的五档 文本
-    private String descXStr[];
 
 
     // Candle数据
     private ArrayList<CandleBean> beans;
 
+    // 最外层的有效区域，除此以外的区域都是边角料
+    RectF validRect = new RectF();
+
+
+
+
+    private VolIndexStrategy volIndexStrategy;
     // 指标适配器
     IndexAdapter indexAdapter;
     // 坐标轴适配器
-    AxisAdapter axisAdapter = new AxisAdapter();
+    AxisAdapter axisAdapter;
 
-    // 最外层的有效区域，除此以外的区域都是边角料
-    RectF validRect = new RectF();
+
 
     /**
      * 组件模式
@@ -136,14 +133,16 @@ public class StockIndexView extends View {
     }
 
 
-    private VolIndexStrategy volIndexStrategy;
+    private TouchAdapter touchAdapter;
 
     private void initData(){
 
         volIndexStrategy = new VolIndexStrategy();
         volIndexStrategy.setData(beans);
+
         touchAdapter = new TouchAdapter(volIndexStrategy);
         indexAdapter = new IndexAdapter(volIndexStrategy);
+        axisAdapter = new AxisAdapter(volIndexStrategy);
 
     }
 
@@ -256,18 +255,13 @@ public class StockIndexView extends View {
         endCandleIndex = beans.size() - 1;
         startCandleIndex = endCandleIndex - unitNum;
 
-        // 计算Y轴五档
-        descY = new float[5];
-
-        float perYSpace = drawHeight / 5;
-
-        for (int i = 0; i < 5; i++) {
-            descY[i] = statusLeftTopPoint.y + perYSpace * i;
-        }
 
 
         // axis rect
         RectF axisRectF = new RectF(validRect);
+        RectF statusRectF = new RectF(validRect);
+        statusRectF.bottom = statusLeftTopPoint.y;
+
 
         // index rect
         RectF viewport = new RectF();
@@ -276,100 +270,21 @@ public class StockIndexView extends View {
         viewport.bottom = validRect.bottom;
         viewport.right = statusRightTopPoint.x;
 
+
         indexAdapter.updateViewPort(viewport);
-        axisAdapter.updateViewPort(axisRectF);
+        axisAdapter.updateViewPort(axisRectF,statusRectF);
 
         updateAreaCandle();
 
     }
 
 
-    private TouchAdapter touchAdapter;
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
         return touchAdapter.doTouchEvent(event,viewModel,startCandleIndex,endCandleIndex,touchCallback);
-
-//        switch (event.getAction()) {
-//            case MotionEvent.ACTION_DOWN:
-//                // 判断左滑还是右滑
-//                lastX = event.getX();
-//                downX = event.getX();
-//                downY = event.getY();
-//                break;
-//            case MotionEvent.ACTION_MOVE:
-//                // 判断左滑还是右滑
-//                float moveX = event.getX() - lastX;
-//
-//                if (viewModel == ViewModel.SHOW_MODEL) {
-//                    // 浏览模式
-//                    if (moveX > minMoveNum) {
-//                        if (startCandleIndex <= 0) {
-//                            // 已经最大了。不做处理
-//                            startCandleIndex = 0;
-//                            Toast.makeText(mContext, "我们是有底线的", Toast.LENGTH_SHORT).show();
-//                            return true;
-//                        } else {
-//                            startCandleIndex -= 1;
-//                            endCandleIndex -= 1;
-//                            updateAreaCandle();
-//                            invalidate();
-//                            lastX = event.getX();
-//                        }
-//
-//
-//                    } else if (moveX < -minMoveNum) {
-//
-//                        if (endCandleIndex >= beans.size()) {
-//                            // 已经最大了。不做处理
-//                            endCandleIndex = beans.size();
-//                            Toast.makeText(mContext, "我们是有底线的", Toast.LENGTH_SHORT).show();
-//                            return true;
-//                        } else {
-//                            startCandleIndex += 1;
-//                            endCandleIndex += 1;
-//                            updateAreaCandle();
-//                            invalidate();
-//                            lastX = event.getX();
-//                        }
-//
-//                    } else {
-//                        // 未形成有效动作
-//                    }
-//                } else {
-//                    // 选择模式
-//                    clickPoint.set(event.getX(), event.getY());
-//                    invalidate();
-//                }
-//
-//
-//                break;
-//            case MotionEvent.ACTION_UP:
-//
-//                if (downX == event.getX() && downY == event.getY()) {
-//                    // 抬起和落点是一个坐标，则认为是一次点击事件
-//                    if (viewModel == ViewModel.SHOW_MODEL) {
-//                        viewModel = ViewModel.CHOOSE_MODEL;
-//                    } else {
-//                        viewModel = ViewModel.SHOW_MODEL;
-//                    }
-//                    LogUtil.d("点击事件");
-//
-//                    clickPoint.set(downX, downY);
-//                    invalidate();
-//                } else {
-//                    LogUtil.d("不是点击事件");
-//                }
-//
-//                // 判断左滑还是右滑
-//                lastX = 0;
-//                break;
-//            case MotionEvent.ACTION_CANCEL:
-//                // 判断左滑还是右滑
-//                lastX = 0;
-//                break;
-//        }
 
 
     }
@@ -383,9 +298,7 @@ public class StockIndexView extends View {
     private void updateAreaCandle() {
 
         indexAdapter.updateArea(startCandleIndex,endCandleIndex);
-        descYStr = indexAdapter.getDescYStr();
-        descX = indexAdapter.getDescX();
-        descXStr = indexAdapter.getDescXStr();
+        axisAdapter.updateByFrameChange();
 
     }
 
@@ -404,7 +317,7 @@ public class StockIndexView extends View {
 
         // 绘制坐标轴
         axisAdapter.drawAxis(canvas);
-        axisAdapter.drawAxisDesc(descY,descYStr,descX,descXStr,canvas);
+        axisAdapter.drawAxisDesc(canvas);
         // 绘制指标
         indexAdapter.drawIndex(canvas,mPaint);
 
@@ -414,8 +327,7 @@ public class StockIndexView extends View {
             indexAdapter.drawSelectIndex(canvas,mPaint,clickPoint);
         }
 
-        // 绘制描述文本
-        canvas.drawText(indexAdapter.getIndexDesc(),statusLeftTopPoint.x,statusLeftTopPoint.y,statusPaint);
+
 
 
     }

@@ -198,6 +198,9 @@ public class VolIndexStrategy implements IndexStrategy {
 
     @Override
     public int getDataSize() {
+        if(candles == null){
+            return 0;
+        }
         return candles.size();
     }
 

@@ -78,10 +78,7 @@ public class IndexAdapter {
 
 
 
-    public String getIndexDesc(){
-        String desc = "   " +  volIndexStrategy.getIndexName() + "： " + volIndexStrategy.getIndexFormula();
-        return desc;
-    }
+
 
 
 }
