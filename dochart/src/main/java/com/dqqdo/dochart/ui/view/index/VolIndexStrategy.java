@@ -48,6 +48,9 @@ public class VolIndexStrategy implements IndexStrategy {
         bgPaint.setColor(Color.RED);
     }
 
+
+
+
     class VolDO {
 
         private long volValue;
@@ -184,6 +187,19 @@ public class VolIndexStrategy implements IndexStrategy {
 
 
     private RectF mViewPort;
+
+    private ArrayList<CandleBean> candles;
+
+
+    @Override
+    public void setData(ArrayList<CandleBean> data) {
+        this.candles = data;
+    }
+
+    @Override
+    public int getDataSize() {
+        return candles.size();
+    }
 
     @Override
     public boolean calcFormulaPoint(List<CandleBean> portData, RectF viewPort) {

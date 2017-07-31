@@ -20,14 +20,15 @@ import java.util.List;
  */
 public class IndexAdapter {
 
+
     private VolIndexStrategy volIndexStrategy;
     private ArrayList<CandleBean> candles;
     private List<CandleBean> portData;
 
     RectF mViewPort;
 
-    public IndexAdapter(){
-        volIndexStrategy = new VolIndexStrategy();
+    public IndexAdapter(VolIndexStrategy strategy){
+        this.volIndexStrategy = strategy;
     }
 
 

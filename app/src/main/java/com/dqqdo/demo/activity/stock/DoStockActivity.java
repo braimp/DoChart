@@ -12,10 +12,13 @@ import com.dqqdo.demo.R;
 import com.dqqdo.dochart.ui.view.index.StockIndexView;
 import com.dqqdo.dochart.ui.view.stock.CandleBean;
 import com.dqqdo.dochart.ui.view.stock.KLineView;
+import com.dqqdo.dochart.util.LogUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * 作者：duqingquan
@@ -33,6 +36,12 @@ public class DoStockActivity extends Activity {
 
         stockIndexView = (StockIndexView) findViewById(R.id.kline_view);
 
+        initData();
+
+    }
+
+
+    private void initData(){
 
         InputStream is = null;
         ArrayList<CandleBean> beans = new ArrayList<>();
@@ -154,7 +163,5 @@ public class DoStockActivity extends Activity {
 
         stockIndexView.setBeans(beans);
         stockIndexView.invalidate();
-
-
     }
 }

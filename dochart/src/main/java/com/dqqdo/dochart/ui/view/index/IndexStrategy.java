@@ -6,6 +6,7 @@ import android.graphics.RectF;
 
 import com.dqqdo.dochart.ui.view.stock.CandleBean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -15,6 +16,10 @@ import java.util.List;
  */
 public interface IndexStrategy {
 
+
+    void setData(ArrayList<CandleBean> candles);
+
+    int getDataSize();
 
     /**
      * 计算公式关键点

@@ -28,7 +28,6 @@ public class StockIndexView extends View {
     private Context mContext;
 
 
-
     // 蜡烛线宽度
     public static final int candleWidth = 15;
     // 蜡烛线间隔量
@@ -45,13 +44,9 @@ public class StockIndexView extends View {
     public static final int topStatusSpace = 50;
 
 
-    // Candle数据
-    private ArrayList<CandleBean> beans;
-
-
     // 组件整体宽高
     private int viewWidth, viewHeight;
-    // 可绘制区域整体
+    // 可绘制区域整体（在KLine模式下，习惯性的使用有效高度的一般）
     private int drawWidth, drawHeight;
     // 顶部边界距离绘制Top边界的绝对数
     private float leftHeightNum;
@@ -79,25 +74,9 @@ public class StockIndexView extends View {
 
 
 
-    // 每像素对应的数值（有效绘制区域）
-    private double perPixelValue;
-    // 手势滑动过程中最小移动量
-    private static final int minMoveNum = 10;
-
-
-    // 用来判断滑动手势，记录本次手势的起始坐标
-    private float lastX;
-    // 用来判断点击手势，记录本地点击动作的落下坐标
-    private float downX;
-    private float downY;
     // 点击事件的坐标位置
     private PointF clickPoint = new PointF();
 
-
-    // 是否已经找到了包含点击数的下标
-    private boolean isFindContainDone = false;
-    // 点击数下标
-    private int clickCandleIndex = 0;
 
 
     // Y轴描述的五档 坐标
@@ -111,7 +90,13 @@ public class StockIndexView extends View {
     private String descXStr[];
 
 
-    IndexAdapter indexAdapter = new IndexAdapter();
+    // Candle数据
+    private ArrayList<CandleBean> beans;
+
+    // 指标适配器
+    IndexAdapter indexAdapter;
+    // 坐标轴适配器
+    AxisAdapter axisAdapter = new AxisAdapter();
 
     // 最外层的有效区域，除此以外的区域都是边角料
     RectF validRect = new RectF();
@@ -129,23 +114,39 @@ public class StockIndexView extends View {
     // 组件模式
     private ViewModel viewModel = ViewModel.SHOW_MODEL;
 
-    AxisAdapter axisAdapter = new AxisAdapter();
 
+    /**************************  构造函数  *********************************/
 
     public StockIndexView(Context context) {
         super(context);
         mContext = context;
+        initData();
     }
 
     public StockIndexView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
+        initData();
     }
 
     public StockIndexView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mContext = context;
+        initData();
     }
+
+
+    private VolIndexStrategy volIndexStrategy;
+
+    private void initData(){
+
+        volIndexStrategy = new VolIndexStrategy();
+        volIndexStrategy.setData(beans);
+        touchAdapter = new TouchAdapter(volIndexStrategy);
+        indexAdapter = new IndexAdapter(volIndexStrategy);
+
+    }
+
 
 
     public void setBeans(ArrayList<CandleBean> beans) {
@@ -178,6 +179,38 @@ public class StockIndexView extends View {
 
     }
 
+    TouchAdapter.TouchCallback touchCallback = new TouchAdapter.TouchCallback() {
+        @Override
+        public void onCandleIndexChanged(int startIndex, int endIndex) {
+            startCandleIndex = startIndex;
+            endCandleIndex = endIndex;
+
+            updateAreaCandle();
+            invalidate();
+        }
+
+        @Override
+        public void onClick(PointF pointF) {
+
+            if (viewModel == StockIndexView.ViewModel.SHOW_MODEL) {
+                viewModel = StockIndexView.ViewModel.CHOOSE_MODEL;
+            } else {
+                viewModel = StockIndexView.ViewModel.SHOW_MODEL;
+            }
+            clickPoint = pointF;
+
+            invalidate();
+
+        }
+
+        @Override
+        public void onSelectChange(PointF pointF) {
+            clickPoint = pointF;
+            updateAreaCandle();
+            invalidate();
+        }
+    };
+
     /**
      * 初始化画笔相关
      */
@@ -193,9 +226,6 @@ public class StockIndexView extends View {
 
     }
 
-
-
-    //
 
 
     /**
@@ -254,90 +284,94 @@ public class StockIndexView extends View {
     }
 
 
+    private TouchAdapter touchAdapter;
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                // 判断左滑还是右滑
-                lastX = event.getX();
-                downX = event.getX();
-                downY = event.getY();
-                break;
-            case MotionEvent.ACTION_MOVE:
-                // 判断左滑还是右滑
-                float moveX = event.getX() - lastX;
+        return touchAdapter.doTouchEvent(event,viewModel,startCandleIndex,endCandleIndex,touchCallback);
 
-                if (viewModel == ViewModel.SHOW_MODEL) {
-                    // 浏览模式
-                    if (moveX > minMoveNum) {
-                        if (startCandleIndex <= 0) {
-                            // 已经最大了。不做处理
-                            startCandleIndex = 0;
-                            Toast.makeText(mContext, "我们是有底线的", Toast.LENGTH_SHORT).show();
-                            return true;
-                        } else {
-                            startCandleIndex -= 1;
-                            endCandleIndex -= 1;
-                            updateAreaCandle();
-                            invalidate();
-                            lastX = event.getX();
-                        }
+//        switch (event.getAction()) {
+//            case MotionEvent.ACTION_DOWN:
+//                // 判断左滑还是右滑
+//                lastX = event.getX();
+//                downX = event.getX();
+//                downY = event.getY();
+//                break;
+//            case MotionEvent.ACTION_MOVE:
+//                // 判断左滑还是右滑
+//                float moveX = event.getX() - lastX;
+//
+//                if (viewModel == ViewModel.SHOW_MODEL) {
+//                    // 浏览模式
+//                    if (moveX > minMoveNum) {
+//                        if (startCandleIndex <= 0) {
+//                            // 已经最大了。不做处理
+//                            startCandleIndex = 0;
+//                            Toast.makeText(mContext, "我们是有底线的", Toast.LENGTH_SHORT).show();
+//                            return true;
+//                        } else {
+//                            startCandleIndex -= 1;
+//                            endCandleIndex -= 1;
+//                            updateAreaCandle();
+//                            invalidate();
+//                            lastX = event.getX();
+//                        }
+//
+//
+//                    } else if (moveX < -minMoveNum) {
+//
+//                        if (endCandleIndex >= beans.size()) {
+//                            // 已经最大了。不做处理
+//                            endCandleIndex = beans.size();
+//                            Toast.makeText(mContext, "我们是有底线的", Toast.LENGTH_SHORT).show();
+//                            return true;
+//                        } else {
+//                            startCandleIndex += 1;
+//                            endCandleIndex += 1;
+//                            updateAreaCandle();
+//                            invalidate();
+//                            lastX = event.getX();
+//                        }
+//
+//                    } else {
+//                        // 未形成有效动作
+//                    }
+//                } else {
+//                    // 选择模式
+//                    clickPoint.set(event.getX(), event.getY());
+//                    invalidate();
+//                }
+//
+//
+//                break;
+//            case MotionEvent.ACTION_UP:
+//
+//                if (downX == event.getX() && downY == event.getY()) {
+//                    // 抬起和落点是一个坐标，则认为是一次点击事件
+//                    if (viewModel == ViewModel.SHOW_MODEL) {
+//                        viewModel = ViewModel.CHOOSE_MODEL;
+//                    } else {
+//                        viewModel = ViewModel.SHOW_MODEL;
+//                    }
+//                    LogUtil.d("点击事件");
+//
+//                    clickPoint.set(downX, downY);
+//                    invalidate();
+//                } else {
+//                    LogUtil.d("不是点击事件");
+//                }
+//
+//                // 判断左滑还是右滑
+//                lastX = 0;
+//                break;
+//            case MotionEvent.ACTION_CANCEL:
+//                // 判断左滑还是右滑
+//                lastX = 0;
+//                break;
+//        }
 
 
-                    } else if (moveX < -minMoveNum) {
-
-                        if (endCandleIndex >= beans.size()) {
-                            // 已经最大了。不做处理
-                            endCandleIndex = beans.size();
-                            Toast.makeText(mContext, "我们是有底线的", Toast.LENGTH_SHORT).show();
-                            return true;
-                        } else {
-                            startCandleIndex += 1;
-                            endCandleIndex += 1;
-                            updateAreaCandle();
-                            invalidate();
-                            lastX = event.getX();
-                        }
-
-                    } else {
-                        // 未形成有效动作
-                    }
-                } else {
-                    // 选择模式
-                    clickPoint.set(event.getX(), event.getY());
-                    invalidate();
-                }
-
-
-                break;
-            case MotionEvent.ACTION_UP:
-
-                if (downX == event.getX() && downY == event.getY()) {
-                    // 抬起和落点是一个坐标，则认为是一次点击事件
-                    if (viewModel == ViewModel.SHOW_MODEL) {
-                        viewModel = ViewModel.CHOOSE_MODEL;
-                    } else {
-                        viewModel = ViewModel.SHOW_MODEL;
-                    }
-                    LogUtil.d("点击事件");
-
-                    clickPoint.set(downX, downY);
-                    invalidate();
-                } else {
-                    LogUtil.d("不是点击事件");
-                }
-
-                // 判断左滑还是右滑
-                lastX = 0;
-                break;
-            case MotionEvent.ACTION_CANCEL:
-                // 判断左滑还是右滑
-                lastX = 0;
-                break;
-        }
-
-        return true;
     }
 
 
@@ -360,9 +394,7 @@ public class StockIndexView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
 
-        isFindContainDone = false;
-
-        if (beans == null || !(beans.size() > 0)) {
+        if (beans == null || beans.size() <= 0) {
             canvas.drawColor(Color.BLUE);
             return;
         }
