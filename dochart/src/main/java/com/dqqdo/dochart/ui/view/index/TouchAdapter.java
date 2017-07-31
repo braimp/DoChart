@@ -82,12 +82,9 @@ public class TouchAdapter {
                         } else {
                             startCandleIndex -= 1;
                             endCandleIndex -= 1;
-
                             lastX = event.getX();
                         }
 
-                        LogUtil.d("startCandleIndex  ---  " + startCandleIndex);
-                        LogUtil.d("endCandleIndex  ---  " + endCandleIndex);
                         callback.onCandleIndexChanged(startCandleIndex,endCandleIndex);
 
                     } else if (moveX < -minMoveNum) {
@@ -96,6 +93,7 @@ public class TouchAdapter {
                         if (endCandleIndex >= dataSize) {
                             // 已经最大了。不做处理
                             endCandleIndex = dataSize;
+                            callback.onCandleIndexChanged(startCandleIndex,endCandleIndex);
                             return true;
                         } else {
                             startCandleIndex += 1;
@@ -104,7 +102,7 @@ public class TouchAdapter {
                         }
                         LogUtil.d("startCandleIndex  ---  " + startCandleIndex);
                         LogUtil.d("endCandleIndex  ---  " + endCandleIndex);
-                        callback.onCandleIndexChanged(startCandleIndex,endCandleIndex);
+
                     } else {
                         // 未形成有效动作
                     }

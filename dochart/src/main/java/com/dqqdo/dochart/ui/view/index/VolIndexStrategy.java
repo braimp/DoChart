@@ -100,6 +100,10 @@ public class VolIndexStrategy implements IndexStrategy {
     @Override
     public void drawIndex(Canvas canvas, Paint paint) {
 
+        if(vols == null){
+            return ;
+        }
+
         int volSize = vols.size();
         for (int i = 0; i < volSize; i++) {
 
@@ -201,6 +205,10 @@ public class VolIndexStrategy implements IndexStrategy {
             return 0;
         }
         return candles.size();
+    }
+
+    public ArrayList<CandleBean> getData(){
+        return candles;
     }
 
     @Override

@@ -20,11 +20,11 @@ import java.util.List;
  */
 public class IndexAdapter {
 
-
+    // 指标算法策略
     private VolIndexStrategy volIndexStrategy;
-    private ArrayList<CandleBean> candles;
+    // 当屏数据
     private List<CandleBean> portData;
-
+    // 视窗
     RectF mViewPort;
 
 
@@ -32,39 +32,32 @@ public class IndexAdapter {
         this.volIndexStrategy = strategy;
     }
 
-
-    public void setData(ArrayList<CandleBean> data){
-        this.candles = data;
-    }
-
-
+    /**
+     * 更新窗口信息
+     * @param viewport 可视区域
+     */
     public void updateViewPort(RectF viewport){
         mViewPort = viewport;
     }
 
-    public void updateArea(int startIndex,int endIndex){
+    /**
+     * 更新区域数据
+     * @param startIndex 开始选中位置坐标
+     * @param endIndex   结束坐标
+     */
+    public void updateByFrameChange(int startIndex, int endIndex){
 
-        portData = candles.subList(startIndex,endIndex);
-        if(mViewPort != null){
-            volIndexStrategy.calcFormulaPoint(portData,mViewPort);
+        ArrayList<CandleBean> allData = volIndexStrategy.getData();
+
+        if(allData != null && allData.size() > 0){
+            portData = allData.subList(startIndex,endIndex);
+            if(mViewPort != null){
+                volIndexStrategy.calcFormulaPoint(portData,mViewPort);
+            }
         }
-
     }
 
 
-    public String[] getDescYStr(){
-        return volIndexStrategy.getDescYStr();
-    }
-
-
-    public String[] getDescXStr(){
-        return volIndexStrategy.getDescXStr();
-    }
-
-
-    public Float[] getDescX(){
-        return volIndexStrategy.getDescX();
-    }
 
     public void drawIndex(Canvas canvas, Paint paint){
         volIndexStrategy.drawIndex(canvas, paint);

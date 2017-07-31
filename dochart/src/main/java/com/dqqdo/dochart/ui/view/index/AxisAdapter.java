@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.text.TextUtils;
 
 /**
  * 坐标轴 适配器
@@ -37,6 +38,10 @@ public class AxisAdapter {
     private String descXStr[];
 
 
+    /**
+     * 构造器
+     * @param strategy 指标策略
+     */
     public AxisAdapter(VolIndexStrategy strategy){
 
         this.volIndexStrategy = strategy;
@@ -94,18 +99,25 @@ public class AxisAdapter {
 
 
 
-
     /**
      * 绘制描述区域
      * @param canvas 画板
      */
     public void drawAxisDesc(Canvas canvas){
 
+
+        if(descXStr == null || descX == null || descY == null || descYStr == null){
+            return ;
+        }
+
         // 绘制Y轴描述文本
         // 绘制五档数值
         for (int i = 0; i < descY.length; i++) {
             float y = descY[i];
             String desc = descYStr[i];
+            if(TextUtils.isEmpty(desc)){
+                continue;
+            }
             float textWidth = statusPaint.measureText(desc);
             float x = mViewPort.left - textWidth;
             canvas.drawText(desc, x, y, statusPaint);
@@ -118,6 +130,9 @@ public class AxisAdapter {
         for(int i = 0; i < descX.length;i++){
             float x = descX[i];
             String desc = descXStr[i];
+            if(TextUtils.isEmpty(desc)){
+                continue;
+            }
             float y = mViewPort.bottom + textHeight;
             canvas.drawText(desc, x, y, statusPaint);
             // 绘制背景线段

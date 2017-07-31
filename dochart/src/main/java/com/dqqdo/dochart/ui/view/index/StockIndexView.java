@@ -10,10 +10,8 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import com.dqqdo.dochart.ui.view.stock.CandleBean;
-import com.dqqdo.dochart.util.LogUtil;
 
 import java.util.ArrayList;
 
@@ -54,8 +52,6 @@ public class StockIndexView extends View {
 
     // 绘制KLine的主画笔
     Paint mPaint = new Paint();
-    // 状态栏画笔
-    Paint statusPaint = new Paint();
 
     // status左上角坐标点
     PointF statusLeftTopPoint;
@@ -72,13 +68,8 @@ public class StockIndexView extends View {
     // 当前展示区域，总绘制单元数量
     private int unitNum;
 
-
-
     // 点击事件的坐标位置
     private PointF clickPoint = new PointF();
-
-
-
 
 
     // Candle数据
@@ -88,13 +79,14 @@ public class StockIndexView extends View {
     RectF validRect = new RectF();
 
 
-
-
+    // 算法策略
     private VolIndexStrategy volIndexStrategy;
     // 指标适配器
     IndexAdapter indexAdapter;
     // 坐标轴适配器
     AxisAdapter axisAdapter;
+    // touch适配器
+    private TouchAdapter touchAdapter;
 
 
 
@@ -133,13 +125,11 @@ public class StockIndexView extends View {
     }
 
 
-    private TouchAdapter touchAdapter;
+
 
     private void initData(){
 
         volIndexStrategy = new VolIndexStrategy();
-        volIndexStrategy.setData(beans);
-
         touchAdapter = new TouchAdapter(volIndexStrategy);
         indexAdapter = new IndexAdapter(volIndexStrategy);
         axisAdapter = new AxisAdapter(volIndexStrategy);
@@ -148,9 +138,10 @@ public class StockIndexView extends View {
 
 
 
+
     public void setBeans(ArrayList<CandleBean> beans) {
         this.beans = beans;
-        indexAdapter.setData(beans);
+        volIndexStrategy.setData(beans);
     }
 
 
@@ -219,9 +210,6 @@ public class StockIndexView extends View {
         mPaint.setStrokeWidth(5);
         mPaint.setColor(Color.BLUE);
 
-        statusPaint = new Paint();
-        statusPaint.setColor(Color.BLACK);
-        statusPaint.setTextSize(26);
 
     }
 
@@ -295,7 +283,7 @@ public class StockIndexView extends View {
      * 更新展示窗口的蜡烛图
      */
     private void updateAreaCandle() {
-        indexAdapter.updateArea(startCandleIndex,endCandleIndex);
+        indexAdapter.updateByFrameChange(startCandleIndex,endCandleIndex);
         axisAdapter.updateByFrameChange();
     }
 
