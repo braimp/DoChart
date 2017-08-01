@@ -22,14 +22,51 @@ public class MACDIndexStrategy extends IndexStrategy {
      */
     class MACDDO {
 
-        private long EMA12 = 0;
+        private double EMA12 = 0;
+        private double EMA26 = 0;
+        private double diff = 0;
+        private double dea = 0;
+        private double bar;
 
-        public long getEMA12() {
+
+        public double getBar() {
+            return bar;
+        }
+
+        public void setBar(double bar) {
+            this.bar = bar;
+        }
+
+        public double getDea() {
+            return dea;
+        }
+
+        public void setDea(double dea) {
+            this.dea = dea;
+        }
+
+        public double getEMA12() {
             return EMA12;
         }
 
-        public void setEMA12(long EMA12) {
+        public void setEMA12(double EMA12) {
             this.EMA12 = EMA12;
+        }
+
+        public double getEMA26() {
+            return EMA26;
+        }
+
+        public void setEMA26(double EMA26) {
+            this.EMA26 = EMA26;
+        }
+
+        public double getDiff() {
+            return diff;
+        }
+
+        public void setDiff(double diff) {
+            this.diff = diff;
         }
     }
 
@@ -57,17 +94,49 @@ public class MACDIndexStrategy extends IndexStrategy {
             if (candleBean != null) {
 
                 long close = candleBean.getClose();
-                long EMA12;
+                double EMA12;
+                double EMA26;
+                double dea;
+                double diff;
+                double macd;
                 if (i == 0) {
                     EMA12 = IndexCalculator.getEma(close, close, 12);
+                    EMA26 = IndexCalculator.getEma(close, close, 26);
+                    diff = 0;
+                    dea = 0;
+                    macd = 0;
+
+                    LogUtil.d("close   ----  " + close);
+                    LogUtil.d("EMA12   ----  " + EMA12);
+                    LogUtil.d("EMA26   ----  " + EMA26);
+                    LogUtil.d("diff   ----  " + diff);
                 } else {
+
                     MACDDO preDO = macddos.get(i - 1);
-                    long preEMA12 = preDO.getEMA12();
+                    double preEMA12 = preDO.getEMA12();
                     EMA12 = IndexCalculator.getEma(close, preEMA12, 12);
+                    double preEMA26 = preDO.getEMA26();
+                    EMA26 = IndexCalculator.getEma(close, preEMA26, 26);
+                    // diff
+                    diff = EMA12 - EMA26;
+                    // dea
+                    double preDea = preDO.getDea();
+                    dea = preDea * 8 / 10 + diff * 2 / 10;
+                    // macd
+                    macd = 2 * (diff - dea);
+
+
+
+
                 }
 
                 MACDDO macddo = new MACDDO();
                 macddo.setEMA12(EMA12);
+                macddo.setEMA26(EMA26);
+                macddo.setDiff(diff);
+                macddo.setDea(dea);
+                macddo.setBar(macd);
+
                 macddos.add(macddo);
 
             }
@@ -86,18 +155,23 @@ public class MACDIndexStrategy extends IndexStrategy {
 //         *
 //         */
         int dataSize = portData.size();
-        for(int i = 0; i < dataSize;i++){
+        for (int i = 0; i < dataSize; i++) {
             CandleBean candleBean = portData.get(i);
-            if(candleBean != null){
+            if (candleBean != null) {
                 String date = candleBean.getDateStr();
                 MACDDO macddo = macddos.get(i);
+
                 LogUtil.d("date  ----   " + date);
-                LogUtil.d("macddo  ----   " + macddo.getEMA12());
+                LogUtil.d("ema12  ----   " + macddo.getEMA12());
+                LogUtil.d("ema26  ----   " + macddo.getEMA26());
+                LogUtil.d("diff  ----   " + macddo.getDiff());
+                LogUtil.d("close  ----   " + candleBean.getClose());
+//                LogUtil.d("macddo  ----   " + macddo.getBar());
+
+
 
             }
         }
-
-
 
 
         return false;
