@@ -14,7 +14,7 @@ import com.dqqdo.dochart.util.LogUtil;
 public class TouchAdapter {
 
     // 当前的策略对象
-    private VolIndexStrategy indexStrategy;
+    private IndexStrategy indexStrategy;
 
     // 手势滑动过程中最小移动量
     private static final int minMoveNum = 10;
@@ -27,7 +27,7 @@ public class TouchAdapter {
     private PointF clickPoint;
 
 
-    TouchAdapter(VolIndexStrategy strategy){
+    TouchAdapter(IndexStrategy strategy){
         indexStrategy = strategy;
     }
 
@@ -86,9 +86,14 @@ public class TouchAdapter {
 
 
                     } else if (moveX < -minMoveNum) {
+                        int dataSize;
+                        if(indexStrategy.getData() == null){
+                            dataSize = 0;
+                        }else {
+                            dataSize = indexStrategy.getData().size();
+                        }
 
 
-                        int dataSize = indexStrategy.getDataSize();
                         if (endCandleIndex >= dataSize) {
                             // 已经最大了。不做处理
                             endCandleIndex = dataSize;

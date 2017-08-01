@@ -19,7 +19,7 @@ import java.util.List;
  * 作者：duqingquan
  * 时间：2017/7/21 16:23
  */
-public class VolIndexStrategy implements IndexStrategy {
+public class VolIndexStrategy extends IndexStrategy {
 
 
     // 当前选中区域的最大数值
@@ -31,8 +31,7 @@ public class VolIndexStrategy implements IndexStrategy {
     private List<VolDO> vols;
     // 窗口绘制信息
     private RectF mViewPort;
-    // 数据集合
-    private ArrayList<CandleBean> candles;
+
 
 
     // Y轴描述的五档 文本
@@ -140,12 +139,14 @@ public class VolIndexStrategy implements IndexStrategy {
     }
 
 
+
     /**
      * 绘制已经选中的指标
      * @param canvas
      * @param paint
      * @param index
      */
+    @Override
     public void drawSelectIndex(Canvas canvas, Paint paint, int index) {
 
         if(index < 0){
@@ -225,7 +226,10 @@ public class VolIndexStrategy implements IndexStrategy {
     }
 
     @Override
-    public boolean calcFormulaPoint(List<CandleBean> portData, RectF viewPort) {
+    public boolean calcFormulaPoint(int startIndex, int endIndex, RectF viewPort) {
+
+
+        List<CandleBean> portData = candles.subList(startIndex,endIndex);
 
         maxHigh = 0;
         minLow = 0;

@@ -3,7 +3,6 @@ package com.dqqdo.dochart.ui.view.index;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.annotation.Nullable;
@@ -79,7 +78,7 @@ public class StockIndexView extends View {
 
 
     // 算法策略
-    private VolIndexStrategy volIndexStrategy;
+    private IndexStrategy indexStrategy;
     // 指标适配器
     IndexAdapter indexAdapter;
     // 坐标轴适配器
@@ -128,10 +127,11 @@ public class StockIndexView extends View {
 
     private void initData(){
 
-        volIndexStrategy = new VolIndexStrategy();
-        touchAdapter = new TouchAdapter(volIndexStrategy);
-        indexAdapter = new IndexAdapter(volIndexStrategy);
-        axisAdapter = new AxisAdapter(volIndexStrategy);
+//        indexStrategy = new VolIndexStrategy();
+        indexStrategy = new MACDIndexStrategy();
+        touchAdapter = new TouchAdapter(indexStrategy);
+        indexAdapter = new IndexAdapter(indexStrategy);
+        axisAdapter = new AxisAdapter(indexStrategy);
 
     }
 
@@ -140,7 +140,7 @@ public class StockIndexView extends View {
 
     public void setBeans(ArrayList<CandleBean> beans) {
         this.beans = beans;
-        volIndexStrategy.setData(beans);
+        indexStrategy.setData(beans);
     }
 
 

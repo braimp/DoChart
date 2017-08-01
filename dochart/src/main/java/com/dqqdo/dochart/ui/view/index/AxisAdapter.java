@@ -25,7 +25,7 @@ public class AxisAdapter {
     Paint statusPaint;
 
     // 指标计算策略
-    private VolIndexStrategy volIndexStrategy;
+    private IndexStrategy volIndexStrategy;
 
     // Y轴描述的五档 坐标
     private float descY[];
@@ -42,7 +42,7 @@ public class AxisAdapter {
      * 构造器
      * @param strategy 指标策略
      */
-    public AxisAdapter(VolIndexStrategy strategy){
+    public AxisAdapter(IndexStrategy strategy){
 
         this.volIndexStrategy = strategy;
 
@@ -109,6 +109,14 @@ public class AxisAdapter {
         if(descXStr == null || descX == null || descY == null || descYStr == null){
             return ;
         }
+
+        if(descYStr.length != descY.length){
+            return ;
+        }
+        if(descXStr.length != descX.length){
+            return ;
+        }
+
 
         // 绘制Y轴描述文本
         // 绘制五档数值
