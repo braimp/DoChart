@@ -125,7 +125,14 @@ public class MACDIndexStrategy extends IndexStrategy {
                     // macd
                     macd = 2 * (diff - dea);
 
-
+//                    if(i < 10){
+                        LogUtil.d("******************");
+                        LogUtil.d("date   ----  " + candleBean.getDateStr());
+                        LogUtil.d("close   ----  " + close);
+                        LogUtil.d("diff   ----  " + diff);
+                        LogUtil.d("dea   ----  " + dea);
+                        LogUtil.d("macd   ----  " + macd);
+//                    }
 
 
                 }
@@ -161,11 +168,11 @@ public class MACDIndexStrategy extends IndexStrategy {
                 String date = candleBean.getDateStr();
                 MACDDO macddo = macddos.get(i);
 
-                LogUtil.d("date  ----   " + date);
-                LogUtil.d("ema12  ----   " + macddo.getEMA12());
-                LogUtil.d("ema26  ----   " + macddo.getEMA26());
-                LogUtil.d("diff  ----   " + macddo.getDiff());
-                LogUtil.d("close  ----   " + candleBean.getClose());
+//                LogUtil.d("date  ----   " + date);
+//                LogUtil.d("ema12  ----   " + macddo.getEMA12());
+//                LogUtil.d("ema26  ----   " + macddo.getEMA26());
+//                LogUtil.d("diff  ----   " + macddo.getDiff());
+//                LogUtil.d("close  ----   " + candleBean.getClose());
 //                LogUtil.d("macddo  ----   " + macddo.getBar());
 
 
