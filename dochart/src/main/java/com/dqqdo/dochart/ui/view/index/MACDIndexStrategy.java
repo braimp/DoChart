@@ -1,7 +1,9 @@
 package com.dqqdo.dochart.ui.view.index;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.RectF;
 
@@ -17,6 +19,20 @@ import java.util.List;
  */
 public class MACDIndexStrategy extends IndexStrategy {
 
+    MACDIndexStrategy() {
+        mPaint.setColor(Color.RED);
+        mPaint.setStrokeCap(Paint.Cap.ROUND);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeWidth(5);
+
+        deaPaint.setColor(Color.BLUE);
+        deaPaint.setStrokeCap(Paint.Cap.ROUND);
+        deaPaint.setStyle(Paint.Style.STROKE);
+        deaPaint.setStrokeWidth(5);
+
+
+    }
+
     /**
      * MACD指标 DATA Object
      */
@@ -28,46 +44,14 @@ public class MACDIndexStrategy extends IndexStrategy {
         private double dea = 0;
         private double bar;
 
+        /*****************绘制部分的关键数据*********************/
+        private float diffY;
+        private float deaY;
+        private float barY;
+        private float barColor;
+        private float x;
 
-        public double getBar() {
-            return bar;
-        }
 
-        public void setBar(double bar) {
-            this.bar = bar;
-        }
-
-        public double getDea() {
-            return dea;
-        }
-
-        public void setDea(double dea) {
-            this.dea = dea;
-        }
-
-        public double getEMA12() {
-            return EMA12;
-        }
-
-        public void setEMA12(double EMA12) {
-            this.EMA12 = EMA12;
-        }
-
-        public double getEMA26() {
-            return EMA26;
-        }
-
-        public void setEMA26(double EMA26) {
-            this.EMA26 = EMA26;
-        }
-
-        public double getDiff() {
-            return diff;
-        }
-
-        public void setDiff(double diff) {
-            this.diff = diff;
-        }
     }
 
     ArrayList<MACDDO> macddos;
@@ -106,43 +90,31 @@ public class MACDIndexStrategy extends IndexStrategy {
                     dea = 0;
                     macd = 0;
 
-                    LogUtil.d("close   ----  " + close);
-                    LogUtil.d("EMA12   ----  " + EMA12);
-                    LogUtil.d("EMA26   ----  " + EMA26);
-                    LogUtil.d("diff   ----  " + diff);
+
                 } else {
 
                     MACDDO preDO = macddos.get(i - 1);
-                    double preEMA12 = preDO.getEMA12();
+                    double preEMA12 = preDO.EMA12;
                     EMA12 = IndexCalculator.getEma(close, preEMA12, 12);
-                    double preEMA26 = preDO.getEMA26();
+                    double preEMA26 = preDO.EMA26;
                     EMA26 = IndexCalculator.getEma(close, preEMA26, 26);
                     // diff
                     diff = EMA12 - EMA26;
                     // dea
-                    double preDea = preDO.getDea();
+                    double preDea = preDO.dea;
                     dea = preDea * 8 / 10 + diff * 2 / 10;
                     // macd
                     macd = 2 * (diff - dea);
-
-//                    if(i < 10){
-                        LogUtil.d("******************");
-                        LogUtil.d("date   ----  " + candleBean.getDateStr());
-                        LogUtil.d("close   ----  " + close);
-                        LogUtil.d("diff   ----  " + diff);
-                        LogUtil.d("dea   ----  " + dea);
-                        LogUtil.d("macd   ----  " + macd);
-//                    }
 
 
                 }
 
                 MACDDO macddo = new MACDDO();
-                macddo.setEMA12(EMA12);
-                macddo.setEMA26(EMA26);
-                macddo.setDiff(diff);
-                macddo.setDea(dea);
-                macddo.setBar(macd);
+                macddo.EMA12 = EMA12;
+                macddo.EMA26 = EMA26;
+                macddo.diff = diff;
+                macddo.dea = dea;
+                macddo.bar = macd;
 
                 macddos.add(macddo);
 
@@ -151,10 +123,26 @@ public class MACDIndexStrategy extends IndexStrategy {
     }
 
 
+    // 当前选中区域的最大数值
+    private double maxHigh = 0;
+    // 当前选中区域的最小数值
+    private double minLow = 0;
+    RectF mViewPort;
+    List<CandleBean> portData;
+    // 0线所在的Y值
+    private float zeroY;
+
+    private int mStartIndex,mEndIndex;
+
     @Override
     public boolean calcFormulaPoint(int startIndex, int endIndex, RectF viewPort) {
 
-        List<CandleBean> portData = candles.subList(startIndex, endIndex);
+
+        mStartIndex = startIndex;
+        mEndIndex = endIndex;
+
+        mViewPort = viewPort;
+        portData = candles.subList(startIndex, endIndex);
 
 //        /**
 //         * 先计算EMA1和EMA2
@@ -162,26 +150,77 @@ public class MACDIndexStrategy extends IndexStrategy {
 //         *
 //         */
         int dataSize = portData.size();
-        for (int i = 0; i < dataSize; i++) {
-            CandleBean candleBean = portData.get(i);
-            if (candleBean != null) {
-                String date = candleBean.getDateStr();
-                MACDDO macddo = macddos.get(i);
+        for (int i = mStartIndex; i < mEndIndex; i++) {
 
-//                LogUtil.d("date  ----   " + date);
-//                LogUtil.d("ema12  ----   " + macddo.getEMA12());
-//                LogUtil.d("ema26  ----   " + macddo.getEMA26());
-//                LogUtil.d("diff  ----   " + macddo.getDiff());
-//                LogUtil.d("close  ----   " + candleBean.getClose());
-//                LogUtil.d("macddo  ----   " + macddo.getBar());
+            MACDDO macddo = macddos.get(i);
+            double diff = macddo.diff;
+            double dea = macddo.dea;
+            double macd = macddo.bar;
 
+            if (diff < minLow) {
+                minLow = diff;
+            }
+            if (dea < minLow) {
+                minLow = dea;
+            }
+            if (macd < minLow) {
+                minLow = macd;
+            }
 
-
+            if (diff > maxHigh) {
+                maxHigh = diff;
+            }
+            if (dea > maxHigh) {
+                maxHigh = dea;
+            }
+            if (macd > maxHigh) {
+                maxHigh = macd;
             }
         }
 
+        // 根据最大，最小数据，确认单位数值
+        double spaceValue = maxHigh - minLow;
+        float lineBoundHeight = viewPort.height();
+        double perPixelValue = (spaceValue / lineBoundHeight);
 
-        return false;
+
+        int j = 0;
+        // 计算指标业务数据集合
+        for (int i = startIndex; i < endIndex; i++,j++) {
+
+
+            // 最高价
+            MACDDO macddo = macddos.get(i);
+
+            double x = viewPort.left + (j * (StockIndexView.candleWidth + StockIndexView.candleSpace)) + StockIndexView.candleSpace;
+            macddo.x = (float) x;
+
+
+            double diffY = viewPort.bottom - (((macddo.diff - minLow)) / perPixelValue);
+            macddo.diffY = (float) diffY;
+            double deaY = viewPort.bottom - (((macddo.dea - minLow)) / perPixelValue);
+            macddo.deaY = (float) deaY;
+
+            double barY;
+            if (minLow < 0) {
+                // 当屏最小值是负数，则计算0线相关的数据
+                zeroY = (float) (viewPort.bottom - Math.abs(minLow) / perPixelValue);
+                if (macddo.bar < 0) {
+                    barY = zeroY + (Math.abs(macddo.bar) / perPixelValue);
+                } else {
+                    barY = viewPort.bottom - (((macddo.bar - minLow)) / perPixelValue);
+                }
+
+            } else {
+                barY = viewPort.bottom - (((macddo.bar - minLow)) / perPixelValue);
+            }
+
+            macddo.barY = (float) barY;
+
+        }
+
+
+        return true;
     }
 
     @Override
@@ -199,8 +238,47 @@ public class MACDIndexStrategy extends IndexStrategy {
         return new Float[0];
     }
 
+    Path diffPath = new Path();
+    Path deaPath = new Path();
+    Paint mPaint = new Paint();
+    Paint deaPaint = new Paint();
+
     @Override
     public void drawIndex(Canvas canvas, Paint paint) {
+
+        diffPath.reset();
+        deaPath.reset();
+
+        // 计算指标业务数据集合
+        for (int i = mStartIndex; i < mEndIndex; i++) {
+            // 最高价
+            MACDDO macddo = macddos.get(i);
+
+            if (i == mStartIndex) {
+                diffPath.moveTo(macddo.x, macddo.diffY);
+                deaPath.moveTo(macddo.x, macddo.deaY);
+            } else {
+                diffPath.lineTo(macddo.x, macddo.diffY);
+                deaPath.lineTo(macddo.x, macddo.deaY);
+            }
+
+
+            if (macddo.bar < 0) {
+                mPaint.setColor(Color.GREEN);
+                canvas.drawLine(macddo.x, zeroY, macddo.x, macddo.barY, mPaint);
+            } else {
+                mPaint.setColor(Color.RED);
+                canvas.drawLine(macddo.x, zeroY, macddo.x, macddo.barY, mPaint);
+            }
+
+
+        }
+
+        mPaint.setColor(Color.RED);
+        canvas.drawLine(mViewPort.left, zeroY, mViewPort.right, zeroY, mPaint);
+        canvas.drawPath(diffPath, mPaint);
+        canvas.drawPath(deaPath, deaPaint);
+
 
     }
 

@@ -91,6 +91,7 @@ public class VolIndexStrategy extends IndexStrategy {
         public void setVolRectF(RectF volRectF) {
             this.volRectF = volRectF;
         }
+
     }
 
 
@@ -204,8 +205,6 @@ public class VolIndexStrategy extends IndexStrategy {
         bgRect.top = volRectF.top - 5;
 
         canvas.drawRect(bgRect,bgPaint);
-
-
         canvas.drawText(descDate,volRectF.left,volRectF.bottom,textPaint);
 
     }
