@@ -21,20 +21,20 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
+ * 基础KLine功能实现
  * 作者：duqingquan
  * 时间：2017/7/11 11:36
  */
-public class DoStockActivity extends Activity {
+public class BasicKLineActivity extends Activity {
 
-//    private KLineView kline_view;
-    private StockIndexView stockIndexView;
+    private KLineView kLineView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stock);
 
-        stockIndexView = (StockIndexView) findViewById(R.id.kline_view);
+        kLineView = (KLineView) findViewById(R.id.kline_view);
 
         initData();
 
@@ -161,7 +161,8 @@ public class DoStockActivity extends Activity {
         }
 
 
-        stockIndexView.setBeans(beans);
-        stockIndexView.invalidate();
+        kLineView.setBeans(beans);
+        kLineView.invalidate();
+
     }
 }

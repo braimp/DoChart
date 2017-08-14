@@ -25,7 +25,15 @@
         <activity android:name="com.dqqdo.demo.activity.LineChartActivity">
         </activity>
 
-        <activity android:name="com.dqqdo.demo.activity.stock.DoStockActivity">
+        <activity android:name="com.dqqdo.demo.activity.stock.BasicKLineActivity">
+
+        </activity>
+
+        <activity android:name="com.dqqdo.demo.activity.stock.StockIndexActivity">
+
+        </activity>
+
+        <activity android:name="com.dqqdo.demo.activity.LoadAnimActivity">
 
         </activity>
 

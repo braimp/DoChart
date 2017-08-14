@@ -11,6 +11,8 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.dqqdo.dochart.util.LogUtil;
+
 /**
  * 指标效果 加载组件
  * Created by duqingquan on 2017/7/5.
@@ -211,6 +213,11 @@ final public class StockArrowView extends View {
         // 刷底色
         canvas.drawColor(bgColor);
 
+        if(animIndex  == 0 || rectAnimSpeed == 0){
+            // 数据尚未初始化完成
+            return ;
+        }
+
         // 刷图案背景
         mPaint.setColor(firstIndexColor);
         canvas.drawLine(startPoint.x, startPoint.y, nodeOnePoint.x, nodeOnePoint.y, mPaint);
@@ -303,6 +310,10 @@ final public class StockArrowView extends View {
         canvas.drawLine(greenRect.centerX(),greenRect.bottom + 10,greenRect.centerX(),greenRect.top - 10,candlePaint);
 
         // 红绿色块交替
+
+        LogUtil.d("animIndex  ===  " + animIndex);
+        LogUtil.d("rectAnimSpeed  ===  " + rectAnimSpeed);
+
         if (animIndex % rectAnimSpeed > rectAnimSpeed / 2) {
 
             mPaint.setColor(Color.RED);

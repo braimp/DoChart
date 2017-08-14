@@ -32,10 +32,24 @@
         />
 
     <Button
-        android:text="KLine"
+        android:text="基本KLine"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/btn_KLine_test"
+        />
+
+    <Button
+        android:text="常用指标"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_stock_index"
+        />
+
+    <Button
+        android:text="加载动画"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_anim"
         />
 
 

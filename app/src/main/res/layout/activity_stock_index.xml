@@ -10,15 +10,11 @@
     >
 
 
-    <com.dqqdo.dochart.ui.view.stock.KLineView
-        android:id="@+id/kline_view"
+
+    <com.dqqdo.dochart.ui.view.index.StockIndexView
+        android:id="@+id/stock_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-
-    <!--<com.dqqdo.dochart.ui.view.index.StockIndexView-->
-        <!--android:id="@+id/kline_view"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"/>-->
 
 
 </LinearLayout>

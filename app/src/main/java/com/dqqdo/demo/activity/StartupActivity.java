@@ -7,7 +7,8 @@ import android.view.View;
 import android.widget.Button;
 
 import com.dqqdo.demo.R;
-import com.dqqdo.demo.activity.stock.DoStockActivity;
+import com.dqqdo.demo.activity.stock.BasicKLineActivity;
+import com.dqqdo.demo.activity.stock.StockIndexActivity;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -23,6 +24,12 @@ public class StartupActivity extends AppCompatActivity {
     Button mBtnLineTest;
     @Bind(R.id.btn_KLine_test)
     Button btnKLineTest;
+    @Bind(R.id.btn_stock_index)
+    Button btnStockIndex;
+
+    @Bind(R.id.btn_anim)
+    Button btnAnim;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +38,7 @@ public class StartupActivity extends AppCompatActivity {
         ButterKnife.bind(this);
     }
 
-    @OnClick({R.id.btn_pie_test, R.id.btn_bar_test,R.id.btn_line_test,R.id.btn_KLine_test})
+    @OnClick({R.id.btn_pie_test, R.id.btn_bar_test,R.id.btn_line_test,R.id.btn_KLine_test,R.id.btn_stock_index,R.id.btn_anim})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_pie_test:
@@ -47,8 +54,16 @@ public class StartupActivity extends AppCompatActivity {
                 startActivity(lineIntent);
                 break;
             case R.id.btn_KLine_test:
-                Intent klineIntent = new Intent(StartupActivity.this, DoStockActivity.class);
+                Intent klineIntent = new Intent(StartupActivity.this, BasicKLineActivity.class);
                 startActivity(klineIntent);
+                break;
+            case R.id.btn_stock_index:
+                Intent indexIntent = new Intent(StartupActivity.this, StockIndexActivity.class);
+                startActivity(indexIntent);
+                break;
+            case R.id.btn_anim:
+                Intent animIntent = new Intent(StartupActivity.this, LoadAnimActivity.class);
+                startActivity(animIntent);
                 break;
 
         }
