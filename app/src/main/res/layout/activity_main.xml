@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.dqqdo.demo.activity.MainActivity">
+    tools:context="com.dqqdo.demo.activity.StartupActivity">
 
 
     <Button
@@ -29,6 +29,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/btn_line_test"
+        />
+
+    <Button
+        android:text="KLine"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_KLine_test"
         />
 
 

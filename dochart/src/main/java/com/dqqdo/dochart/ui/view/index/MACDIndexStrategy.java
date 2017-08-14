@@ -149,7 +149,6 @@ public class MACDIndexStrategy extends IndexStrategy {
 //         * 平滑系数=2/（周期单位+1） w= 2  /  ()
 //         *
 //         */
-        int dataSize = portData.size();
         for (int i = mStartIndex; i < mEndIndex; i++) {
 
             MACDDO macddo = macddos.get(i);

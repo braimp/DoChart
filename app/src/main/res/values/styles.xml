@@ -8,4 +8,15 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!-- inherit from the material theme -->
+    <style name="MaterialStyle" parent="Theme.AppCompat.Light">
+        <!-- Main theme colors -->
+        <!--   your app branding color for the app bar -->
+        <item name="colorPrimary">#1111EE</item>
+        <!--   darker variant for the status bar and contextual app bars -->
+        <item name="colorPrimaryDark">#2B2B2B</item>
+        <!--   theme UI controls like checkboxes and text fields -->
+        <item name="colorAccent">#EEEEEE</item>
+    </style>
+
 </resources>

@@ -20,6 +20,7 @@ import android.view.View;
 import com.dqqdo.dobase.DoLog;
 import com.dqqdo.dochart.data.ChartValueBean;
 import com.dqqdo.dochart.ui.view.listener.IPieClickListener;
+import com.dqqdo.dochart.util.LogUtil;
 import com.dqqdo.dochart.util.MatrixUtil;
 
 import java.util.ArrayList;
@@ -205,7 +206,7 @@ public class PieChartView extends View implements View.OnTouchListener {
      * 内部实现
      ******************************/
 
-/*---放大所需要的变量---*/
+    /*---放大所需要的变量---*/
 
     /*定义三种状态分别是拖拽，放大和none*/
     static final int NONE = 0;
@@ -267,10 +268,7 @@ public class PieChartView extends View implements View.OnTouchListener {
 
             case MotionEvent.ACTION_POINTER_DOWN:
 
-                /*获取当前矩阵的反向矩阵*/
-                float zoom = 1 / MatrixUtil.getScale(matrix);
-                float tx = MatrixUtil.getTransX(matrix);
-                float ty = MatrixUtil.getTransY(matrix);
+
 
 
                 start.set(event.getX(), event.getY());
@@ -308,8 +306,6 @@ public class PieChartView extends View implements View.OnTouchListener {
                         globalZoomNum = MatrixUtil.getScale(matrix);
 
                         matrix.getValues(matrixValue);
-                        DoLog.d("pointerCount  ====  " + Arrays.toString(matrixValue) );
-
 
                         if (globalZoomNum < 1.0f) {
                             //缩放动作，限制使用者无法缩放
@@ -374,12 +370,29 @@ public class PieChartView extends View implements View.OnTouchListener {
      */
     private int getPointUnitIndex(float x, float y) {
 
+
+        /*获取当前矩阵的反向矩阵*/
+        float zoom = MatrixUtil.getScale(matrix);
+        float tx = MatrixUtil.getTransX(matrix);
+        float ty = MatrixUtil.getTransY(matrix);
+
+//        LogUtil.d("zoom  ---  " + zoom);
+//        LogUtil.d("tx  ---  " + tx);
+//        LogUtil.d("ty  ---  " + ty);
+
+        float centerX = (center[0] * zoom) + tx;
+        float centerY = (center[1] * zoom) + ty;
+        float radiusValue = radius * zoom;
+
+        LogUtil.d("centerX  ---  " + centerX);
+        LogUtil.d("centerY  ---  " + centerY);
+
         // 第一步，判断当前点是否位于圆内
-        double absX = (int) Math.abs((center[0] - x));
-        double absY = (int) Math.abs((center[1] - y));
+        double absX = (int) Math.abs((centerX - x));
+        double absY = (int) Math.abs((centerY - y));
 
         double result = Math.hypot(absX, absY);
-        if (result > radius) {
+        if (result > radiusValue) {
             // 大于半径，在圆外不作处理
             return -1;
         }
@@ -425,14 +438,24 @@ public class PieChartView extends View implements View.OnTouchListener {
      */
     private int getPointQuadrant(float x, float y) {
 
-        if (x > center[0]) {
-            if (y > center[1]) {
+          /*获取当前矩阵的反向矩阵*/
+        float zoom = MatrixUtil.getScale(matrix);
+        float tx = MatrixUtil.getTransX(matrix);
+        float ty = MatrixUtil.getTransY(matrix);
+
+
+        float centerX = (center[0] * zoom) + tx;
+        float centerY = (center[1] * zoom) + ty;
+
+
+        if (x > centerX) {
+            if (y > centerY) {
                 return 1;
             } else {
                 return 4;
             }
         } else {
-            if (y > center[1]) {
+            if (y > centerY) {
                 return 2;
             } else {
                 return 3;
@@ -790,7 +813,7 @@ public class PieChartView extends View implements View.OnTouchListener {
      * 绘制描述线段
      *
      * @param canvas 画布对象
-     * @param index  当前描述单元下标
+     * @param pos  当前描述单元下标
      */
     private void drawDescLine(Canvas canvas, int pos) {
 
