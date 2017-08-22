@@ -132,6 +132,7 @@ public class VolIndexStrategy extends IndexStrategy {
      * @param pointF
      * @return
      */
+    @Override
     public int getSelectIndex(PointF pointF) {
         int perUnitWidth = StockIndexView.candleWidth + StockIndexView.candleSpace;
         float viewDistance = pointF.x - mViewPort.left;
