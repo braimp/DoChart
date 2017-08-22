@@ -7,6 +7,8 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.text.TextUtils;
 
+import com.dqqdo.dochart.util.LogUtil;
+
 /**
  * 坐标轴 适配器
  * 作者：duqingquan

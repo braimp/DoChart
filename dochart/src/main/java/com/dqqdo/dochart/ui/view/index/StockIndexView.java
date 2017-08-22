@@ -129,6 +129,7 @@ public class StockIndexView extends View {
 
 //        indexStrategy = new VolIndexStrategy();
         indexStrategy = new MACDIndexStrategy();
+//        indexStrategy = new KDJIndexStrategy();
         touchAdapter = new TouchAdapter(indexStrategy);
         indexAdapter = new IndexAdapter(indexStrategy);
         axisAdapter = new AxisAdapter(indexStrategy);

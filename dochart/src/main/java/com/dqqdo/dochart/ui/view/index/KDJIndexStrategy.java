@@ -8,8 +8,11 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 
 import com.dqqdo.dochart.ui.view.stock.CandleBean;
+import com.dqqdo.dochart.util.LogUtil;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -133,17 +136,21 @@ public class KDJIndexStrategy extends IndexStrategy {
     private float zeroY;
 
     private int mStartIndex,mEndIndex;
+    ArrayList<String> descX = new ArrayList<>();
+    ArrayList<Float> descXValue = new ArrayList<>();
+    String[] descY = new String[5];
 
     @Override
     public boolean calcFormulaPoint(int startIndex, int endIndex, RectF viewPort) {
 
+        descX.clear();
+        descXValue.clear();
 
         mStartIndex = startIndex;
         mEndIndex = endIndex;
 
         mViewPort = viewPort;
         portData = candles.subList(startIndex, endIndex);
-
 
 
         for (int i = mStartIndex; i < mEndIndex; i++) {
@@ -179,18 +186,35 @@ public class KDJIndexStrategy extends IndexStrategy {
         float lineBoundHeight = viewPort.height();
         double perPixelValue = (spaceValue / lineBoundHeight);
 
+        double perYUnit = spaceValue / 5;
+        // 计算五档数值
+        for (int i = 0; i < 5; i++) {
+            double yValue = (maxHigh * 1.0 - perYUnit * i);
+            DecimalFormat df = new DecimalFormat("###.00");
+            descY[i] = df.format(yValue);
+        }
+
+
 
         int j = 0;
         // 计算指标业务数据集合
         for (int i = startIndex; i < endIndex; i++,j++) {
 
-
             // 最高价
             MACDDO macddo = macddos.get(i);
+
 
             double x = viewPort.left + (j * (StockIndexView.candleWidth + StockIndexView.candleSpace)) + StockIndexView.candleSpace;
             macddo.x = (float) x;
 
+            CandleBean candleBean = candles.get(i);
+            int dayNum = getDayNum(candleBean.getTime());
+            // 每个月一号，绘制月线
+            if (dayNum == 1) {
+                String dateStr = candleBean.getDateStr();
+                descX.add(dateStr);
+                descXValue.add(macddo.x);
+            }
 
             double diffY = viewPort.bottom - (((macddo.diff - minLow)) / perPixelValue);
             macddo.diffY = (float) diffY;
@@ -219,19 +243,27 @@ public class KDJIndexStrategy extends IndexStrategy {
         return true;
     }
 
+    private int getDayNum(long time) {
+        // 初始化当前月份
+        long monthValue = time % Long.parseLong("100000000");
+        int monthNum = (int) (monthValue / 1000000);
+        return monthNum;
+    }
+
     @Override
     public String[] getDescYStr() {
-        return new String[0];
+        return descY;
     }
 
     @Override
     public String[] getDescXStr() {
-        return new String[0];
+
+        return descX.toArray(new String[descX.size()]);
     }
 
     @Override
     public Float[] getDescX() {
-        return new Float[0];
+        return descXValue.toArray(new Float[descXValue.size()]);
     }
 
     Path diffPath = new Path();
@@ -267,13 +299,13 @@ public class KDJIndexStrategy extends IndexStrategy {
                 canvas.drawLine(macddo.x, zeroY, macddo.x, macddo.barY, mPaint);
             }
 
-
         }
 
         mPaint.setColor(Color.RED);
         canvas.drawLine(mViewPort.left, zeroY, mViewPort.right, zeroY, mPaint);
         canvas.drawPath(diffPath, mPaint);
         canvas.drawPath(deaPath, deaPaint);
+
 
 
     }

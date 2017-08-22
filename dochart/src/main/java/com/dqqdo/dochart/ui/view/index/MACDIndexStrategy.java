@@ -10,19 +10,19 @@ import android.graphics.RectF;
 import com.dqqdo.dochart.ui.view.stock.CandleBean;
 import com.dqqdo.dochart.util.LogUtil;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
+ * KDJ
  * 作者：duqingquan
  * 时间：2017/7/31 17:56
  */
 public class MACDIndexStrategy extends IndexStrategy {
 
-    Paint textPaint = new Paint();
-
     MACDIndexStrategy() {
-
         mPaint.setColor(Color.RED);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStyle(Paint.Style.STROKE);
@@ -32,11 +32,6 @@ public class MACDIndexStrategy extends IndexStrategy {
         deaPaint.setStrokeCap(Paint.Cap.ROUND);
         deaPaint.setStyle(Paint.Style.STROKE);
         deaPaint.setStrokeWidth(5);
-
-        textPaint.setColor(Color.GRAY);
-        textPaint.setStrokeCap(Paint.Cap.ROUND);
-        textPaint.setStyle(Paint.Style.STROKE);
-        textPaint.setStrokeWidth(2);
 
 
     }
@@ -62,7 +57,7 @@ public class MACDIndexStrategy extends IndexStrategy {
 
     }
 
-
+    ArrayList<MACDDO> macddos;
 
 
     @Override
@@ -97,7 +92,10 @@ public class MACDIndexStrategy extends IndexStrategy {
                     diff = 0;
                     dea = 0;
                     macd = 0;
+
+
                 } else {
+
                     MACDDO preDO = macddos.get(i - 1);
                     double preEMA12 = preDO.EMA12;
                     EMA12 = IndexCalculator.getEma(close, preEMA12, 12);
@@ -110,6 +108,8 @@ public class MACDIndexStrategy extends IndexStrategy {
                     dea = preDea * 8 / 10 + diff * 2 / 10;
                     // macd
                     macd = 2 * (diff - dea);
+
+
                 }
 
                 MACDDO macddo = new MACDDO();
@@ -126,39 +126,33 @@ public class MACDIndexStrategy extends IndexStrategy {
     }
 
 
-    ArrayList<MACDDO> macddos;
     // 当前选中区域的最大数值
     private double maxHigh = 0;
     // 当前选中区域的最小数值
     private double minLow = 0;
     RectF mViewPort;
     List<CandleBean> portData;
-    List<MACDDO> portMOCD;
     // 0线所在的Y值
     private float zeroY;
-    private int mStartIndex,mEndIndex;
 
-    Path diffPath = new Path();
-    Path deaPath = new Path();
-    Paint mPaint = new Paint();
-    Paint deaPaint = new Paint();
+    private int mStartIndex,mEndIndex;
+    ArrayList<String> descX = new ArrayList<>();
+    ArrayList<Float> descXValue = new ArrayList<>();
+    String[] descY = new String[5];
 
     @Override
     public boolean calcFormulaPoint(int startIndex, int endIndex, RectF viewPort) {
 
+        descX.clear();
+        descXValue.clear();
 
         mStartIndex = startIndex;
         mEndIndex = endIndex;
 
         mViewPort = viewPort;
         portData = candles.subList(startIndex, endIndex);
-        portMOCD = macddos.subList(startIndex,endIndex);
 
-//        /**
-//         * 先计算EMA1和EMA2
-//         * 平滑系数=2/（周期单位+1） w= 2  /  ()
-//         *
-//         */
+
         for (int i = mStartIndex; i < mEndIndex; i++) {
 
             MACDDO macddo = macddos.get(i);
@@ -192,6 +186,15 @@ public class MACDIndexStrategy extends IndexStrategy {
         float lineBoundHeight = viewPort.height();
         double perPixelValue = (spaceValue / lineBoundHeight);
 
+        double perYUnit = spaceValue / 5;
+        // 计算五档数值
+        for (int i = 0; i < 5; i++) {
+            double yValue = (maxHigh * 1.0 - perYUnit * i);
+            DecimalFormat df = new DecimalFormat("###.00");
+            descY[i] = df.format(yValue);
+        }
+
+
 
         int j = 0;
         // 计算指标业务数据集合
@@ -201,9 +204,18 @@ public class MACDIndexStrategy extends IndexStrategy {
             // 最高价
             MACDDO macddo = macddos.get(i);
 
+
             double x = viewPort.left + (j * (StockIndexView.candleWidth + StockIndexView.candleSpace)) + StockIndexView.candleSpace;
             macddo.x = (float) x;
 
+            CandleBean candleBean = candles.get(i);
+            int dayNum = getDayNum(candleBean.getTime());
+            // 每个月一号，绘制月线
+            if (dayNum == 1) {
+                String dateStr = candleBean.getDateStr();
+                descX.add(dateStr);
+                descXValue.add(macddo.x);
+            }
 
             double diffY = viewPort.bottom - (((macddo.diff - minLow)) / perPixelValue);
             macddo.diffY = (float) diffY;
@@ -232,22 +244,33 @@ public class MACDIndexStrategy extends IndexStrategy {
         return true;
     }
 
+    private int getDayNum(long time) {
+        // 初始化当前月份
+        long monthValue = time % Long.parseLong("100000000");
+        int monthNum = (int) (monthValue / 1000000);
+        return monthNum;
+    }
+
     @Override
     public String[] getDescYStr() {
-        return new String[0];
+        return descY;
     }
 
     @Override
     public String[] getDescXStr() {
-        return new String[0];
+
+        return descX.toArray(new String[descX.size()]);
     }
 
     @Override
     public Float[] getDescX() {
-        return new Float[0];
+        return descXValue.toArray(new Float[descXValue.size()]);
     }
 
-
+    Path diffPath = new Path();
+    Path deaPath = new Path();
+    Paint mPaint = new Paint();
+    Paint deaPaint = new Paint();
 
     @Override
     public void drawIndex(Canvas canvas, Paint paint) {
@@ -277,7 +300,6 @@ public class MACDIndexStrategy extends IndexStrategy {
                 canvas.drawLine(macddo.x, zeroY, macddo.x, macddo.barY, mPaint);
             }
 
-
         }
 
         mPaint.setColor(Color.RED);
@@ -286,41 +308,26 @@ public class MACDIndexStrategy extends IndexStrategy {
         canvas.drawPath(deaPath, deaPaint);
 
 
+
     }
 
     @Override
     public String getIndexName() {
-        return "MACD 指标";
+        return "KDJ 指标（9日）";
     }
 
     @Override
     public String getIndexFormula() {
-        return "太复杂，就不列出来了";
+        return "随机数指标，分为KDJ 三条曲线";
     }
 
     @Override
     public int getSelectIndex(PointF pointF) {
-        int perUnitWidth = StockIndexView.candleWidth + StockIndexView.candleSpace;
-        float viewDistance = pointF.x - mViewPort.left;
-        int indexNum = (int) (viewDistance / perUnitWidth);
-        return indexNum;
+        return 0;
     }
 
     @Override
     public void drawSelectIndex(Canvas canvas, Paint paint, int index) {
-
-        if(index < 0){
-            return ;
-        }
-
-        if(index >= portData.size()){
-            return;
-        }
-
-        MACDDO mocddo = portMOCD.get(index);
-        float selectX =  mocddo.x;
-        canvas.drawLine(selectX,mViewPort.bottom,selectX,mViewPort.top,textPaint);
-
 
     }
 }
