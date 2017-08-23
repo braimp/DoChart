@@ -12,7 +12,6 @@ import com.dqqdo.dochart.util.LogUtil;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -33,93 +32,138 @@ public class KDJIndexStrategy extends IndexStrategy {
         deaPaint.setStyle(Paint.Style.STROKE);
         deaPaint.setStrokeWidth(5);
 
+        jPaint.setColor(Color.GREEN);
+        jPaint.setStrokeCap(Paint.Cap.ROUND);
+        jPaint.setStyle(Paint.Style.STROKE);
+        jPaint.setStrokeWidth(5);
+
+
 
     }
 
     /**
      * MACD指标 DATA Object
      */
-    class MACDDO {
+    class KDJDO {
 
-        private double EMA12 = 0;
-        private double EMA26 = 0;
-        private double diff = 0;
-        private double dea = 0;
-        private double bar;
+        private double kValue = 0;
+        private double dValue = 0;
+        private double jValue = 0;
+        // 9日 （C－L9）÷（H9－L9）×100
+        private double rsvValue = 0;
 
         /*****************绘制部分的关键数据*********************/
-        private float diffY;
-        private float deaY;
-        private float barY;
-        private float barColor;
+        private float kY;
+        private float dY;
+        private float jY;
         private float x;
 
 
     }
 
-    ArrayList<MACDDO> macddos;
+    ArrayList<KDJDO> KDJDOs;
 
 
     @Override
     public void setData(ArrayList<CandleBean> data) {
         super.setData(data);
-        macddos = new ArrayList<>(candles.size());
-        initMea();
+        KDJDOs = new ArrayList<>(candles.size());
+        initKDJ();
     }
 
     /**
      * EMA需要12 和 26 天的数据，需要开始时就计算完毕
      */
-    private void initMea() {
+    private void initKDJ() {
 
-
-        macddos.clear();
-
+        KDJDOs.clear();
         int dataSize = candles.size();
+
         for (int i = 0; i < dataSize; i++) {
+
+            KDJDOs.add(new KDJDO());
+
             CandleBean candleBean = candles.get(i);
+
+            // most low
+            long ln = 0;
+            // most high
+            long hn = 0;
+
+            long close = candleBean.getClose();
+
+
+            if (i < 8) {
+
+                if (i == 0) {
+
+                    CandleBean perBean = candles.get(i);
+                    long perLow = perBean.getMostLow();
+                    long perHigh = perBean.getMostHigh();
+
+                    ln = perLow;
+                    hn = perHigh;
+                } else {
+                    // 不足9日，则取前几日
+                    for (int j = 0; j <= i; j++) {
+
+                        CandleBean perBean = candles.get(j);
+                        long perLow = perBean.getMostLow();
+                        long perHigh = perBean.getMostHigh();
+
+
+                        if (ln == 0 || ln > perLow) {
+                            ln = perLow;
+                        }
+
+                        if (hn < perHigh) {
+                            hn = perHigh;
+                        }
+                    }
+                }
+            } else {
+
+                for (int j = i - 8; j <= i; j++) {
+
+                    CandleBean perBean = candles.get(j);
+                    long perLow = perBean.getMostLow();
+                    long perHigh = perBean.getMostHigh();
+
+                    if (ln == 0 || ln > perLow) {
+                        ln = perLow;
+                    }
+
+                    if (hn < perHigh) {
+                        hn = perHigh;
+                    }
+                }
+            }
+
+
+            KDJDO kdjdo = KDJDOs.get(i);
+            kdjdo.rsvValue = (close - ln) * 1.0 / (hn - ln) * 100;
+
+        }
+
+
+        for (int i = 0; i < dataSize; i++) {
+
+            CandleBean candleBean = candles.get(i);
+
             if (candleBean != null) {
 
-                long close = candleBean.getClose();
-                double EMA12;
-                double EMA26;
-                double dea;
-                double diff;
-                double macd;
+                KDJDO kdjdo = KDJDOs.get(i);
                 if (i == 0) {
-                    EMA12 = IndexCalculator.getEma(close, close, 12);
-                    EMA26 = IndexCalculator.getEma(close, close, 26);
-                    diff = 0;
-                    dea = 0;
-                    macd = 0;
-
-
+                    // 若无前一日K值与D值，则可以分别用50代替
+                    kdjdo.kValue = 2.0 / 3 * 50 + 1.0 / 3 * kdjdo.rsvValue;
+                    kdjdo.dValue = 2.0 / 3 * 50 + 1.0 / 3 * kdjdo.kValue;
+                    kdjdo.jValue = 3.0 * kdjdo.kValue - 2 * kdjdo.dValue;
                 } else {
-
-                    MACDDO preDO = macddos.get(i - 1);
-                    double preEMA12 = preDO.EMA12;
-                    EMA12 = IndexCalculator.getEma(close, preEMA12, 12);
-                    double preEMA26 = preDO.EMA26;
-                    EMA26 = IndexCalculator.getEma(close, preEMA26, 26);
-                    // diff
-                    diff = EMA12 - EMA26;
-                    // dea
-                    double preDea = preDO.dea;
-                    dea = preDea * 8 / 10 + diff * 2 / 10;
-                    // macd
-                    macd = 2 * (diff - dea);
-
-
+                    KDJDO preDo = KDJDOs.get(i - 1);
+                    kdjdo.kValue = 2.0 / 3 * preDo.kValue + 1.0 / 3 * kdjdo.rsvValue;
+                    kdjdo.dValue = 2.0 / 3 * preDo.dValue + 1.0 / 3 * kdjdo.kValue;
+                    kdjdo.jValue = 3.0 * kdjdo.kValue - 2.0 * kdjdo.dValue;
                 }
-
-                MACDDO macddo = new MACDDO();
-                macddo.EMA12 = EMA12;
-                macddo.EMA26 = EMA26;
-                macddo.diff = diff;
-                macddo.dea = dea;
-                macddo.bar = macd;
-
-                macddos.add(macddo);
 
             }
         }
@@ -135,7 +179,7 @@ public class KDJIndexStrategy extends IndexStrategy {
     // 0线所在的Y值
     private float zeroY;
 
-    private int mStartIndex,mEndIndex;
+    private int mStartIndex, mEndIndex;
     ArrayList<String> descX = new ArrayList<>();
     ArrayList<Float> descXValue = new ArrayList<>();
     String[] descY = new String[5];
@@ -155,29 +199,26 @@ public class KDJIndexStrategy extends IndexStrategy {
 
         for (int i = mStartIndex; i < mEndIndex; i++) {
 
-            MACDDO macddo = macddos.get(i);
-            double diff = macddo.diff;
-            double dea = macddo.dea;
-            double macd = macddo.bar;
+            KDJDO KDJDO = KDJDOs.get(i);
 
-            if (diff < minLow) {
-                minLow = diff;
+            if (KDJDO.kValue < minLow) {
+                minLow = KDJDO.kValue;
             }
-            if (dea < minLow) {
-                minLow = dea;
+            if (KDJDO.dValue < minLow) {
+                minLow = KDJDO.dValue;
             }
-            if (macd < minLow) {
-                minLow = macd;
+            if (KDJDO.jValue < minLow) {
+                minLow = KDJDO.jValue;
             }
 
-            if (diff > maxHigh) {
-                maxHigh = diff;
+            if (KDJDO.kValue > maxHigh) {
+                maxHigh = KDJDO.kValue;
             }
-            if (dea > maxHigh) {
-                maxHigh = dea;
+            if (KDJDO.dValue > maxHigh) {
+                maxHigh = KDJDO.dValue;
             }
-            if (macd > maxHigh) {
-                maxHigh = macd;
+            if (KDJDO.jValue > maxHigh) {
+                maxHigh = KDJDO.jValue;
             }
         }
 
@@ -195,17 +236,15 @@ public class KDJIndexStrategy extends IndexStrategy {
         }
 
 
-
         int j = 0;
         // 计算指标业务数据集合
-        for (int i = startIndex; i < endIndex; i++,j++) {
+        for (int i = startIndex; i < endIndex; i++, j++) {
 
             // 最高价
-            MACDDO macddo = macddos.get(i);
-
+            KDJDO KDJDO = KDJDOs.get(i);
 
             double x = viewPort.left + (j * (StockIndexView.candleWidth + StockIndexView.candleSpace)) + StockIndexView.candleSpace;
-            macddo.x = (float) x;
+            KDJDO.x = (float) x;
 
             CandleBean candleBean = candles.get(i);
             int dayNum = getDayNum(candleBean.getTime());
@@ -213,29 +252,16 @@ public class KDJIndexStrategy extends IndexStrategy {
             if (dayNum == 1) {
                 String dateStr = candleBean.getDateStr();
                 descX.add(dateStr);
-                descXValue.add(macddo.x);
+                descXValue.add(KDJDO.x);
             }
 
-            double diffY = viewPort.bottom - (((macddo.diff - minLow)) / perPixelValue);
-            macddo.diffY = (float) diffY;
-            double deaY = viewPort.bottom - (((macddo.dea - minLow)) / perPixelValue);
-            macddo.deaY = (float) deaY;
+            double dy = viewPort.bottom - (((KDJDO.dValue - minLow)) / perPixelValue);
+            KDJDO.dY = (float) dy;
+            double ky = viewPort.bottom - (((KDJDO.kValue - minLow)) / perPixelValue);
+            KDJDO.kY = (float) ky;
+            double jy = viewPort.bottom - (((KDJDO.jValue - minLow)) / perPixelValue);
+            KDJDO.jY = (float) jy;
 
-            double barY;
-            if (minLow < 0) {
-                // 当屏最小值是负数，则计算0线相关的数据
-                zeroY = (float) (viewPort.bottom - Math.abs(minLow) / perPixelValue);
-                if (macddo.bar < 0) {
-                    barY = zeroY + (Math.abs(macddo.bar) / perPixelValue);
-                } else {
-                    barY = viewPort.bottom - (((macddo.bar - minLow)) / perPixelValue);
-                }
-
-            } else {
-                barY = viewPort.bottom - (((macddo.bar - minLow)) / perPixelValue);
-            }
-
-            macddo.barY = (float) barY;
 
         }
 
@@ -266,46 +292,46 @@ public class KDJIndexStrategy extends IndexStrategy {
         return descXValue.toArray(new Float[descXValue.size()]);
     }
 
-    Path diffPath = new Path();
-    Path deaPath = new Path();
+
     Paint mPaint = new Paint();
     Paint deaPaint = new Paint();
+    Paint jPaint = new Paint();
 
     @Override
     public void drawIndex(Canvas canvas, Paint paint) {
 
-        diffPath.reset();
-        deaPath.reset();
+
+        Path dPath = new Path();
+        Path kPath = new Path();
+        Path jPath = new Path();
 
         // 计算指标业务数据集合
         for (int i = mStartIndex; i < mEndIndex; i++) {
+
             // 最高价
-            MACDDO macddo = macddos.get(i);
+            KDJDO KDJDO = KDJDOs.get(i);
+
 
             if (i == mStartIndex) {
-                diffPath.moveTo(macddo.x, macddo.diffY);
-                deaPath.moveTo(macddo.x, macddo.deaY);
+                dPath.moveTo(KDJDO.x, KDJDO.dY);
+                kPath.moveTo(KDJDO.x, KDJDO.kY);
+                jPath.moveTo(KDJDO.x, KDJDO.jY);
             } else {
-                diffPath.lineTo(macddo.x, macddo.diffY);
-                deaPath.lineTo(macddo.x, macddo.deaY);
-            }
-
-
-            if (macddo.bar < 0) {
-                mPaint.setColor(Color.GREEN);
-                canvas.drawLine(macddo.x, zeroY, macddo.x, macddo.barY, mPaint);
-            } else {
-                mPaint.setColor(Color.RED);
-                canvas.drawLine(macddo.x, zeroY, macddo.x, macddo.barY, mPaint);
+                KDJDO preDo = KDJDOs.get(i - 1);
+                float midX = (KDJDO.x + preDo.x) / 2;
+                dPath.cubicTo(midX,preDo.dY,midX,KDJDO.dY,KDJDO.x,KDJDO.dY);
+                kPath.cubicTo(midX,preDo.kY,midX,KDJDO.kY,KDJDO.x,KDJDO.kY);
+                jPath.cubicTo(midX,preDo.jY,midX,KDJDO.jY,KDJDO.x,KDJDO.jY);
             }
 
         }
 
-        mPaint.setColor(Color.RED);
-        canvas.drawLine(mViewPort.left, zeroY, mViewPort.right, zeroY, mPaint);
-        canvas.drawPath(diffPath, mPaint);
-        canvas.drawPath(deaPath, deaPaint);
 
+        mPaint.setColor(Color.RED);
+//        canvas.drawLine(mViewPort.left, zeroY, mViewPort.right, zeroY, mPaint);
+        canvas.drawPath(dPath, mPaint);
+        canvas.drawPath(kPath, deaPaint);
+        canvas.drawPath(jPath, jPaint);
 
 
     }
@@ -322,11 +348,27 @@ public class KDJIndexStrategy extends IndexStrategy {
 
     @Override
     public int getSelectIndex(PointF pointF) {
-        return 0;
+        int perUnitWidth = StockIndexView.candleWidth + StockIndexView.candleSpace;
+        float viewDistance = pointF.x - mViewPort.left;
+        int indexNum = (int) (viewDistance / perUnitWidth);
+        return indexNum;
     }
 
     @Override
     public void drawSelectIndex(Canvas canvas, Paint paint, int index) {
+
+        if(index < 0){
+            return ;
+        }
+
+        if(mStartIndex + index >= KDJDOs.size()){
+            return;
+        }
+
+        KDJDO kdjdo = KDJDOs.get(mStartIndex + index);
+
+//        LogUtil.d("rsvValue  ====  "  + kdjdo.rsvValue
+//                + candles.get(index).getDateStr());
 
     }
 }

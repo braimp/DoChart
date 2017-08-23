@@ -11,8 +11,10 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.dqqdo.dochart.ui.view.stock.CandleBean;
+import com.dqqdo.dochart.util.LogUtil;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * 股票指标 展示组件
@@ -128,8 +130,8 @@ public class StockIndexView extends View {
     private void initData(){
 
 //        indexStrategy = new VolIndexStrategy();
-        indexStrategy = new MACDIndexStrategy();
-//        indexStrategy = new KDJIndexStrategy();
+//        indexStrategy = new MACDIndexStrategy();
+        indexStrategy = new KDJIndexStrategy();
         touchAdapter = new TouchAdapter(indexStrategy);
         indexAdapter = new IndexAdapter(indexStrategy);
         axisAdapter = new AxisAdapter(indexStrategy);
@@ -287,6 +289,8 @@ public class StockIndexView extends View {
 
         // 绘制背景
         canvas.drawColor(Color.WHITE);
+
+        LogUtil.d("bbbbbb");
 
         // 绘制坐标轴
         axisAdapter.drawAxis(canvas);
