@@ -22,6 +22,7 @@ import java.util.List;
 public class KDJIndexStrategy extends IndexStrategy {
 
     KDJIndexStrategy() {
+
         mPaint.setColor(Color.RED);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStyle(Paint.Style.STROKE);
@@ -36,8 +37,6 @@ public class KDJIndexStrategy extends IndexStrategy {
         jPaint.setStrokeCap(Paint.Cap.ROUND);
         jPaint.setStyle(Paint.Style.STROKE);
         jPaint.setStrokeWidth(5);
-
-
 
     }
 
@@ -61,7 +60,7 @@ public class KDJIndexStrategy extends IndexStrategy {
 
     }
 
-    ArrayList<KDJDO> KDJDOs;
+
 
 
     @Override
@@ -183,12 +182,14 @@ public class KDJIndexStrategy extends IndexStrategy {
     ArrayList<String> descX = new ArrayList<>();
     ArrayList<Float> descXValue = new ArrayList<>();
     String[] descY = new String[5];
+    ArrayList<KDJDO> KDJDOs;
 
     @Override
     public boolean calcFormulaPoint(int startIndex, int endIndex, RectF viewPort) {
 
         descX.clear();
         descXValue.clear();
+
 
         mStartIndex = startIndex;
         mEndIndex = endIndex;
@@ -201,31 +202,39 @@ public class KDJIndexStrategy extends IndexStrategy {
 
             KDJDO KDJDO = KDJDOs.get(i);
 
-            if (KDJDO.kValue < minLow) {
+            if(i == mStartIndex){
                 minLow = KDJDO.kValue;
-            }
-            if (KDJDO.dValue < minLow) {
-                minLow = KDJDO.dValue;
-            }
-            if (KDJDO.jValue < minLow) {
-                minLow = KDJDO.jValue;
+                maxHigh = KDJDO.kValue;
+            }else{
+                if (KDJDO.kValue < minLow) {
+                    minLow = KDJDO.kValue;
+                }
+                if (KDJDO.dValue < minLow) {
+                    minLow = KDJDO.dValue;
+                }
+                if (KDJDO.jValue < minLow) {
+                    minLow = KDJDO.jValue;
+                }
+
+                if (KDJDO.kValue > maxHigh) {
+                    maxHigh = KDJDO.kValue;
+                }
+                if (KDJDO.dValue > maxHigh) {
+                    maxHigh = KDJDO.dValue;
+                }
+                if (KDJDO.jValue > maxHigh) {
+                    maxHigh = KDJDO.jValue;
+                }
             }
 
-            if (KDJDO.kValue > maxHigh) {
-                maxHigh = KDJDO.kValue;
-            }
-            if (KDJDO.dValue > maxHigh) {
-                maxHigh = KDJDO.dValue;
-            }
-            if (KDJDO.jValue > maxHigh) {
-                maxHigh = KDJDO.jValue;
-            }
+
         }
 
         // 根据最大，最小数据，确认单位数值
         double spaceValue = maxHigh - minLow;
         float lineBoundHeight = viewPort.height();
         double perPixelValue = (spaceValue / lineBoundHeight);
+
 
         double perYUnit = spaceValue / 5;
         // 计算五档数值
@@ -328,7 +337,6 @@ public class KDJIndexStrategy extends IndexStrategy {
 
 
         mPaint.setColor(Color.RED);
-//        canvas.drawLine(mViewPort.left, zeroY, mViewPort.right, zeroY, mPaint);
         canvas.drawPath(dPath, mPaint);
         canvas.drawPath(kPath, deaPaint);
         canvas.drawPath(jPath, jPaint);
@@ -367,8 +375,6 @@ public class KDJIndexStrategy extends IndexStrategy {
 
         KDJDO kdjdo = KDJDOs.get(mStartIndex + index);
 
-//        LogUtil.d("rsvValue  ====  "  + kdjdo.rsvValue
-//                + candles.get(index).getDateStr());
 
     }
 }

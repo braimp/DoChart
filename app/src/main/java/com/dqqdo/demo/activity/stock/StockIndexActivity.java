@@ -66,7 +66,6 @@ public class StockIndexActivity extends Activity {
                 candleBean.setAmount(array.getLong(7));
 
 
-
                 beans.add(candleBean);
             }
 
