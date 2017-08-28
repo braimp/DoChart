@@ -38,7 +38,7 @@ public class StartupActivity extends AppCompatActivity {
         ButterKnife.bind(this);
     }
 
-    @OnClick({R.id.btn_pie_test, R.id.btn_bar_test,R.id.btn_line_test,R.id.btn_KLine_test,R.id.btn_stock_index,R.id.btn_anim})
+    @OnClick({R.id.btn_pie_test, R.id.btn_bar_test,R.id.btn_line_test,R.id.btn_KLine_test,R.id.btn_stock_index,R.id.btn_anim,R.id.btn_matrix})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_pie_test:
@@ -64,6 +64,10 @@ public class StartupActivity extends AppCompatActivity {
             case R.id.btn_anim:
                 Intent animIntent = new Intent(StartupActivity.this, LoadAnimActivity.class);
                 startActivity(animIntent);
+                break;
+            case R.id.btn_matrix:
+                Intent matrixIntent = new Intent(StartupActivity.this, MatrixActivity.class);
+                startActivity(matrixIntent);
                 break;
 
         }

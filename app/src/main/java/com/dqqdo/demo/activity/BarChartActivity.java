@@ -12,8 +12,11 @@ import com.dqqdo.dobase.BaseActivity;
 import com.dqqdo.dobase.DoLog;
 import com.dqqdo.dochart.ui.view.BarChartView;
 import com.dqqdo.dochart.ui.view.PieChartView;
+import com.dqqdo.dochart.util.LogUtil;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 作者：duqingquan
