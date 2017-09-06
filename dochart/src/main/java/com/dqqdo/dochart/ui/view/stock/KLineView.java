@@ -574,6 +574,9 @@ public class KLineView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
 
+
+
+
         isFindContainDone = false;
 
         if (beans == null || !(beans.size() > 0)) {

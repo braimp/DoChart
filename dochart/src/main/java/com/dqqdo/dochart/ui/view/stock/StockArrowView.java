@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -38,7 +39,7 @@ final public class StockArrowView extends View {
     private int arrowWidth = 10;
 
     // 设置动画速度，这里需要注意不要设置边界数字(0-20)
-    private int animSpeed = 5;
+    private int animSpeed = 3;
     // TODO 这里还是有问题，需要考虑小于整百的组件宽度，但是目前满足需求了。
     // 色块动态速度，不要这里边界数字(100-500 整百数字)
     private int rectAnimSpeed = 200;
@@ -48,6 +49,8 @@ final public class StockArrowView extends View {
     private int animIndex = 100;
     // 绘制过程中用到的主要画笔
     private Paint mPaint;
+    private Paint arrowPaint;
+
     private Paint candlePaint;
     // 用来擦除的画笔
     private Paint erasurePaint;
@@ -89,6 +92,8 @@ final public class StockArrowView extends View {
     // 变窄效果的,两侧X坐标，总体变化量
     float animPathX;
 
+    Path fixedPath = new Path();
+
 
     public StockArrowView(Context context) {
         super(context);
@@ -113,8 +118,9 @@ final public class StockArrowView extends View {
     private void initPaint() {
 
         mPaint = new Paint();
+        LogUtil.d("lineWidth  ===  " + lineWidth);
         mPaint.setStrokeWidth(lineWidth);
-        mPaint.setColor(Color.BLUE);
+        mPaint.setColor(firstIndexColor);
 
         candlePaint = new Paint();
         candlePaint.setStrokeWidth(5);
@@ -127,9 +133,14 @@ final public class StockArrowView extends View {
 
 
         mPaint.setAntiAlias(true);
+        mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
 
+
+        arrowPaint = new Paint();
+        arrowPaint.setStrokeWidth(1);
+        arrowPaint.setColor(firstIndexColor);
     }
 
 
@@ -139,6 +150,9 @@ final public class StockArrowView extends View {
         // 准备数据
         width = getWidth();
         height = getHeight();
+
+        LogUtil.d("width  ----  " + width);
+        LogUtil.d("height  ----  " + height);
 
         initPoint();
         initPaint();
@@ -209,6 +223,8 @@ final public class StockArrowView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        long startTime = SystemClock.elapsedRealtime();
+//        canvas.clipRect(0,0,width,height);
 
         // 刷底色
         canvas.drawColor(bgColor);
@@ -220,9 +236,18 @@ final public class StockArrowView extends View {
 
         // 刷图案背景
         mPaint.setColor(firstIndexColor);
-        canvas.drawLine(startPoint.x, startPoint.y, nodeOnePoint.x, nodeOnePoint.y, mPaint);
-        canvas.drawLine(startPoint.x - 10, startPoint.y, startPoint.x + lineWidth, startPoint.y, erasurePaint);
-        canvas.drawLine(nodeOnePoint.x, nodeOnePoint.y, nodeTwoPoint.x, nodeTwoPoint.y, mPaint);
+
+        fixedPath.reset();
+        fixedPath.moveTo(startPoint.x,startPoint.y);
+        fixedPath.lineTo(nodeOnePoint.x,nodeOnePoint.y);
+        fixedPath.lineTo(nodeTwoPoint.x,nodeTwoPoint.y);
+        canvas.drawPath(fixedPath,mPaint);
+
+//        canvas.drawLine(startPoint.x, startPoint.y, nodeOnePoint.x, nodeOnePoint.y, mPaint);
+//        canvas.drawLine(nodeOnePoint.x, nodeOnePoint.y, nodeTwoPoint.x, nodeTwoPoint.y, mPaint);
+
+        canvas.drawLine(startPoint.x - 10, startPoint.y, startPoint.x + lineWidth + 10, startPoint.y, erasurePaint);
+
 
         calcThirdLineStart();
         drawCompleteThirdLine(canvas);
@@ -297,6 +322,7 @@ final public class StockArrowView extends View {
         }
         invalidate();
 
+//        LogUtil.d("end --- " + (SystemClock.elapsedRealtime() - startTime));
 
     }
 
@@ -310,9 +336,6 @@ final public class StockArrowView extends View {
         canvas.drawLine(greenRect.centerX(),greenRect.bottom + 10,greenRect.centerX(),greenRect.top - 10,candlePaint);
 
         // 红绿色块交替
-
-        LogUtil.d("animIndex  ===  " + animIndex);
-        LogUtil.d("rectAnimSpeed  ===  " + rectAnimSpeed);
 
         if (animIndex % rectAnimSpeed > rectAnimSpeed / 2) {
 
@@ -347,6 +370,8 @@ final public class StockArrowView extends View {
         // 计算path起点x坐标
         animPathX = (float) (Math.sqrt(Math.pow(lineWidth / 2, 2) / (Math.pow(startLineK, 2) + 1)));
 
+        LogUtil.d("animPathX  ===  " + animPathX);
+
         lineStartLeft.x = nodeTwoPoint.x - animPathX;
         lineStartLeft.y = -(lineStartLeft.x * startLineK + startLineB);
 
@@ -368,10 +393,10 @@ final public class StockArrowView extends View {
 
         PointF lineLeft = new PointF();
         PointF lineRight = new PointF();
-        lineLeft.x = endPoint.x - 5;
+        lineLeft.x = endPoint.x - 2;
         lineLeft.y = -(lineLeft.x * lineK + lineB);
 
-        lineRight.x = endPoint.x + 5;
+        lineRight.x = endPoint.x + 2;
         lineRight.y = -(lineRight.x * lineK + lineB);
 
         Path linePath = new Path();
@@ -380,16 +405,24 @@ final public class StockArrowView extends View {
         linePath.lineTo(lineStartRight.x, lineStartRight.y);
         linePath.lineTo(lineRight.x, lineRight.y);
         linePath.lineTo(lineLeft.x, lineLeft.y);
+        linePath.close();
 
-        canvas.drawPath(linePath, mPaint);
+        LogUtil.d("lineStartLeft  ===  " + lineStartLeft.x + " " + lineStartLeft.y);
+        LogUtil.d("lineStartRight  ===  " + lineStartRight.x + "  " + lineStartRight.y);
+        LogUtil.d("lineRight  ===  " + lineRight.x + "  " + lineRight.y);
+        LogUtil.d("lineLeft  ===  " + lineLeft.x + "   "+ lineLeft.y);
+
+
+        canvas.drawPath(linePath, arrowPaint);
 
 
         Path arrowPath = new Path();
         arrowPath.moveTo(arrowEndPoint.x, arrowEndPoint.y);
         arrowPath.lineTo(arrowLeftPoint.x, arrowLeftPoint.y);
         arrowPath.lineTo(arrowRightPoint.x, arrowRightPoint.y);
+        arrowPath.close();
 
-        canvas.drawPath(arrowPath, mPaint);
+        canvas.drawPath(arrowPath, arrowPaint);
 
     }
 }
