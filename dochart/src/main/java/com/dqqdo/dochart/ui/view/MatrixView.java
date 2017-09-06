@@ -64,9 +64,7 @@ public class MatrixView extends View{
 
     @Override
     public void onDraw(Canvas canvas) {
-
         canvas.drawBitmap(mBitmap,matrix,mPaint);
-
     }
 
 

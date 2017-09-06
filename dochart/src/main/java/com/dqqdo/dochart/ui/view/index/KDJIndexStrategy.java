@@ -71,7 +71,7 @@ public class KDJIndexStrategy extends IndexStrategy {
     }
 
     /**
-     * EMA需要12 和 26 天的数据，需要开始时就计算完毕
+     * RSV需要9天的数据，需要开始时就计算完毕
      */
     private void initKDJ() {
 

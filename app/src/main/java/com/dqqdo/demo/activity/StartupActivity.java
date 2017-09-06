@@ -1,14 +1,17 @@
 package com.dqqdo.demo.activity;
 
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.dqqdo.demo.R;
 import com.dqqdo.demo.activity.stock.BasicKLineActivity;
 import com.dqqdo.demo.activity.stock.StockIndexActivity;
+import com.dqqdo.dochart.util.LogUtil;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -27,6 +30,10 @@ public class StartupActivity extends AppCompatActivity {
     @Bind(R.id.btn_stock_index)
     Button btnStockIndex;
 
+    @Bind(R.id.tv_font_test)
+    TextView tvFontTest;
+
+
     @Bind(R.id.btn_anim)
     Button btnAnim;
 
@@ -36,12 +43,21 @@ public class StartupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+
+
     }
 
     @OnClick({R.id.btn_pie_test, R.id.btn_bar_test,R.id.btn_line_test,R.id.btn_KLine_test,R.id.btn_stock_index,R.id.btn_anim,R.id.btn_matrix})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_pie_test:
+                // 测试 font
+                Paint.FontMetrics fontMetrics = tvFontTest.getPaint().getFontMetrics();
+                LogUtil.d("fontMetrics ==  " + fontMetrics);
+                LogUtil.d("height ==  " + tvFontTest.getMeasuredHeight());
+                LogUtil.d("getTextSize ==  " + tvFontTest.getPaint().getTextSize());
+
                 Intent pieIntent = new Intent(StartupActivity.this, PieChartActivity.class);
                 startActivity(pieIntent);
                 break;

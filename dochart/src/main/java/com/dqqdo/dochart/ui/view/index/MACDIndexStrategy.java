@@ -93,7 +93,6 @@ public class MACDIndexStrategy extends IndexStrategy {
                     dea = 0;
                     macd = 0;
 
-
                 } else {
 
                     MACDDO preDO = macddos.get(i - 1);
@@ -108,7 +107,6 @@ public class MACDIndexStrategy extends IndexStrategy {
                     dea = preDea * 8 / 10 + diff * 2 / 10;
                     // macd
                     macd = 2 * (diff - dea);
-
 
                 }
 
