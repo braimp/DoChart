@@ -118,7 +118,6 @@ final public class StockArrowView extends View {
     private void initPaint() {
 
         mPaint = new Paint();
-        LogUtil.d("lineWidth  ===  " + lineWidth);
         mPaint.setStrokeWidth(lineWidth);
         mPaint.setColor(firstIndexColor);
 
@@ -150,9 +149,6 @@ final public class StockArrowView extends View {
         // 准备数据
         width = getWidth();
         height = getHeight();
-
-        LogUtil.d("width  ----  " + width);
-        LogUtil.d("height  ----  " + height);
 
         initPoint();
         initPaint();
@@ -236,6 +232,7 @@ final public class StockArrowView extends View {
 
         // 刷图案背景
         mPaint.setColor(firstIndexColor);
+        arrowPaint.setColor(firstIndexColor);
 
         fixedPath.reset();
         fixedPath.moveTo(startPoint.x,startPoint.y);
@@ -243,8 +240,6 @@ final public class StockArrowView extends View {
         fixedPath.lineTo(nodeTwoPoint.x,nodeTwoPoint.y);
         canvas.drawPath(fixedPath,mPaint);
 
-//        canvas.drawLine(startPoint.x, startPoint.y, nodeOnePoint.x, nodeOnePoint.y, mPaint);
-//        canvas.drawLine(nodeOnePoint.x, nodeOnePoint.y, nodeTwoPoint.x, nodeTwoPoint.y, mPaint);
 
         canvas.drawLine(startPoint.x - 10, startPoint.y, startPoint.x + lineWidth + 10, startPoint.y, erasurePaint);
 
@@ -253,29 +248,34 @@ final public class StockArrowView extends View {
         drawCompleteThirdLine(canvas);
 
 
-        // 刷动画
-        if (animIndex < endPoint.x) {
-            animIndex += animSpeed;
-        }
+
 
         drawColorRect(canvas);
         mPaint.setColor(secondIndexColor);
+        arrowPaint.setColor(secondIndexColor);
 
 
         if (animIndex < nodeOnePoint.x) {
             float tempY = (k1 * animIndex + b1);
             canvas.drawLine(startPoint.x, startPoint.y, animIndex, -tempY, mPaint);
-            canvas.drawLine(startPoint.x - 10, startPoint.y, startPoint.x + lineWidth, startPoint.y, erasurePaint);
+            canvas.drawLine(startPoint.x - 10, startPoint.y, startPoint.x + lineWidth + 10, startPoint.y, erasurePaint);
         } else {
-            canvas.drawLine(startPoint.x, startPoint.y, nodeOnePoint.x, nodeOnePoint.y, mPaint);
-            canvas.drawLine(startPoint.x - 10, startPoint.y, startPoint.x + lineWidth, startPoint.y, erasurePaint);
+            fixedPath.reset();
+            fixedPath.moveTo(startPoint.x,startPoint.y);
+            fixedPath.lineTo(nodeOnePoint.x,nodeOnePoint.y);
+
+
 
             // 剩下的节点
             if (animIndex < nodeTwoPoint.x) {
                 float tempY = (k2 * animIndex + b2);
-                canvas.drawLine(nodeOnePoint.x, nodeOnePoint.y, animIndex, -tempY, mPaint);
+                fixedPath.lineTo(animIndex,-tempY);
+                canvas.drawPath(fixedPath,mPaint);
+                canvas.drawLine(startPoint.x - 10, startPoint.y, startPoint.x + lineWidth + 10, startPoint.y, erasurePaint);
             } else {
-                canvas.drawLine(nodeOnePoint.x, nodeOnePoint.y, nodeTwoPoint.x, nodeTwoPoint.y, mPaint);
+
+                fixedPath.lineTo(nodeTwoPoint.x,nodeTwoPoint.y);
+                canvas.drawPath(fixedPath,mPaint);
 
                 if (animIndex < endPoint.x) {
 
@@ -286,6 +286,7 @@ final public class StockArrowView extends View {
                     float perAnimLineNum = animLineWidth / animFrameNum;
                     int nowFrameIndex = (int) (animIndex - nodeTwoPoint.x);
 
+
                     float tempY = (k3 * animIndex + b3);
 
                     float lineK = -1 / k3;
@@ -293,12 +294,13 @@ final public class StockArrowView extends View {
 
                     PointF lineLeft = new PointF();
                     PointF lineRight = new PointF();
-                    lineLeft.x = animIndex - (10 - perAnimLineNum * nowFrameIndex);
+
+
+                    lineLeft.x = animIndex - (2 - perAnimLineNum * nowFrameIndex);
                     lineLeft.y = -(lineLeft.x * lineK + lineB);
 
-                    lineRight.x = animIndex + (10 - perAnimLineNum * nowFrameIndex);
+                    lineRight.x = animIndex + (2 - perAnimLineNum * nowFrameIndex);
                     lineRight.y = -(lineRight.x * lineK + lineB);
-
 
                     Path linePath = new Path();
 
@@ -306,20 +308,26 @@ final public class StockArrowView extends View {
                     linePath.lineTo(lineStartRight.x, lineStartRight.y);
                     linePath.lineTo(lineRight.x, lineRight.y);
                     linePath.lineTo(lineLeft.x, lineLeft.y);
+                    linePath.close();
 
-                    canvas.drawPath(linePath, mPaint);
+                    canvas.drawPath(linePath, arrowPaint);
 
+                    canvas.drawLine(startPoint.x - 10, startPoint.y, startPoint.x + lineWidth + 10, startPoint.y, erasurePaint);
                 } else {
+
                     drawCompleteThirdLine(canvas);
                 }
             }
 
         }
 
-
+        // 刷动画
         if (animIndex > endPoint.x) {
             animIndex = (int) startPoint.x;
+        }else{
+            animIndex += animSpeed;
         }
+
         invalidate();
 
 //        LogUtil.d("end --- " + (SystemClock.elapsedRealtime() - startTime));
@@ -370,8 +378,6 @@ final public class StockArrowView extends View {
         // 计算path起点x坐标
         animPathX = (float) (Math.sqrt(Math.pow(lineWidth / 2, 2) / (Math.pow(startLineK, 2) + 1)));
 
-        LogUtil.d("animPathX  ===  " + animPathX);
-
         lineStartLeft.x = nodeTwoPoint.x - animPathX;
         lineStartLeft.y = -(lineStartLeft.x * startLineK + startLineB);
 
@@ -406,12 +412,6 @@ final public class StockArrowView extends View {
         linePath.lineTo(lineRight.x, lineRight.y);
         linePath.lineTo(lineLeft.x, lineLeft.y);
         linePath.close();
-
-        LogUtil.d("lineStartLeft  ===  " + lineStartLeft.x + " " + lineStartLeft.y);
-        LogUtil.d("lineStartRight  ===  " + lineStartRight.x + "  " + lineStartRight.y);
-        LogUtil.d("lineRight  ===  " + lineRight.x + "  " + lineRight.y);
-        LogUtil.d("lineLeft  ===  " + lineLeft.x + "   "+ lineLeft.y);
-
 
         canvas.drawPath(linePath, arrowPaint);
 
