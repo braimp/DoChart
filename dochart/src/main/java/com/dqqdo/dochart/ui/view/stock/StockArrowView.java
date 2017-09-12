@@ -166,8 +166,8 @@ final public class StockArrowView extends View {
         arrowLength = width / 20;
         arrowWidth = arrowLength / 5;
 
-        greenRect.set((float) (width * 0.15), (float) (width * 0.5), (float) (width * 0.18), (float) (width * 0.6));
-        redRect.set((float) (width * 0.21), (float) (width * 0.5), (float) (width * 0.24), (float) (width * 0.6));
+        greenRect.set((float) (width * 0.15), (float) (width * 0.5), (float) (width * 0.16), (float) (width * 0.6));
+        redRect.set((float) (width * 0.21), (float) (width * 0.5), (float) (width * 0.22), (float) (width * 0.6));
 
         // 各关键点的位置
         startPoint.set((float) (width * 0.15), (float) (width * 0.9));
@@ -219,7 +219,6 @@ final public class StockArrowView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        long startTime = SystemClock.elapsedRealtime();
 //        canvas.clipRect(0,0,width,height);
 
         // 刷底色
@@ -282,7 +281,7 @@ final public class StockArrowView extends View {
                     // 动画份数
                     int animFrameNum = (int) (endPoint.x - nodeTwoPoint.x);
                     // 总的变化量
-                    float animLineWidth = animPathX - 5;
+                    float animLineWidth = animPathX  / 2;
                     float perAnimLineNum = animLineWidth / animFrameNum;
                     int nowFrameIndex = (int) (animIndex - nodeTwoPoint.x);
 
@@ -296,10 +295,10 @@ final public class StockArrowView extends View {
                     PointF lineRight = new PointF();
 
 
-                    lineLeft.x = animIndex - (2 - perAnimLineNum * nowFrameIndex);
+                    lineLeft.x = animIndex - (5 - perAnimLineNum * nowFrameIndex);
                     lineLeft.y = -(lineLeft.x * lineK + lineB);
 
-                    lineRight.x = animIndex + (2 - perAnimLineNum * nowFrameIndex);
+                    lineRight.x = animIndex + (5 - perAnimLineNum * nowFrameIndex);
                     lineRight.y = -(lineRight.x * lineK + lineB);
 
                     Path linePath = new Path();
@@ -330,7 +329,6 @@ final public class StockArrowView extends View {
 
         invalidate();
 
-//        LogUtil.d("end --- " + (SystemClock.elapsedRealtime() - startTime));
 
     }
 
@@ -399,10 +397,11 @@ final public class StockArrowView extends View {
 
         PointF lineLeft = new PointF();
         PointF lineRight = new PointF();
-        lineLeft.x = endPoint.x - 2;
+        lineLeft.x = endPoint.x - animPathX / 2;
         lineLeft.y = -(lineLeft.x * lineK + lineB);
 
-        lineRight.x = endPoint.x + 2;
+        LogUtil.d(" animPathX  ---   " + animPathX);
+        lineRight.x = endPoint.x + animPathX / 2;
         lineRight.y = -(lineRight.x * lineK + lineB);
 
         Path linePath = new Path();
