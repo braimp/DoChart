@@ -58,13 +58,7 @@
         android:id="@+id/btn_matrix"
         />
 
-    <TextView
-        android:text="测试文本aaa111111111111反对司法ＤＪＪＪｆｆＦＦＦ４５６４４５４５６４６５４"
-        android:layout_width="match_parent"
-        android:textSize="20dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/tv_font_test"
-        />
+
 
 
 </LinearLayout>

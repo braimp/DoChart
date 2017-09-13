@@ -30,9 +30,6 @@ public class StartupActivity extends AppCompatActivity {
     @Bind(R.id.btn_stock_index)
     Button btnStockIndex;
 
-    @Bind(R.id.tv_font_test)
-    TextView tvFontTest;
-
 
     @Bind(R.id.btn_anim)
     Button btnAnim;
@@ -52,11 +49,6 @@ public class StartupActivity extends AppCompatActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_pie_test:
-                // 测试 font
-                Paint.FontMetrics fontMetrics = tvFontTest.getPaint().getFontMetrics();
-                LogUtil.d("fontMetrics ==  " + fontMetrics);
-                LogUtil.d("height ==  " + tvFontTest.getMeasuredHeight());
-                LogUtil.d("getTextSize ==  " + tvFontTest.getPaint().getTextSize());
 
                 Intent pieIntent = new Intent(StartupActivity.this, PieChartActivity.class);
                 startActivity(pieIntent);

@@ -32,8 +32,9 @@ public class MatrixView extends View{
      */
     private void init(Context context) {
         mBitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.foo);
+        matrix.postTranslate(100,100);
         matrix.preScale(0.5f,0.5f);
-        matrix.preTranslate(100,100);
+
 
     }
 
