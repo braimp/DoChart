@@ -5,6 +5,12 @@
               android:background="#000000"
               android:layout_height="match_parent">
 
+    <Button
+        android:layout_width="match_parent"
+        android:id="@+id/btn_get"
+        android:text="获取通讯录"
+        android:layout_height="wrap_content"/>
+
     <com.dqqdo.dochart.ui.view.MatrixView
         android:layout_width="match_parent"
         android:id="@+id/pie_chart_view"
