@@ -1,5 +1,7 @@
 package com.dqqdo.dobase;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -12,16 +14,14 @@ import android.view.View;
  */
 public abstract class BaseActivity extends FragmentActivity {
 
-    private Handler mMainHandler;//主线程的 Handler。
-    private Handler mWorkHandler;//工作线程的 Handler。
-    HandlerThread mHandlerThread;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        setVolumeControlStream(AudioManager.STREAM_MUSIC);// 使得音量键控制媒体声音
+        getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        getWindow().getDecorView().setBackgroundDrawable(null);
 
         setContentView(getContentView());
 
@@ -31,22 +31,7 @@ public abstract class BaseActivity extends FragmentActivity {
 
     }
 
-    public Handler getMainHandler() {
-        if (mMainHandler==null){
-            mMainHandler = new Handler(getMainLooper());
-        }
-        return mMainHandler;
-    }
 
-
-    public Handler getWorkHandler() {
-        if (mWorkHandler==null){
-            mHandlerThread = new HandlerThread("TrainingClient");
-            mHandlerThread.start();
-            mWorkHandler = new Handler(mHandlerThread.getLooper());
-        }
-        return mWorkHandler;
-    }
 
 
     /**

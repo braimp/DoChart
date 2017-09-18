@@ -10,7 +10,10 @@ import android.graphics.RectF;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 
 import com.dqqdo.dochart.util.LogUtil;
 
@@ -23,6 +26,8 @@ final public class StockArrowView extends View {
     /********************** 配置量***********************/
     // 组件的背景颜色
     private int bgColor = Color.WHITE;
+
+    private boolean isViewReady = false;
 
     // 主题图案的第一颜色
     private int firstIndexColor = Color.GREEN;
@@ -49,9 +54,9 @@ final public class StockArrowView extends View {
     private int animIndex = 100;
     // 绘制过程中用到的主要画笔
     private Paint mPaint;
+    private Paint colorRectPaint;
     private Paint arrowPaint;
 
-    private Paint candlePaint;
     // 用来擦除的画笔
     private Paint erasurePaint;
 
@@ -94,6 +99,8 @@ final public class StockArrowView extends View {
 
     Path fixedPath = new Path();
 
+    // 指示蜡烛线超出蜡烛本身的高度
+    private float candleWickLength = 20;
 
     public StockArrowView(Context context) {
         super(context);
@@ -121,9 +128,10 @@ final public class StockArrowView extends View {
         mPaint.setStrokeWidth(lineWidth);
         mPaint.setColor(firstIndexColor);
 
-        candlePaint = new Paint();
-        candlePaint.setStrokeWidth(5);
-        candlePaint.setColor(Color.BLACK);
+        colorRectPaint = new Paint();
+        colorRectPaint.setStrokeWidth(5);
+        colorRectPaint.setColor(Color.BLACK);
+
 
         erasurePaint = new Paint();
         erasurePaint.setStrokeWidth(lineWidth);
@@ -140,20 +148,24 @@ final public class StockArrowView extends View {
         arrowPaint = new Paint();
         arrowPaint.setStrokeWidth(1);
         arrowPaint.setColor(firstIndexColor);
+
     }
+
 
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        // 准备数据
-        width = getWidth();
-        height = getHeight();
-
-        initPoint();
-        initPaint();
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        width = w;
+        height = h;
+        if(width != 0 && height != 0){
+            initPoint();
+            initPaint();
+            isViewReady = true;
+        }else{
+            isViewReady = false;
+        }
     }
-
 
     /**
      * 初始化关键点位置坐标（如果需要改变图案形状，在这里修改）
@@ -166,8 +178,10 @@ final public class StockArrowView extends View {
         arrowLength = width / 20;
         arrowWidth = arrowLength / 5;
 
-        greenRect.set((float) (width * 0.15), (float) (width * 0.5), (float) (width * 0.16), (float) (width * 0.6));
-        redRect.set((float) (width * 0.21), (float) (width * 0.5), (float) (width * 0.22), (float) (width * 0.6));
+        greenRect.set((float) (width * 0.15), (float) (width * 0.5), (float) (width * 0.18), (float) (width * 0.6));
+        redRect.set((float) (width * 0.21), (float) (width * 0.5), (float) (width * 0.24), (float) (width * 0.6));
+
+        candleWickLength = greenRect.height() /  3;
 
         // 各关键点的位置
         startPoint.set((float) (width * 0.15), (float) (width * 0.9));
@@ -219,12 +233,15 @@ final public class StockArrowView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-//        canvas.clipRect(0,0,width,height);
+
+        // 限定有效绘制区域去屏幕区域，超出屏幕的不绘制
+        canvas.clipRect(0,0,width,height);
+
 
         // 刷底色
         canvas.drawColor(bgColor);
 
-        if(animIndex  == 0 || rectAnimSpeed == 0){
+        if(animIndex  == 0 || rectAnimSpeed == 0 || !isViewReady){
             // 数据尚未初始化完成
             return ;
         }
@@ -239,14 +256,11 @@ final public class StockArrowView extends View {
         fixedPath.lineTo(nodeTwoPoint.x,nodeTwoPoint.y);
         canvas.drawPath(fixedPath,mPaint);
 
-
         canvas.drawLine(startPoint.x - 10, startPoint.y, startPoint.x + lineWidth + 10, startPoint.y, erasurePaint);
 
 
         calcThirdLineStart();
         drawCompleteThirdLine(canvas);
-
-
 
 
         drawColorRect(canvas);
@@ -317,7 +331,6 @@ final public class StockArrowView extends View {
                     drawCompleteThirdLine(canvas);
                 }
             }
-
         }
 
         // 刷动画
@@ -338,28 +351,22 @@ final public class StockArrowView extends View {
      */
     private void drawColorRect(Canvas canvas){
 
-        canvas.drawLine(redRect.centerX(),redRect.bottom + 10,redRect.centerX(),redRect.top - 10,candlePaint);
-        canvas.drawLine(greenRect.centerX(),greenRect.bottom + 10,greenRect.centerX(),greenRect.top - 10,candlePaint);
+        colorRectPaint.setColor(Color.BLACK);
+        // 绘制蜡烛线的顶端位置坐标
+        canvas.drawLine(redRect.centerX(),redRect.bottom + candleWickLength,redRect.centerX(),redRect.top - candleWickLength,colorRectPaint);
+        canvas.drawLine(greenRect.centerX(),greenRect.bottom + candleWickLength,greenRect.centerX(),greenRect.top - candleWickLength,colorRectPaint);
 
         // 红绿色块交替
-
         if (animIndex % rectAnimSpeed > rectAnimSpeed / 2) {
-
-            mPaint.setColor(Color.RED);
-            canvas.drawRect(redRect, mPaint);
-
-            mPaint.setColor(Color.GREEN);
-            canvas.drawRect(greenRect, mPaint);
-
-
+            colorRectPaint.setColor(Color.RED);
+            canvas.drawRect(redRect, colorRectPaint);
+            colorRectPaint.setColor(Color.GREEN);
+            canvas.drawRect(greenRect, colorRectPaint);
         } else {
-
-            mPaint.setColor(Color.GREEN);
-            canvas.drawRect(redRect, mPaint);
-
-            mPaint.setColor(Color.RED);
-            canvas.drawRect(greenRect, mPaint);
-
+            colorRectPaint.setColor(Color.GREEN);
+            canvas.drawRect(redRect, colorRectPaint);
+            colorRectPaint.setColor(Color.RED);
+            canvas.drawRect(greenRect, colorRectPaint);
         }
     }
 
@@ -400,7 +407,6 @@ final public class StockArrowView extends View {
         lineLeft.x = endPoint.x - animPathX / 2;
         lineLeft.y = -(lineLeft.x * lineK + lineB);
 
-        LogUtil.d(" animPathX  ---   " + animPathX);
         lineRight.x = endPoint.x + animPathX / 2;
         lineRight.y = -(lineRight.x * lineK + lineB);
 
