@@ -11,6 +11,8 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/dobase" />
             <option value="$PROJECT_DIR$/dochart" />
+            <option value="$PROJECT_DIR$/domonitor" />
+            <option value="$PROJECT_DIR$/doplugin" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

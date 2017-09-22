@@ -1,1 +1,1 @@
-include ':app', ':dobase', ':dochart'
+include ':app', ':dobase', ':dochart', ':domonitor', ':doplugin'

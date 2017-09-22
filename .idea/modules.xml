@@ -7,6 +7,8 @@
       <module fileurl="file://$PROJECT_DIR$/chart_sample.iml" filepath="$PROJECT_DIR$/chart_sample.iml" />
       <module fileurl="file://$PROJECT_DIR$/dobase/dobase.iml" filepath="$PROJECT_DIR$/dobase/dobase.iml" />
       <module fileurl="file://$PROJECT_DIR$/dochart/dochart.iml" filepath="$PROJECT_DIR$/dochart/dochart.iml" />
+      <module fileurl="file://$PROJECT_DIR$/domonitor/domonitor.iml" filepath="$PROJECT_DIR$/domonitor/domonitor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/doplugin/doplugin.iml" filepath="$PROJECT_DIR$/doplugin/doplugin.iml" />
     </modules>
   </component>
 </project>
