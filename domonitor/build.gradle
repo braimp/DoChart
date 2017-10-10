@@ -33,7 +33,7 @@ buildscript {
         classpath 'com.dqqdo.doplugin:doplugin:1.0.0'
     }
 }
-apply plugin: 'plugin.test'
+apply plugin: 'doplugin'
 
 
 dependencies {

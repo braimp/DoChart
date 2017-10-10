@@ -27,7 +27,6 @@ public class BarChartActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-
     }
 
     @Override
