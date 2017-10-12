@@ -26,7 +26,6 @@ final public class StockArrowView extends View {
     /********************** 配置量***********************/
     // 组件的背景颜色
     private int bgColor = Color.WHITE;
-
     private boolean isViewReady = false;
 
     // 主题图案的第一颜色
@@ -34,7 +33,7 @@ final public class StockArrowView extends View {
     // 主题图案的第二颜色
     private int secondIndexColor = Color.RED;
 
-    // 箭头主体宽度，会动态改变
+    // 箭头线段主体宽度，会动态改变
     private int lineWidth = 20;
     // 组件整体宽高
     private int width, height;
@@ -237,7 +236,6 @@ final public class StockArrowView extends View {
         // 限定有效绘制区域去屏幕区域，超出屏幕的不绘制
         canvas.clipRect(0,0,width,height);
 
-
         // 刷底色
         canvas.drawColor(bgColor);
 
@@ -264,20 +262,22 @@ final public class StockArrowView extends View {
 
 
         drawColorRect(canvas);
+
         mPaint.setColor(secondIndexColor);
         arrowPaint.setColor(secondIndexColor);
 
 
         if (animIndex < nodeOnePoint.x) {
+            // 第一段动画
             float tempY = (k1 * animIndex + b1);
             canvas.drawLine(startPoint.x, startPoint.y, animIndex, -tempY, mPaint);
             canvas.drawLine(startPoint.x - 10, startPoint.y, startPoint.x + lineWidth + 10, startPoint.y, erasurePaint);
         } else {
+            // 第二段动画
+
             fixedPath.reset();
             fixedPath.moveTo(startPoint.x,startPoint.y);
             fixedPath.lineTo(nodeOnePoint.x,nodeOnePoint.y);
-
-
 
             // 剩下的节点
             if (animIndex < nodeTwoPoint.x) {
@@ -290,33 +290,46 @@ final public class StockArrowView extends View {
                 fixedPath.lineTo(nodeTwoPoint.x,nodeTwoPoint.y);
                 canvas.drawPath(fixedPath,mPaint);
 
-                if (animIndex < endPoint.x) {
+                if (animIndex <= endPoint.x) {
 
                     // 动画份数
                     int animFrameNum = (int) (endPoint.x - nodeTwoPoint.x);
                     // 总的变化量
-                    float animLineWidth = animPathX  / 2;
+                    float animLineWidth = lineWidth / 4;
+                    // 每一帧动画，第三部分线段宽度的缩小步长
                     float perAnimLineNum = animLineWidth / animFrameNum;
+                    // 当前帧动画下标
                     int nowFrameIndex = (int) (animIndex - nodeTwoPoint.x);
+                    // 当前帧下的线段宽度
+                    float nowAnimLineWidth = lineWidth / 2 - nowFrameIndex * perAnimLineNum;
 
 
                     float tempY = (k3 * animIndex + b3);
-
                     float lineK = -1 / k3;
                     float lineB = tempY - lineK * animIndex;
+
+
 
                     PointF lineLeft = new PointF();
                     PointF lineRight = new PointF();
 
+                    // 计算path起点x坐标
+                    float animStepX = (float) (Math.sqrt(Math.pow(nowAnimLineWidth / 2, 2) / (Math.pow(lineK, 2) + 1)));
 
-                    lineLeft.x = animIndex - (5 - perAnimLineNum * nowFrameIndex);
+                    lineLeft.x = animIndex - animStepX;
                     lineLeft.y = -(lineLeft.x * lineK + lineB);
 
-                    lineRight.x = animIndex + (5 - perAnimLineNum * nowFrameIndex);
+                    lineRight.x = animIndex + animStepX;
                     lineRight.y = -(lineRight.x * lineK + lineB);
 
-                    Path linePath = new Path();
+//                    lineLeft.x = animIndex - (5 - perAnimLineNum * nowFrameIndex);
+//                    lineLeft.y = -(lineLeft.x * lineK + lineB);
+//                    lineRight.x = animIndex + (5 - perAnimLineNum * nowFrameIndex);
+//                    lineRight.y = -(lineRight.x * lineK + lineB);
 
+
+                    // 绘制形状
+                    Path linePath = new Path();
                     linePath.moveTo(lineStartLeft.x, lineStartLeft.y);
                     linePath.lineTo(lineStartRight.x, lineStartRight.y);
                     linePath.lineTo(lineRight.x, lineRight.y);
@@ -324,14 +337,14 @@ final public class StockArrowView extends View {
                     linePath.close();
 
                     canvas.drawPath(linePath, arrowPaint);
-
                     canvas.drawLine(startPoint.x - 10, startPoint.y, startPoint.x + lineWidth + 10, startPoint.y, erasurePaint);
                 } else {
-
+                    // 绘制完整的第二层动画
                     drawCompleteThirdLine(canvas);
                 }
             }
         }
+
 
         // 刷动画
         if (animIndex > endPoint.x) {
@@ -379,7 +392,6 @@ final public class StockArrowView extends View {
         float startLineK = -1 / k3;
         float startLineB = -nodeTwoPoint.y - startLineK * nodeTwoPoint.x;
 
-
         // 计算path起点x坐标
         animPathX = (float) (Math.sqrt(Math.pow(lineWidth / 2, 2) / (Math.pow(startLineK, 2) + 1)));
 
@@ -404,11 +416,16 @@ final public class StockArrowView extends View {
 
         PointF lineLeft = new PointF();
         PointF lineRight = new PointF();
-        lineLeft.x = endPoint.x - animPathX / 2;
+
+        // 计算path起点x坐标
+        float animStepX = (float) (Math.sqrt(Math.pow(lineWidth / 4, 2) / (Math.pow(lineK, 2) + 1)));
+
+        lineLeft.x = endPoint.x - animStepX;
         lineLeft.y = -(lineLeft.x * lineK + lineB);
 
-        lineRight.x = endPoint.x + animPathX / 2;
+        lineRight.x = endPoint.x + animStepX;
         lineRight.y = -(lineRight.x * lineK + lineB);
+
 
         Path linePath = new Path();
 
