@@ -694,6 +694,10 @@ public class KLineView extends View {
                             * stockRightBean.radioRightCumulative);
                     long mostLow = (long) (candleBean.getMostLow() * 1.0
                             * stockRightBean.radioRightCumulative);
+                    long m5 = (long) (candleBean.getM5() * 1.0
+                            * stockRightBean.radioRightCumulative);
+                    long m10 = (long) (candleBean.getM10() * 1.0
+                            * stockRightBean.radioRightCumulative);
 
                     LogUtil.d("i    ---------   " + drawCandleBean.getTime());
                     LogUtil.d("candleBean.getOpen()    ---------   " + candleBean.getOpen());
@@ -701,6 +705,12 @@ public class KLineView extends View {
                     LogUtil.d("candleBean.getMostHigh()    ---------   " + candleBean.getMostHigh());
                     LogUtil.d("candleBean.getMostLow()    ---------   " + candleBean.getMostLow());
                     LogUtil.d("radioRightCumulative    ---------   " + stockRightBean.radioRightCumulative);
+
+                    LogUtil.d("open    ---------   " + open);
+                    LogUtil.d("close    ---------   " + close);
+                    LogUtil.d("mostHigh    ---------   " + mostHigh);
+                    LogUtil.d("mostLow    ---------   " + mostLow);
+
                     LogUtil.d("********************************  ");
 
 
@@ -708,17 +718,13 @@ public class KLineView extends View {
                     drawCandleBean.setClose(close);
                     drawCandleBean.setMostHigh(mostHigh);
                     drawCandleBean.setMostLow(mostLow);
-
-//                    drawCandleBean.setOpen(candleBean.getOpen());
-//                    drawCandleBean.setClose(candleBean.getClose());
-//                    drawCandleBean.setMostHigh(candleBean.getMostHigh());
-//                    drawCandleBean.setMostLow(candleBean.getMostLow());
-
+                    drawCandleBean.setM5(m5);
+                    drawCandleBean.setM10(m10);
 
 
                 }else {
+
                     // 前复权  当日收盘价*当日累计复权比例/最新日期的累计复权比例
-                    drawCandleBean = candleBean;
                     drawCandleBean.setOpen((long) (candleBean.getOpen()
                             * stockRightBean.getRadioRightToday()
                             / stockRightBean.getRadioRightCumulative()));
@@ -735,11 +741,10 @@ public class KLineView extends View {
                 }
 
             }else{
-                drawCandleBean = candleBean;
-//                drawCandleBean.setOpen(candleBean.getOpen());
-//                drawCandleBean.setClose(candleBean.getClose());
-//                drawCandleBean.setMostHigh(candleBean.getMostHigh());
-//                drawCandleBean.setMostLow(candleBean.getMostLow());
+                drawCandleBean.setOpen(candleBean.getOpen());
+                drawCandleBean.setClose(candleBean.getClose());
+                drawCandleBean.setMostHigh(candleBean.getMostHigh());
+                drawCandleBean.setMostLow(candleBean.getMostLow());
             }
 
 
@@ -792,6 +797,9 @@ public class KLineView extends View {
 
         float lineBoundHeight = lineBottomBoundY - lineTopBoundY;
 
+        LogUtil.d("maxHigh  --- " + maxHigh);
+        LogUtil.d("minLow  --- " + minLow);
+
         perPixelValue = spaceValue * 1.0 / lineBoundHeight;
 
 
@@ -842,10 +850,11 @@ public class KLineView extends View {
 
         // 计算五档数值
         for (int i = 0; i < 5; i++) {
-            double yValue = (maxHigh * 1.0 - perPixelValue * i) / 100;
 
+            double yValue = (maxHigh * 1.0 - perPixelValue * i) / 100;
             DecimalFormat df = new DecimalFormat("###.00");
             descYStr[i] = df.format(yValue);
+
         }
 
     }
