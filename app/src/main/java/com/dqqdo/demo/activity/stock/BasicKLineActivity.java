@@ -2,14 +2,16 @@ package com.dqqdo.demo.activity.stock;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.dqqdo.demo.R;
-import com.dqqdo.dochart.ui.view.index.StockIndexView;
 import com.dqqdo.dochart.ui.view.stock.CandleBean;
 import com.dqqdo.dochart.ui.view.stock.KLineView;
 import com.dqqdo.dochart.util.LogUtil;
@@ -17,8 +19,6 @@ import com.dqqdo.dochart.util.LogUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * 基础KLine功能实现
@@ -28,6 +28,10 @@ import java.util.TimerTask;
 public class BasicKLineActivity extends Activity {
 
     private KLineView kLineView;
+    private RadioButton radioRightForward;
+    private RadioButton radioRightBackward;
+    private RadioButton radioRightNo;
+    private RadioGroup radioGroup;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,7 +39,28 @@ public class BasicKLineActivity extends Activity {
         setContentView(R.layout.activity_stock);
 
         kLineView = (KLineView) findViewById(R.id.kline_view);
+        radioRightForward = (RadioButton) findViewById(R.id.radio_right_forward);
+        radioRightBackward = (RadioButton) findViewById(R.id.radio_right_backward);
+        radioRightNo = (RadioButton) findViewById(R.id.radio_right_no);
+        radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
 
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
+
+                switch (checkedId){
+                    case R.id.radio_right_forward:
+                        kLineView.setRightType(KLineView.RightType.RIGHT_FORWARD);
+                        break;
+                    case R.id.radio_right_backward:
+                        kLineView.setRightType(KLineView.RightType.RIGHT_BACKWARD);
+                        break;
+                    case R.id.radio_right_no:
+                        kLineView.setRightType(KLineView.RightType.NO_RIGHT);
+                        break;
+                }
+            }
+        });
         initData();
 
     }
@@ -68,8 +93,6 @@ public class BasicKLineActivity extends Activity {
                 candleBean.setMostLow( array.getLong(5));
                 candleBean.setVolume(array.getLong(6));
                 candleBean.setAmount(array.getLong(7));
-
-
 
                 beans.add(candleBean);
             }

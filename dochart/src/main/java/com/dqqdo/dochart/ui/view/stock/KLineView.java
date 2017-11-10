@@ -22,127 +22,267 @@ import java.util.ArrayList;
 
 /**
  * K线界面组件
- * 作者：duqingquan
+ * @author duqingquan
  * 时间：2017/7/12 10:26
  */
 public class KLineView extends View {
 
-    // 上下文数据对象
+    /**
+     * 上下文数据对象
+     */
     private Context mContext;
 
 
-    // 蜡烛线宽度
+    /**
+     * 蜡烛线宽度
+     */
     private static int candleWidth = 15;
-    // 蜡烛线间隔量
+    /**
+     * 蜡烛线间隔量
+     */
     private static int candleSpace = 15;
-    // 左侧间距
-    private static final int axisLeftSpace = 80;
-    // 顶部间距
-    private static final int axisTopSpace = 10;
-    // 底部间距
-    private static final int axisBottomSpace = 10;
-    // 右侧间距
-    private static final int axisRightSpace = 30;
-    // 顶部的状态展示区域（M5-M10-M15）
-    private static final int topStatusSpace = 50;
+    /**
+     * 左侧间距
+     */
+    private static final int AXIS_LEFT_SPACE = 80;
+    /**
+     * 顶部间距
+     */
+    private static final int AXIS_TOP_SPACE = 10;
+    /**
+     * 底部间距
+     */
+    private static final int AXIS_BOTTOM_SPACE = 10;
+    /**
+     * 右侧间距
+     */
+    private static final int AXIS_RIGHT_SPACE = 30;
+    /**
+     * 顶部的状态展示区域（M5-M10-M15）
+     */
+    private static final int TOP_STATUS_SPACE = 50;
+    /**
+     * mean数据线段宽度
+     */
+    private static final int MEAN_LINE_WIDTH = 2;
 
-    // mean数据线段宽度
-    private static final int meanLineWidth = 2;
 
-
-    // Candle数据
+    /**
+     *  Candle数据
+     */
     private ArrayList<CandleBean> beans;
 
-    // 组件整体宽高
+    /**
+     *  变化过的 Candle数据
+     */
+    private ArrayList<CandleBean> drawBeans;
+
+    /**
+     * 组件整体宽高
+     */
     private int viewWidth, viewHeight;
-    // 可绘制区域整体
+    /**
+     * 可绘制区域整体
+     */
     private int drawWidth, drawHeight;
-    // 顶部边界距离绘制Top边界的绝对数
+    /**
+     * 顶部边界距离绘制Top边界的绝对数
+     */
     private float leftHeightNum;
-    // 顶部边界距离status边界的绝对数
+    /**
+     * 顶部边界距离status边界的绝对数
+     */
     private float statusHeightNum;
 
-    // 绘制KLine的主画笔
+    /**
+     * 绘制KLine的主画笔
+     */
     Paint mPaint = new Paint();
-    // 坐标画笔
+    /**
+     *  坐标画笔
+     */
     Paint axisPaint = new Paint();
-    // 状态栏画笔
+    /**
+     * 状态栏画笔
+     */
     Paint statusPaint = new Paint();
-    // toast画笔
+    /**
+     * toast画笔
+     */
     Paint toastPaint = new Paint();
-    // M5画笔
+    /**
+     * M5画笔
+     */
     Paint meanPaint = new Paint();
-    // M10画笔
+    /**
+     * M10画笔
+     */
     Paint mean10Paint = new Paint();
 
 
-    // top边界左上角坐标点
+    /**
+     * top边界左上角坐标点
+     */
     PointF leftTopPoint;
-    // top边界右上角坐标点
+    /**
+     * top边界右上角坐标点
+     */
     PointF rightTopPoint;
-    // status左上角坐标点
+    /**
+     * status左上角坐标点
+     */
     PointF statusLeftTopPoint;
-    // status右上角坐标点
+    /**
+     * status右上角坐标点
+     */
     PointF statusRightTopPoint;
-    // 左下角坐标点
+    /**
+     * 左下角坐标点
+     */
     PointF leftBottomPoint;
-    // 右下角坐标点
+    /**
+     * 右下角坐标点
+     */
     PointF rightBottomPoint;
 
-    // 蜡烛线开始下标
+    /**
+     * 蜡烛线开始下标
+     */
     private int startCandleIndex;
-    // 蜡烛线结束下标
+    /**
+     * 蜡烛线结束下标
+     */
     private int endCandleIndex;
-    // 每个绘制单元的宽度
+    /**
+     * 每个绘制单元的宽度
+     */
     private int perUnitWidth;
-    // 当前展示区域，总绘制单元数量
+    /**
+     * 当前展示区域，总绘制单元数量
+     */
     private int unitNum;
 
-    // 当前选中区域的最大数值
+
+    /**
+     * 当前选中区域的最大数值
+     */
     private long maxHigh;
-    // 当前选中区域的最小数值
+    /**
+     * 当前选中区域的最小数值
+     */
     private long minLow;
 
 
-    // 每像素对应的数值
+    /**
+     * 每像素对应的数值
+     */
     private double perPixelValue;
-    // 手势滑动过程中最小移动量
+    /**
+     * 手势滑动过程中最小移动量
+     */
     private static final int minMoveNum = 10;
 
-    // 用来判断滑动手势，记录本次手势的起始坐标
+    /**
+     * 用来判断滑动手势，记录本次手势的起始坐标
+     */
     private float lastX;
-    // 用来判断点击手势，记录本地点击动作的落下坐标
+    /**
+     * 用来判断点击手势，记录本地点击动作的落下坐标
+     */
     private float downX;
     private float downY;
-    // 点击事件的坐标位置
+    /**
+     * 点击事件的坐标位置
+     */
     private PointF clickPoint = new PointF();
 
 
-    // 是否已经找到了包含点击数的下标
+    /**
+     * 是否已经找到了包含点击数的下标
+     */
     private boolean isFindContainDone = false;
-    // 点击数下标
+    /**
+     * 点击数下标
+     */
     private int clickCandleIndex = 0;
-    // 选中区域的m5曲线
+    /**
+     * 选中区域的m5曲线
+     */
     private Path m5Path = new Path();
-    // 选中区域的m10曲线
+    /**
+     * 选中区域的m10曲线
+     */
     private Path m10Path = new Path();
 
-    // KLine的上层边界
+    /**
+     * KLine的上层边界
+     */
     private float lineTopBoundY;
-    // KLine的下层边界
+    /**
+     * KLine的下层边界
+     */
     private float lineBottomBoundY;
+
+
 
     /**
      * 组件模式
      */
     enum ViewModel {
-        // 浏览模式
+
+        /**
+         * 浏览模式
+         */
         SHOW_MODEL,
-        // 选中模式
+        /**
+         * 选中模式
+         */
         CHOOSE_MODEL
+
     }
 
-    // 组件模式
+
+    /**
+     * 除权 复权 类型
+     */
+    public enum RightType{
+
+        /**
+         * 前复权
+         */
+        RIGHT_FORWARD,
+
+        /**
+         * 后复权
+         */
+        RIGHT_BACKWARD,
+
+        /**
+         * 不复权
+         */
+        NO_RIGHT
+    }
+
+    /**
+     * 除复权选择
+     */
+    RightType rightType = RightType.NO_RIGHT;
+
+
+    public RightType getRightType() {
+        return rightType;
+    }
+
+    public void setRightType(RightType rightType) {
+        this.rightType = rightType;
+        updateAreaCandle();
+        invalidate();
+    }
+
+
+    /**
+     * 组件模式
+     */
     private ViewModel viewModel = ViewModel.SHOW_MODEL;
 
     /**
@@ -157,12 +297,15 @@ public class KLineView extends View {
         MIN60
     }
 
+
     /**
      * 时间单位
      */
     private TimeUnit timeUnit = TimeUnit.MONTH;
 
-    // 当前展示的下标
+    /**
+     * 当前展示的下标
+     */
     private int currentMoth = 0;
 
 
@@ -182,8 +325,86 @@ public class KLineView extends View {
     }
 
 
+    /**
+     * 股票除权，复权信息
+     */
+    class StockRightBean{
+
+        /**
+         * 当日复权比例
+         */
+        private double radioRightToday = 1;
+
+        /**
+         * 累计复权比例
+         */
+        private double radioRightCumulative = 1;
+
+
+        public double getRadioRightToday() {
+            return radioRightToday;
+        }
+
+        public void setRadioRightToday(double radioRightToday) {
+            this.radioRightToday = radioRightToday;
+        }
+
+        public double getRadioRightCumulative() {
+            return radioRightCumulative;
+        }
+
+        public void setRadioRightCumulative(double radioRightCumulative) {
+            this.radioRightCumulative = radioRightCumulative;
+        }
+
+    }
+
+    ArrayList<StockRightBean> rightBeans = new ArrayList<>();
+
     public void setBeans(ArrayList<CandleBean> beans) {
         this.beans = beans;
+        int size = beans.size();
+        drawBeans = new ArrayList<>(size);
+        rightBeans = new ArrayList<>(size);
+
+
+        for(int i = 0; i < size;i++){
+
+            CandleBean tmpBean = beans.get(i);
+            drawBeans.add(tmpBean.clone());
+
+            // 计算除权，复权相关信息
+            StockRightBean stockRightBean = new StockRightBean();
+
+            if(i == 0){
+                stockRightBean.setRadioRightToday(1);
+                stockRightBean.setRadioRightCumulative(1);
+            }else {
+                StockRightBean preRightBean = rightBeans.get(i -1);
+
+                CandleBean preCandleBean = beans.get(i - 1);
+                CandleBean nowCandleBean = beans.get(i);
+
+                double preRadio = preRightBean.radioRightCumulative;
+
+
+                double cumulativeRadio = preRadio *
+                        preCandleBean.getClose() * 1.0
+                        / nowCandleBean.getClose();
+
+                double todayRadio = preCandleBean.getClose() * 1.0
+                        / nowCandleBean.getClose();
+
+                stockRightBean.setRadioRightCumulative(cumulativeRadio);
+                stockRightBean.setRadioRightToday(todayRadio);
+
+            }
+
+            rightBeans.add(stockRightBean);
+
+        }
+
+
     }
 
 
@@ -226,14 +447,14 @@ public class KLineView extends View {
         meanPaint = new Paint();
         meanPaint.setStrokeCap(Paint.Cap.ROUND);
         meanPaint.setStyle(Paint.Style.STROKE);
-        meanPaint.setStrokeWidth(meanLineWidth);
+        meanPaint.setStrokeWidth(MEAN_LINE_WIDTH);
         meanPaint.setColor(Color.BLUE);
 
 
         mean10Paint = new Paint();
         mean10Paint.setStrokeCap(Paint.Cap.ROUND);
         mean10Paint.setStyle(Paint.Style.STROKE);
-        mean10Paint.setStrokeWidth(meanLineWidth);
+        mean10Paint.setStrokeWidth(MEAN_LINE_WIDTH);
         mean10Paint.setColor(Color.BLACK);
 
     }
@@ -246,12 +467,12 @@ public class KLineView extends View {
 
         leftHeightNum = (viewHeight - viewWidth) / 2;
 
-        leftTopPoint = new PointF(axisLeftSpace, leftHeightNum + axisTopSpace);
-        rightTopPoint = new PointF(viewWidth - axisRightSpace, leftHeightNum + axisTopSpace);
-        statusLeftTopPoint = new PointF(axisLeftSpace, leftHeightNum + axisTopSpace + topStatusSpace);
-        statusRightTopPoint = new PointF(viewWidth - axisRightSpace, leftHeightNum + axisTopSpace + topStatusSpace);
-        leftBottomPoint = new PointF(axisLeftSpace, viewHeight - leftHeightNum - axisBottomSpace);
-        rightBottomPoint = new PointF(viewWidth - axisRightSpace, viewHeight - leftHeightNum - axisBottomSpace);
+        leftTopPoint = new PointF(AXIS_LEFT_SPACE, leftHeightNum + AXIS_TOP_SPACE);
+        rightTopPoint = new PointF(viewWidth - AXIS_RIGHT_SPACE, leftHeightNum + AXIS_TOP_SPACE);
+        statusLeftTopPoint = new PointF(AXIS_LEFT_SPACE, leftHeightNum + AXIS_TOP_SPACE + TOP_STATUS_SPACE);
+        statusRightTopPoint = new PointF(viewWidth - AXIS_RIGHT_SPACE, leftHeightNum + AXIS_TOP_SPACE + TOP_STATUS_SPACE);
+        leftBottomPoint = new PointF(AXIS_LEFT_SPACE, viewHeight - leftHeightNum - AXIS_BOTTOM_SPACE);
+        rightBottomPoint = new PointF(viewWidth - AXIS_RIGHT_SPACE, viewHeight - leftHeightNum - AXIS_BOTTOM_SPACE);
 
 
         drawWidth = (int) (rightBottomPoint.x - leftTopPoint.x);
@@ -295,16 +516,15 @@ public class KLineView extends View {
 
             case MotionEvent.ACTION_POINTER_DOWN:
 
-                LogUtil.d("event.getPointerCount()   ====  " + event.getPointerCount());
                 if (event.getPointerCount() == 2) {
                     if (viewModel == ViewModel.SHOW_MODEL) {
                         // 浏览模式下，且是双指操作
                         startLen = Math.abs((int) event.getX(0) - (int) event.getX(1));
                     }
                 }
+
                 break;
             case MotionEvent.ACTION_DOWN:
-
 
                 // 判断左滑还是右滑
                 lastX = event.getX();
@@ -312,9 +532,9 @@ public class KLineView extends View {
                 downY = event.getY();
                 break;
             case MotionEvent.ACTION_MOVE:
+
                 int pointCount = event.getPointerCount();
 
-//                LogUtil.d("pointCount  ===  " + pointCount);
                 if (pointCount == 2) {
 
 
@@ -322,8 +542,6 @@ public class KLineView extends View {
                         // 浏览模式下，且是双指操作
                         int xLen = Math.abs((int) event.getX(0) - (int) event.getX(1));
 
-//                        LogUtil.d("xLen  ---  " + xLen);
-//                        LogUtil.d("startLen  ---  " + startLen);
 
                         int scaleX = (int) ((xLen - startLen) / 100);
                         if(scaleX > 0){
@@ -412,12 +630,11 @@ public class KLineView extends View {
                     } else {
                         viewModel = ViewModel.SHOW_MODEL;
                     }
-                    LogUtil.d("点击事件");
 
                     clickPoint.set(downX, downY);
                     invalidate();
                 } else {
-                    LogUtil.d("不是点击事件");
+                    return false;
                 }
 
                 // 判断左滑还是右滑
@@ -433,10 +650,15 @@ public class KLineView extends View {
     }
 
 
-    // Y轴描述的五档 坐标
-    private float descY[];
-    // Y轴描述的五档 文本
-    private String descYStr[];
+    /**
+     * Y轴描述的五档 坐标
+     */
+    private float[] descY;
+    /**
+     * Y轴描述的五档 文本
+     */
+    private String[] descYStr;
+
 
 
     /**
@@ -448,13 +670,84 @@ public class KLineView extends View {
         minLow = 0;
 
 
+
         // 第一趟需要计算出最大最小数字
         for (int i = startCandleIndex; i < endCandleIndex; i++) {
+
+            StockRightBean stockRightBean = rightBeans.get(i);
             CandleBean candleBean = beans.get(i);
+            CandleBean drawCandleBean = drawBeans.get(i);
+
+
+
+            // 如果存在除复权的情况，则提前进行处理
+            if(rightType != RightType.NO_RIGHT){
+
+                if(rightType == RightType.RIGHT_BACKWARD){
+
+                    // 后复权  当日收盘价*当日累计复权比例
+                    long open = (long) (candleBean.getOpen() * 1.0
+                            * stockRightBean.radioRightCumulative);
+                    long close = (long) (candleBean.getClose() * 1.0
+                            * stockRightBean.radioRightCumulative);
+                    long mostHigh = (long) (candleBean.getMostHigh() * 1.0
+                            * stockRightBean.radioRightCumulative);
+                    long mostLow = (long) (candleBean.getMostLow() * 1.0
+                            * stockRightBean.radioRightCumulative);
+
+                    LogUtil.d("i    ---------   " + drawCandleBean.getTime());
+                    LogUtil.d("candleBean.getOpen()    ---------   " + candleBean.getOpen());
+                    LogUtil.d("candleBean.getClose()    ---------   " + candleBean.getClose());
+                    LogUtil.d("candleBean.getMostHigh()    ---------   " + candleBean.getMostHigh());
+                    LogUtil.d("candleBean.getMostLow()    ---------   " + candleBean.getMostLow());
+                    LogUtil.d("radioRightCumulative    ---------   " + stockRightBean.radioRightCumulative);
+                    LogUtil.d("********************************  ");
+
+
+                    drawCandleBean.setOpen(open);
+                    drawCandleBean.setClose(close);
+                    drawCandleBean.setMostHigh(mostHigh);
+                    drawCandleBean.setMostLow(mostLow);
+
+//                    drawCandleBean.setOpen(candleBean.getOpen());
+//                    drawCandleBean.setClose(candleBean.getClose());
+//                    drawCandleBean.setMostHigh(candleBean.getMostHigh());
+//                    drawCandleBean.setMostLow(candleBean.getMostLow());
+
+
+
+                }else {
+                    // 前复权  当日收盘价*当日累计复权比例/最新日期的累计复权比例
+                    drawCandleBean = candleBean;
+                    drawCandleBean.setOpen((long) (candleBean.getOpen()
+                            * stockRightBean.getRadioRightToday()
+                            / stockRightBean.getRadioRightCumulative()));
+                    drawCandleBean.setClose((long) (candleBean.getClose()
+                            * stockRightBean.getRadioRightToday()
+                            / stockRightBean.getRadioRightCumulative()));
+                    drawCandleBean.setMostHigh((long) (candleBean.getMostHigh()
+                            * stockRightBean.getRadioRightToday()
+                            / stockRightBean.getRadioRightCumulative()));
+                    drawCandleBean.setMostLow((long) (candleBean.getMostLow()
+                            * stockRightBean.getRadioRightToday()
+                            / stockRightBean.getRadioRightCumulative()));
+
+                }
+
+            }else{
+                drawCandleBean = candleBean;
+//                drawCandleBean.setOpen(candleBean.getOpen());
+//                drawCandleBean.setClose(candleBean.getClose());
+//                drawCandleBean.setMostHigh(candleBean.getMostHigh());
+//                drawCandleBean.setMostLow(candleBean.getMostLow());
+            }
+
+
             // 最高价
-            long mostHigh = candleBean.getMostHigh();
-            long m5 = candleBean.getM5();
-            long m10 = candleBean.getM10();
+            long mostHigh = drawCandleBean.getMostHigh();
+            long m5 = drawCandleBean.getM5();
+            long m10 = drawCandleBean.getM10();
+
             if (maxHigh == 0) {
                 maxHigh = mostHigh;
             } else {
@@ -472,8 +765,9 @@ public class KLineView extends View {
             }
 
 
+
             // 最低价
-            long mostLow = candleBean.getMostLow();
+            long mostLow = drawCandleBean.getMostLow();
             if (minLow == 0) {
                 minLow = mostLow;
             } else {
@@ -503,18 +797,19 @@ public class KLineView extends View {
 
         int j = 0;
         for (int i = startCandleIndex; i < endCandleIndex; i++) {
-            CandleBean candleBean = beans.get(i);
+
+            CandleBean drawCandleBean = drawBeans.get(i);
             long candleTopValue;
             long candleBottomValue;
             // 计算展示颜色
-            if (candleBean.getClose() > candleBean.getOpen()) {
-                candleBean.setFlagColor(Color.RED);
-                candleTopValue = candleBean.getClose();
-                candleBottomValue = candleBean.getOpen();
+            if (drawCandleBean.getClose() > drawCandleBean.getOpen()) {
+                drawCandleBean.setFlagColor(Color.RED);
+                candleTopValue = drawCandleBean.getClose();
+                candleBottomValue = drawCandleBean.getOpen();
             } else {
-                candleBean.setFlagColor(Color.GREEN);
-                candleTopValue = candleBean.getOpen();
-                candleBottomValue = candleBean.getClose();
+                drawCandleBean.setFlagColor(Color.GREEN);
+                candleTopValue = drawCandleBean.getOpen();
+                candleBottomValue = drawCandleBean.getClose();
             }
 
             // 计算蜡烛线四个点
@@ -526,21 +821,21 @@ public class KLineView extends View {
 
             float topY = (float) ((maxHigh - candleTopValue) / perPixelValue + lineTopBoundY);
             float bottomY = (float) ((maxHigh - candleBottomValue) / perPixelValue + lineTopBoundY);
-            float wickTopY = (float) ((maxHigh - candleBean.getMostHigh()) / perPixelValue + lineTopBoundY);
-            float wickBottomY = (float) ((maxHigh - candleBean.getMostLow()) / perPixelValue + lineTopBoundY);
+            float wickTopY = (float) ((maxHigh - drawCandleBean.getMostHigh()) / perPixelValue + lineTopBoundY);
+            float wickBottomY = (float) ((maxHigh - drawCandleBean.getMostLow()) / perPixelValue + lineTopBoundY);
 
             //M5 -M10用到的数值
-            float m5Y = (float) ((maxHigh - candleBean.getM5()) / perPixelValue + lineTopBoundY);
-            float m10Y = (float) ((maxHigh - candleBean.getM10()) / perPixelValue + lineTopBoundY);
+            float m5Y = (float) ((maxHigh - drawCandleBean.getM5()) / perPixelValue + lineTopBoundY);
+            float m10Y = (float) ((maxHigh - drawCandleBean.getM10()) / perPixelValue + lineTopBoundY);
 
 
-            candleBean.setWickTopPoint(new PointF(middleX, wickTopY));
-            candleBean.setWickBottomPoint(new PointF(middleX, wickBottomY));
-            candleBean.setHolderLeftTopPoint(new PointF(startX, topY));
-            candleBean.setHolderRightBottomPoint(new PointF(endX, bottomY));
+            drawCandleBean.setWickTopPoint(new PointF(middleX, wickTopY));
+            drawCandleBean.setWickBottomPoint(new PointF(middleX, wickBottomY));
+            drawCandleBean.setHolderLeftTopPoint(new PointF(startX, topY));
+            drawCandleBean.setHolderRightBottomPoint(new PointF(endX, bottomY));
 
-            candleBean.setM5Point(new PointF(middleX, m5Y));
-            candleBean.setM10Point(new PointF(middleX, m10Y));
+            drawCandleBean.setM5Point(new PointF(middleX, m5Y));
+            drawCandleBean.setM10Point(new PointF(middleX, m10Y));
 
             j++;
         }
@@ -576,10 +871,9 @@ public class KLineView extends View {
 
 
 
-
         isFindContainDone = false;
 
-        if (beans == null || !(beans.size() > 0)) {
+        if (drawBeans == null || !(drawBeans.size() > 0)) {
             canvas.drawColor(Color.BLUE);
             return;
         }
@@ -594,11 +888,11 @@ public class KLineView extends View {
         m10Path = new Path();
 
         for (int i = startCandleIndex; i < endCandleIndex; i++) {
-            CandleBean candleBean = beans.get(i);
+            CandleBean drawCandleBean = drawBeans.get(i);
             // 判断当前的落点位置
             if (viewModel == ViewModel.CHOOSE_MODEL) {
                 if (!isFindContainDone) {
-                    if (candleBean.isContains(clickPoint)) {
+                    if (drawCandleBean.isContains(clickPoint)) {
                         isFindContainDone = true;
                         clickCandleIndex = i;
                     }
@@ -606,31 +900,31 @@ public class KLineView extends View {
             }
 
             // 绘制主体
-            candleBean.drawSelf(canvas, mPaint);
+            drawCandleBean.drawSelf(canvas, mPaint);
             // 绘制m5-m10曲线
             if (i == startCandleIndex) {
                 // 开始位置
-                PointF pointF = candleBean.getM5Point();
+                PointF pointF = drawCandleBean.getM5Point();
                 m5Path.moveTo(pointF.x, pointF.y);
-                PointF m10pointF = candleBean.getM10Point();
+                PointF m10pointF = drawCandleBean.getM10Point();
                 m10Path.moveTo(m10pointF.x, m10pointF.y);
 
-                int dayNum = getDayNum(candleBean.getTime());
+                int dayNum = getDayNum(drawCandleBean.getTime());
                 // 每个月一号，绘制月线
                 if (dayNum == 1) {
-                    float lineX = candleBean.getWickBottomPoint().x;
+                    float lineX = drawCandleBean.getWickBottomPoint().x;
                     canvas.drawLine(lineX, statusLeftTopPoint.y, lineX, leftBottomPoint.y, axisPaint);
                     // 绘制下标
-                    String dateStr = candleBean.getDateStr();
+                    String dateStr = drawCandleBean.getDateStr();
                     Rect rect = new Rect();
                     statusPaint.getTextBounds(dateStr, 0, dateStr.length(), rect);
                     canvas.drawText(dateStr, (lineX - rect.width() / 2), leftBottomPoint.y + rect.height(), statusPaint);
                 }
-                LogUtil.d(currentMoth + "");
+
             } else {
                 // 不是开始位置
-                PointF pointF = candleBean.getM5Point();
-                CandleBean preCandle = beans.get(i - 1);
+                PointF pointF = drawCandleBean.getM5Point();
+                CandleBean preCandle = drawBeans.get(i - 1);
                 PointF prePoint = preCandle.getM5Point();
 
                 float wt = (pointF.x + prePoint.x) / 2;
@@ -645,16 +939,16 @@ public class KLineView extends View {
                 m5Path.cubicTo(p3.x, p3.y, p4.x, p4.y, pointF.x, pointF.y);
 
 
-                PointF m10pointF = candleBean.getM10Point();
+                PointF m10pointF = drawCandleBean.getM10Point();
                 m10Path.lineTo(m10pointF.x, m10pointF.y);
 
-                int dayNum = getDayNum(candleBean.getTime());
+                int dayNum = getDayNum(drawCandleBean.getTime());
                 // 每个月一号，绘制月线
                 if (dayNum == 1) {
-                    float lineX = candleBean.getWickBottomPoint().x;
+                    float lineX = drawCandleBean.getWickBottomPoint().x;
                     canvas.drawLine(lineX, statusLeftTopPoint.y, lineX, leftBottomPoint.y, axisPaint);
                     // 绘制下标
-                    String dateStr = candleBean.getDateStr();
+                    String dateStr = drawCandleBean.getDateStr();
                     Rect rect = new Rect();
                     statusPaint.getTextBounds(dateStr, 0, dateStr.length(), rect);
                     canvas.drawText(dateStr, (lineX - rect.width() / 2), leftBottomPoint.y + rect.height(), statusPaint);
@@ -669,11 +963,11 @@ public class KLineView extends View {
         if (viewModel == ViewModel.CHOOSE_MODEL) {
             if (clickCandleIndex != 0) {
                 // 绘制当前选择的 Candle信息
-                CandleBean selectedCandle = beans.get(clickCandleIndex);
+                CandleBean selectedCandle = drawBeans.get(clickCandleIndex);
                 if (selectedCandle != null) {
                     // 绘制选中线
                     selectedCandle.drawSelectedLine(canvas, axisPaint,
-                            axisLeftSpace, axisLeftSpace + drawWidth,
+                            AXIS_LEFT_SPACE, AXIS_LEFT_SPACE + drawWidth,
                             statusHeightNum, statusHeightNum + drawHeight);
 
                     // 状态信息绘制
@@ -749,11 +1043,20 @@ public class KLineView extends View {
     }
 
 
+    /**
+     * 绘制矩形
+     * @param canvas
+     * @param p
+     * @param rect
+     */
     private void drawRoundRect(Canvas canvas, Paint p, RectF rect) {
-        p.setStyle(Paint.Style.FILL);//充满
+        //充满
+        p.setStyle(Paint.Style.FILL);
         p.setColor(Color.LTGRAY);
-        p.setAntiAlias(true);// 设置画笔的锯齿效果
-        canvas.drawRoundRect(rect, 20, 15, p);//第二个参数是x半径，第三个参数是y半径
+        // 设置画笔的锯齿效果
+        p.setAntiAlias(true);
+        //第二个参数是x半径，第三个参数是y半径
+        canvas.drawRoundRect(rect, 20, 15, p);
     }
 
     private int getMonthNum(long time) {

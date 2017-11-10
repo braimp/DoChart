@@ -31,6 +31,7 @@ public class StartupActivity extends AppCompatActivity {
     Button btnStockIndex;
 
 
+
     @Bind(R.id.btn_anim)
     Button btnAnim;
 
@@ -76,6 +77,8 @@ public class StartupActivity extends AppCompatActivity {
             case R.id.btn_matrix:
                 Intent matrixIntent = new Intent(StartupActivity.this, MatrixActivity.class);
                 startActivity(matrixIntent);
+                break;
+            default:
                 break;
 
         }

@@ -13,8 +13,9 @@ import com.dqqdo.dochart.util.LogUtil;
  * 蜡烛图对象
  * 作者：duqingquan
  * 时间：2017/7/12 13:42
+ * @author hexun
  */
-public class CandleBean {
+public class CandleBean implements Cloneable{
 
     // 时间
     private long time;
@@ -288,6 +289,41 @@ public class CandleBean {
 
     public void setM15(long m15) {
         this.m15 = m15;
+    }
+
+
+
+    @Override
+    protected CandleBean clone() {
+        CandleBean clone = null;
+        try{
+            clone = (CandleBean) super.clone();
+            clone.setMostHigh(mostHigh);
+            clone.setMostLow(mostLow);
+            clone.setClose(close);
+            clone.setOpen(open);
+            clone.setAmount(amount);
+            clone.setTime(time);
+
+            clone.setM15(m15);
+            clone.setM5(m5);
+            clone.setM10(m10);
+
+            clone.setFlagColor(flagColor);
+            clone.setHolderLeftTopPoint(holderLeftTopPoint);
+            clone.setHolderRightBottomPoint(holderRightBottomPoint);
+            clone.setWickTopPoint(wickTopPoint);
+            clone.setWickBottomPoint(wickBottomPoint);
+
+            clone.setM5Point(m5Point);
+            clone.setM10Point(m10Point);
+            clone.setM15Point(m15Point);
+        }catch(CloneNotSupportedException e){
+            // won't happen
+            throw new RuntimeException(e);
+        }
+
+        return clone;
     }
 
 }

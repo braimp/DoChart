@@ -5,10 +5,47 @@
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:orientation="vertical"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     >
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFF"
+        android:orientation="horizontal">
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content"
+            android:contentDescription="rightName">
+
+            <RadioButton
+                android:id="@+id/radio_right_forward"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="前复权"></RadioButton>
+
+            <RadioButton
+                android:id="@+id/radio_right_backward"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="后复权"></RadioButton>
+
+            <RadioButton
+                android:id="@+id/radio_right_no"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="不复权"></RadioButton>
+        </RadioGroup>
+
+    </LinearLayout>
 
     <com.dqqdo.dochart.ui.view.stock.KLineView
         android:id="@+id/kline_view"
@@ -16,9 +53,9 @@
         android:layout_height="match_parent"/>
 
     <!--<com.dqqdo.dochart.ui.view.index.StockIndexView-->
-        <!--android:id="@+id/kline_view"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"/>-->
+    <!--android:id="@+id/kline_view"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
 
 
 </LinearLayout>
