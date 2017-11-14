@@ -42,6 +42,8 @@ public class StartupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        String a = "aaa";
+        a.intern();
 
 
     }
