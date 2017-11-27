@@ -290,8 +290,6 @@ public class StockIndexView extends View {
         // 绘制背景
         canvas.drawColor(Color.WHITE);
 
-        LogUtil.d("bbbbbb");
-
         // 绘制坐标轴
         axisAdapter.drawAxis(canvas);
         axisAdapter.drawAxisDesc(canvas);
