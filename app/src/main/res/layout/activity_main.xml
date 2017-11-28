@@ -58,6 +58,20 @@
         android:id="@+id/btn_matrix"
         />
 
+    <Button
+        android:text="指标解析"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_index_parse"
+        />
+
+    <Button
+        android:text="波浪动画"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_wave_anim"
+        />
+
 
 
 

@@ -4,6 +4,7 @@ package com.dqqdo.dochart.resolver;
  * 指标解析器 接口定义
  * 作者：duqingquan
  * 时间：2017/10/10 17:43
+ * @author hexun
  */
 public interface IndexResolver {
 

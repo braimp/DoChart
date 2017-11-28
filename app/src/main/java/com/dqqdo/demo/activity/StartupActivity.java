@@ -10,7 +10,9 @@ import android.widget.TextView;
 
 import com.dqqdo.demo.R;
 import com.dqqdo.demo.activity.stock.BasicKLineActivity;
+import com.dqqdo.demo.activity.stock.IndexParseActivity;
 import com.dqqdo.demo.activity.stock.StockIndexActivity;
+import com.dqqdo.demo.activity.stock.WaveAnimActivity;
 import com.dqqdo.dochart.util.LogUtil;
 
 import butterknife.Bind;
@@ -30,6 +32,12 @@ public class StartupActivity extends AppCompatActivity {
     @Bind(R.id.btn_stock_index)
     Button btnStockIndex;
 
+    @Bind(R.id.btn_index_parse)
+    Button btnIndexParse;
+
+    @Bind(R.id.btn_wave_anim)
+    Button btnWaveAnim;
+
 
 
     @Bind(R.id.btn_anim)
@@ -42,13 +50,13 @@ public class StartupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        String a = "aaa";
-        a.intern();
 
 
     }
 
-    @OnClick({R.id.btn_pie_test, R.id.btn_bar_test,R.id.btn_line_test,R.id.btn_KLine_test,R.id.btn_stock_index,R.id.btn_anim,R.id.btn_matrix})
+    @OnClick({R.id.btn_pie_test, R.id.btn_bar_test,R.id.btn_line_test,R.id.btn_KLine_test
+            ,R.id.btn_stock_index,R.id.btn_anim,R.id.btn_matrix,R.id.btn_index_parse
+            ,R.id.btn_wave_anim})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_pie_test:
@@ -80,6 +88,15 @@ public class StartupActivity extends AppCompatActivity {
                 Intent matrixIntent = new Intent(StartupActivity.this, MatrixActivity.class);
                 startActivity(matrixIntent);
                 break;
+            case R.id.btn_index_parse:
+                Intent indexParseIntent = new Intent(StartupActivity.this, IndexParseActivity.class);
+                startActivity(indexParseIntent);
+                break;
+            case R.id.btn_wave_anim:
+                Intent waveIntent = new Intent(StartupActivity.this, WaveAnimActivity.class);
+                startActivity(waveIntent);
+                break;
+
             default:
                 break;
 
