@@ -3,3 +3,7 @@
 settings.gradle,0\5\05efc8b1657769a27696d478ded1e95f38737233
 <
 build.gradle,f\0\f07866736216be0ee2aba49e392191aeae700a35
+7
+LICENSE,0\3\0398ccd0f49298b10a3d76a47800d2ebecd49859
+9
+	README.md,8\e\8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
