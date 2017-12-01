@@ -7,6 +7,7 @@ import com.dqqdo.dobase.BaseActivity;
  * 曲线图绘制
  * 作者：duqingquan
  * 时间：2017/2/21 18:16
+ * @author hexun
  */
 public class LineChartActivity extends BaseActivity {
 
