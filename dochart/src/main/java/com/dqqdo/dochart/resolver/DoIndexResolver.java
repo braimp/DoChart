@@ -1,12 +1,8 @@
 package com.dqqdo.dochart.resolver;
 
-import com.dqqdo.dochart.resolver.syntax.FormulaLine;
+import com.dqqdo.dochart.resolver.syntax.sentence.FormulaLine;
 import com.dqqdo.dochart.util.LogUtil;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;

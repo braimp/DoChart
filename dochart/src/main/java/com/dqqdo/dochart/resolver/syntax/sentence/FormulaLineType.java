@@ -1,4 +1,4 @@
-package com.dqqdo.dochart.resolver.syntax;
+package com.dqqdo.dochart.resolver.syntax.sentence;
 
 /**
  * 作者：duqingquan

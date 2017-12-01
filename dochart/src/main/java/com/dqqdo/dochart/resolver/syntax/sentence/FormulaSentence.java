@@ -1,4 +1,4 @@
-package com.dqqdo.dochart.resolver.syntax;
+package com.dqqdo.dochart.resolver.syntax.sentence;
 
 /**
  * 公式分句,每一行都可以包含多个分句
@@ -7,7 +7,7 @@ package com.dqqdo.dochart.resolver.syntax;
  */
 public class FormulaSentence {
 
-    String content;
+    private String content;
 
     FormulaSentence(String line){
         this.content = line;
