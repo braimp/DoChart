@@ -8,7 +8,7 @@ import com.dqqdo.dochart.resolver.syntax.function.AbsDrawFunction;
  */
 public class LineThick2DrawFunction extends AbsDrawFunction {
 
-    private String keyword = "LINETHICK2";
+    private String keyword = "LineThick2";
 
 
     @Override

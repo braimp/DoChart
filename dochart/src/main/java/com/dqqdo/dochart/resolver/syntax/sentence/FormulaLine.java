@@ -1,8 +1,12 @@
 package com.dqqdo.dochart.resolver.syntax.sentence;
 
+import com.dqqdo.dochart.resolver.syntax.parser.SentenceParser;
+import com.dqqdo.dochart.resolver.syntax.parser.ShapeFactory;
 import com.dqqdo.dochart.util.LogUtil;
 
 import java.util.ArrayList;
+
+import static com.dqqdo.dochart.resolver.syntax.DoConstants.LINE_END_CHAR;
 
 /**
  * 公式的组成部分，公式行
@@ -29,6 +33,7 @@ public class FormulaLine {
     public FormulaLine(String line){
         this.content = line;
 
+
         char[] chars = line.toCharArray();
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -48,7 +53,9 @@ public class FormulaLine {
             if(chars[i] == ',' && !isInBracket){
                 // 不是函数内的逗号,则认为是断句符号
                 String sentence = stringBuilder.toString();
-                FormulaSentence formulaSentence = new FormulaSentence(sentence);
+                FormulaSentence formulaSentence =
+                        SentenceParser.getInstance().parseSentence(sentence);
+
                 if(!formulaSentence.isValid()){
                     isValid = false;
                     return ;
@@ -56,7 +63,21 @@ public class FormulaLine {
                 sentences.add(formulaSentence);
                 stringBuilder.delete(0,stringBuilder.length());
             }else{
-                stringBuilder.append(chars[i]);
+                if (LINE_END_CHAR.equals(String.valueOf(chars[i]))) {
+                    String sentence = stringBuilder.toString();
+                    FormulaSentence formulaSentence =
+                            SentenceParser.getInstance().parseSentence(sentence);
+                    if(!formulaSentence.isValid()){
+                        isValid = false;
+                        return ;
+                    }
+                    sentences.add(formulaSentence);
+
+                    stringBuilder.delete(0,stringBuilder.length());
+                    break;
+                }else{
+                    stringBuilder.append(chars[i]);
+                }
             }
 
         }
@@ -64,10 +85,17 @@ public class FormulaLine {
         int sSize = sentences.size();
         for(int i = 0 ; i < sSize;i++){
             FormulaSentence formulaSentence = sentences.get(i);
-//            if(formulaSentence){
-//
-//            }
-            LogUtil.d(" i-- " + i);
+
+            if(formulaSentence instanceof ColorSentence){
+                LogUtil.d("ColorSentence  ----" + formulaSentence.toString());
+            }
+            if(formulaSentence instanceof ShapeSentence){
+                LogUtil.d("ShapeSentence  ----" + formulaSentence.toString());
+            }
+            if(formulaSentence instanceof EvaluationSentence){
+                LogUtil.d("EvaluationSentence  ----" + formulaSentence.toString());
+            }
+
         }
 
     }

@@ -8,6 +8,8 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static com.dqqdo.dochart.resolver.syntax.DoConstants.LINE_END_CHAR;
+
 /**
  * 指标解析器对象
  * 作者：duqingquan
@@ -89,8 +91,8 @@ public class DoIndexResolver {
             if(lines.length > 0){
                 // 有数据
                 for(int i = 0; i < lines.length;i++){
-                    LogUtil.d("lines[i]" +lines[i]);
-                    FormulaLine formulaLine = new FormulaLine(lines[i]);
+
+                    FormulaLine formulaLine = new FormulaLine(lines[i] + LINE_END_CHAR);
                     if(!formulaLine.isValid()){
                         // 有任何行语法错误，当前公式存在异常，结束
                         break;
