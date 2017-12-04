@@ -8,4 +8,8 @@ public class DoConstants {
 
     public static final String LINE_END_CHAR = "#";
 
+    public static final String EXPRESSION_DEFINE = ":=";
+
+    public static final String EXPRESSION_EQUAL = ":";
+
 }

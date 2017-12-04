@@ -1,5 +1,6 @@
 package com.dqqdo.dochart.resolver;
 
+import com.dqqdo.dochart.resolver.syntax.ScriptRuntime;
 import com.dqqdo.dochart.resolver.syntax.sentence.FormulaLine;
 import com.dqqdo.dochart.util.LogUtil;
 
@@ -75,11 +76,12 @@ public class DoIndexResolver {
 
         private String formula;
         private StockInfo stockInfo;
-
+        private ScriptRuntime scriptRuntime;
 
         private ResolverTask(ResolverDTO resolverDTO){
             this.formula = resolverDTO.getFormula();
             this.stockInfo = resolverDTO.getStockInfo();
+            scriptRuntime = new ScriptRuntime();
         }
 
         @Override

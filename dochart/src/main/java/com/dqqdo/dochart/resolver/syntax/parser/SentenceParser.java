@@ -30,6 +30,7 @@ public class SentenceParser {
     private final String COLOR_KEYWORD = "color";
 
     public FormulaSentence parseSentence(String line){
+
         FormulaSentence sentence;
         // 解析判断，当前分句的类型
         if(line.startsWith(COLOR_KEYWORD.toLowerCase())
