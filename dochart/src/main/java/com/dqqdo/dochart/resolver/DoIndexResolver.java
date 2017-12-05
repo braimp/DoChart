@@ -1,7 +1,7 @@
 package com.dqqdo.dochart.resolver;
 
-import com.dqqdo.dochart.resolver.syntax.ScriptRuntime;
 import com.dqqdo.dochart.resolver.syntax.sentence.FormulaLine;
+import com.dqqdo.dochart.resolver.syntax.sentence.FormulaLineType;
 import com.dqqdo.dochart.util.LogUtil;
 
 import java.util.concurrent.ExecutorService;
@@ -30,6 +30,11 @@ public class DoIndexResolver {
      */
     private ExecutorService executorService;
 
+    /**
+     * 脚本运行时环境
+     */
+    private ScriptEnvironment scriptEnvironment;
+
 
     public static DoIndexResolver getInstance(){
         if(instance == null){
@@ -55,34 +60,47 @@ public class DoIndexResolver {
                 TimeUnit.SECONDS,
                 new SynchronousQueue<Runnable>());
 
+        scriptEnvironment = new ScriptEnvironment();
+        // 填充假数据
+        // TODO 准备真实数据，数据来源工作量略大，等待后续实现。
+        StockInfo stockInfo = new StockInfo();
+        ViewPortInfo viewPortInfo = new ViewPortInfo();
+        scriptEnvironment.prepareWork(stockInfo,viewPortInfo);
 
     }
 
+    /**
+     * 提交新的解析任务
+     * @param resolverTaskDO 解析任务对象
+     * @return 是否提交成功
+     */
+    public boolean submitResolver(ResolverTaskDO resolverTaskDO,IResolverCallback resolverCallback) {
 
-    public boolean submitResolver(ResolverDTO resolverDTO) {
-
-        if(resolverDTO == null){
+        if(resolverTaskDO == null){
             return false;
         }else{
-            executorService.submit(new ResolverTask(resolverDTO));
+            executorService.submit(new ResolverTask(resolverTaskDO,resolverCallback));
             return true;
         }
 
     }
 
 
-
+    /**
+     * 解析任务类
+     */
     class ResolverTask implements Runnable{
 
         private String formula;
-        private StockInfo stockInfo;
         private ScriptRuntime scriptRuntime;
+        private IResolverCallback resolverCallback;
 
-        private ResolverTask(ResolverDTO resolverDTO){
+        private ResolverTask(ResolverTaskDO resolverDTO,IResolverCallback callback){
             this.formula = resolverDTO.getFormula();
-            this.stockInfo = resolverDTO.getStockInfo();
-            scriptRuntime = new ScriptRuntime();
+            this.scriptRuntime = new ScriptRuntime();
+            this.resolverCallback = callback;
         }
+
 
         @Override
         public void run() {
@@ -108,9 +126,43 @@ public class DoIndexResolver {
             }
 
             // 命令行解析完毕
+            for(int i = 0; i < formulaLines.length;i++){
 
+                FormulaLine formulaLine = formulaLines[i];
+                if(formulaLine.getFormulaLineType() == FormulaLineType.DRAW){
+                    // 行为命令，则获取drawItem对象数据，返回给外部
+                    // TODO
+                }else{
+                    // 定义命令，则将运算后的结果，储存到Runtime，提供给内部调用
+                    // TODO
+                }
+
+            }
 
         }
+
+
+    }
+
+
+    /**
+     * 解析任务返回的回调
+     */
+    interface IResolverCallback{
+
+        /**
+         * 解析成功回调
+         * @param result 产出的解析结果对象
+         */
+        void onSuccess(ResolverResult result);
+
+        /**
+         * 解析失败回调
+         * @param errCode 错误代码
+         * @param errDesc 错误描述
+         */
+        void onFail(int errCode,String errDesc);
+
     }
 
 

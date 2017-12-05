@@ -9,17 +9,17 @@ import com.dqqdo.dochart.resolver.syntax.shape.IShape;
  */
 public class ShapeSentence extends FormulaSentence{
 
-    IShape shape;
+    private IShape shape;
 
     public ShapeSentence(String line) {
         super(line);
+
         // 解析图形函数
         Class<? extends IShape> classz = ShapeFactory
                 .getInstance()
                 .getShapeClass(line);
 
         if(classz != null){
-
             try {
                 shape = classz.newInstance();
             } catch (InstantiationException e) {
@@ -36,5 +36,13 @@ public class ShapeSentence extends FormulaSentence{
 
     public IShape getShape(){
         return shape;
+    }
+
+
+    @Override
+    public String toString() {
+        return "ShapeSentence{" +
+                "shape=" + shape +
+                '}';
     }
 }

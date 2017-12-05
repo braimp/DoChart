@@ -24,5 +24,51 @@ public class LogicPrimitive {
      */
     private IShape shape;
 
+    /**
+     * 图元数值
+     */
+    private double value;
 
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    public IShape getShape() {
+        return shape;
+    }
+
+    public void setShape(IShape shape) {
+        this.shape = shape;
+    }
+
+    public double getValue() {
+        return value;
+    }
+
+    public void setValue(double value) {
+        this.value = value;
+    }
+
+    public LogicPrimitive(String name, int color, IShape shape, double value) {
+        this.name = name;
+        this.color = color;
+        this.shape = shape;
+        this.value = value;
+    }
+
+    public LogicPrimitive() {
+    }
 }

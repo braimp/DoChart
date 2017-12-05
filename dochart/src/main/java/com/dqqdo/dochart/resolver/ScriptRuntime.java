@@ -1,4 +1,4 @@
-package com.dqqdo.dochart.resolver.syntax;
+package com.dqqdo.dochart.resolver;
 
 import java.util.HashMap;
 
@@ -11,14 +11,13 @@ import java.util.HashMap;
 public class ScriptRuntime {
 
 
-
     /**
      * 变量表
      */
     private HashMap<String,Object> scriptVariables = new HashMap<>();
 
     /**
-     * 构造器，每一个脚本运行时都需要一个独立的RM
+     * 构造器，每一个脚本运行时都需要一个独立的Runtime
      */
     public ScriptRuntime(){
 

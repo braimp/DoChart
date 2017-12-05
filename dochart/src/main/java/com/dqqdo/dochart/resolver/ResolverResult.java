@@ -1,4 +1,4 @@
-package com.dqqdo.dochart.resolver.draw;
+package com.dqqdo.dochart.resolver;
 
 /**
  * 解析完成返回的结果对象

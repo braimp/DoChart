@@ -1,5 +1,7 @@
 package com.dqqdo.dochart.resolver.syntax.sentence;
 
+import com.dqqdo.dochart.resolver.syntax.DoConstants;
+import com.dqqdo.dochart.resolver.syntax.LogicPrimitive;
 import com.dqqdo.dochart.resolver.syntax.parser.SentenceParser;
 import com.dqqdo.dochart.resolver.syntax.parser.ShapeFactory;
 import com.dqqdo.dochart.util.LogUtil;
@@ -26,12 +28,27 @@ public class FormulaLine {
     private ArrayList<FormulaSentence> sentences = new ArrayList<>();
 
     /**
+     * 逻辑上的图元对象，如果是普通绘制语句，那么最终返回结果就是这个。
+     */
+    private LogicPrimitive logicPrimitive;
+
+    /**
      * 是否是有效的
      */
     private boolean isValid = true;
 
     public FormulaLine(String line){
         this.content = line;
+
+        if(line.contains(DoConstants.EXPRESSION_DEFINE)){
+            // 计算
+            formulaLineType = FormulaLineType.NORMAL;
+        }else if(line.contains(DoConstants.EXPRESSION_EQUAL)){
+            // 定义
+            formulaLineType = FormulaLineType.DRAW;
+        }else{
+            return ;
+        }
 
 
         char[] chars = line.toCharArray();
@@ -81,25 +98,44 @@ public class FormulaLine {
             }
 
         }
-        // 分句解析完成
-        int sSize = sentences.size();
-        for(int i = 0 ; i < sSize;i++){
-            FormulaSentence formulaSentence = sentences.get(i);
 
-            if(formulaSentence instanceof ColorSentence){
-                LogUtil.d("ColorSentence  ----" + formulaSentence.toString());
-            }
-            if(formulaSentence instanceof ShapeSentence){
-                LogUtil.d("ShapeSentence  ----" + formulaSentence.toString());
-            }
-            if(formulaSentence instanceof EvaluationSentence){
-                LogUtil.d("EvaluationSentence  ----" + formulaSentence.toString());
+        if(line.contains(DoConstants.EXPRESSION_EQUAL)){
+
+            // 计算语句，需要构造产出逻辑图元对象
+            logicPrimitive = new LogicPrimitive();
+
+            // 分句解析完成
+            int sSize = sentences.size();
+            for(int i = 0 ; i < sSize;i++){
+                FormulaSentence formulaSentence = sentences.get(i);
+
+                if(formulaSentence instanceof ColorSentence){
+                    logicPrimitive.setColor(((ColorSentence) formulaSentence).getColorInt());
+                }
+                if(formulaSentence instanceof ShapeSentence){
+                    logicPrimitive.setShape(((ShapeSentence) formulaSentence).getShape());
+                }
+                if(formulaSentence instanceof EvaluationSentence){
+                    logicPrimitive.setValue(((EvaluationSentence) formulaSentence).getValue());
+                }
+
             }
 
+        }else{
+            // TODO
+            // 定义语句，只是需要计算，并且将变量储存到变量表中
         }
+
 
     }
 
+    /**
+     * 如果是输出语句，则返回逻辑图元
+     * @return  返回逻辑图元对象
+     */
+    public LogicPrimitive getLogicPrimitive(){
+        return logicPrimitive;
+    }
 
 
     public String getContent() {

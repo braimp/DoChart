@@ -38,4 +38,14 @@ public class ColorSentence extends FormulaSentence {
     public String getColorStr(){
         return colorStr;
     }
+
+
+    @Override
+    public String toString() {
+        return "ColorSentence{" +
+                "contentColor=" + contentColor +
+                ", colorStr='" + colorStr + '\'' +
+                ", keyWord='" + keyWord + '\'' +
+                '}';
+    }
 }

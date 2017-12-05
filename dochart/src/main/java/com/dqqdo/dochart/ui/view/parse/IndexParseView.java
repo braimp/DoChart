@@ -8,8 +8,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.dqqdo.dochart.resolver.DoIndexResolver;
-import com.dqqdo.dochart.resolver.ResolverDTO;
-import com.dqqdo.dochart.resolver.StockInfo;
+import com.dqqdo.dochart.resolver.ResolverTaskDO;
 
 /**
  * 作者：duqingquan
@@ -25,20 +24,9 @@ public class IndexParseView extends View{
      * 设置公式
      */
     public void setFormula(String formula){
-        ResolverDTO resolverDTO = new ResolverDTO();
-        /**
-         *  这里构造假的股票信息
-         */
-        StockInfo stockInfo = new StockInfo();
-        stockInfo.setCode("0000002");
-        stockInfo.setId(1L);
-
-        resolverDTO.setStockInfo(stockInfo);
-        resolverDTO.setFormula(formula);
-
-
-        indexResolver.submitResolver(resolverDTO);
-
+        ResolverTaskDO resolverTaskDO = new ResolverTaskDO();
+        resolverTaskDO.setFormula(formula);
+        indexResolver.submitResolver(resolverTaskDO);
     }
 
     private void init(){
