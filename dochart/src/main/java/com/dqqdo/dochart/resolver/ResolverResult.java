@@ -1,24 +1,25 @@
 package com.dqqdo.dochart.resolver;
 
+import com.dqqdo.dochart.resolver.draw.IDrawItem;
+
+import java.util.List;
+
 /**
  * 解析完成返回的结果对象
- * 作者：duqingquan
  * 时间：2017/11/29 14:07
+ * @author duqingquan
  */
 public class ResolverResult {
 
-    /**
-     * 错误代码
-     * 0  success
-     * 1  fail
-     */
-    private int errorCode;
+    private List<IDrawItem> drawItems;
 
-    /**
-     * 错误描述
-     */
-    private int errorDesc;
+    public List<IDrawItem> getDrawItems() {
+        return drawItems;
+    }
 
+    public void setDrawItems(List<IDrawItem> drawItems) {
+        this.drawItems = drawItems;
+    }
 
 
 

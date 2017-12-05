@@ -1,9 +1,14 @@
 package com.dqqdo.dochart.resolver;
 
+import com.dqqdo.dochart.resolver.draw.DrawItemParser;
+import com.dqqdo.dochart.resolver.draw.IDrawItem;
+import com.dqqdo.dochart.resolver.syntax.LogicPrimitive;
 import com.dqqdo.dochart.resolver.syntax.sentence.FormulaLine;
 import com.dqqdo.dochart.resolver.syntax.sentence.FormulaLineType;
 import com.dqqdo.dochart.util.LogUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -91,8 +96,17 @@ public class DoIndexResolver {
      */
     class ResolverTask implements Runnable{
 
+        /**
+         * 公式
+         */
         private String formula;
+        /**
+         * 脚本运行时环境
+         */
         private ScriptRuntime scriptRuntime;
+        /**
+         * 解析回调
+         */
         private IResolverCallback resolverCallback;
 
         private ResolverTask(ResolverTaskDO resolverDTO,IResolverCallback callback){
@@ -104,6 +118,10 @@ public class DoIndexResolver {
 
         @Override
         public void run() {
+
+            if(resolverCallback == null){
+                return ;
+            }
 
             // 所有的命令行 打包成一个数组，验证合法后，依次执行数组
             String[] lines = formula.split(";");
@@ -126,18 +144,33 @@ public class DoIndexResolver {
             }
 
             // 命令行解析完毕
+            ResolverResult resolverResult = new ResolverResult();
+            List<IDrawItem> totalDrawItems = new ArrayList<>();
+
             for(int i = 0; i < formulaLines.length;i++){
 
                 FormulaLine formulaLine = formulaLines[i];
                 if(formulaLine.getFormulaLineType() == FormulaLineType.DRAW){
                     // 行为命令，则获取drawItem对象数据，返回给外部
-                    // TODO
+                    LogicPrimitive logicPrimitive = formulaLine.getLogicPrimitive();
+                    // TODO 将逻辑图元转换为可绘制的drawItem对象
+                    List<IDrawItem> drawItems = DrawItemParser
+                            .getInstance()
+                            .parseLogicPrimitive(logicPrimitive);
+
+                    totalDrawItems.addAll(drawItems);
+
                 }else{
                     // 定义命令，则将运算后的结果，储存到Runtime，提供给内部调用
-                    // TODO
+                    // TODO 数据有效性校验
+                    scriptRuntime.putVariables(formulaLine.getVariables());
                 }
 
             }
+
+            resolverResult.setDrawItems(totalDrawItems);
+            // 解析完成，给予成功回调
+            resolverCallback.onSuccess(resolverResult);
 
         }
 
@@ -148,7 +181,7 @@ public class DoIndexResolver {
     /**
      * 解析任务返回的回调
      */
-    interface IResolverCallback{
+    public interface IResolverCallback{
 
         /**
          * 解析成功回调

@@ -34,4 +34,10 @@ public class ScriptRuntime {
         return true;
     }
 
+    public boolean putVariables(HashMap<String,Object> varObjects){
+
+        scriptVariables.putAll(varObjects);
+        return true;
+    }
+
 }

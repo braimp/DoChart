@@ -40,10 +40,50 @@ public class FunctionManager {
         return isMatch;
     }
 
-
-    public double getFuncValue(String expression){
-        return 0.0;
+    /**
+     * 获取函数的结果值
+     * @param expression 函数表达式
+     * @return 结果值
+     */
+    public FuncVarDO getFuncValue(String expression){
+        // TODO 这里好麻烦，需要实现等式的解析
+        FuncVarDO varDO = new FuncVarDO();
+        varDO.setName("h1");
+        varDO.setValue(0.0);
+        return varDO;
     }
 
+    /**
+     * 函数返回的数据对象
+     */
+    public class FuncVarDO{
+
+        private String name;
+        private Double value;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public Double getValue() {
+            return value;
+        }
+
+        public void setValue(Double value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return "FuncVarDO{" +
+                    "name='" + name + '\'' +
+                    ", value=" + value +
+                    '}';
+        }
+    }
 
 }

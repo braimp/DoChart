@@ -8,7 +8,13 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.dqqdo.dochart.resolver.DoIndexResolver;
+import com.dqqdo.dochart.resolver.ResolverResult;
 import com.dqqdo.dochart.resolver.ResolverTaskDO;
+import com.dqqdo.dochart.resolver.draw.IDrawItem;
+import com.dqqdo.dochart.util.LogUtil;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * 作者：duqingquan
@@ -19,14 +25,26 @@ public class IndexParseView extends View{
 
 
     private DoIndexResolver indexResolver;
+    private List<IDrawItem> drawItems;
 
     /**
      * 设置公式
      */
     public void setFormula(String formula){
-        ResolverTaskDO resolverTaskDO = new ResolverTaskDO();
+        final ResolverTaskDO resolverTaskDO = new ResolverTaskDO();
         resolverTaskDO.setFormula(formula);
-        indexResolver.submitResolver(resolverTaskDO);
+        indexResolver.submitResolver(resolverTaskDO, new DoIndexResolver.IResolverCallback() {
+            @Override
+            public void onSuccess(ResolverResult result) {
+                LogUtil.d("result ---  " + result);
+                drawItems = result.getDrawItems();
+            }
+
+            @Override
+            public void onFail(int errCode, String errDesc) {
+
+            }
+        });
     }
 
     private void init(){
@@ -51,7 +69,16 @@ public class IndexParseView extends View{
 
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
         canvas.drawColor(Color.BLUE);
+        synchronized (drawItems){
+            if(drawItems != null && !drawItems.isEmpty()){
+                Iterator<IDrawItem> iterator = drawItems.iterator();
+                while (iterator.hasNext()){
+                    IDrawItem drawItem =  iterator.next();
+                    drawItem.drawSelf(canvas);
+                }
+            }
+        }
+
     }
 }

@@ -1,12 +1,15 @@
 package com.dqqdo.dochart.resolver.syntax.sentence;
 
+import com.dqqdo.dochart.resolver.ScriptRuntime;
 import com.dqqdo.dochart.resolver.syntax.DoConstants;
 import com.dqqdo.dochart.resolver.syntax.LogicPrimitive;
+import com.dqqdo.dochart.resolver.syntax.function.FunctionManager;
 import com.dqqdo.dochart.resolver.syntax.parser.SentenceParser;
 import com.dqqdo.dochart.resolver.syntax.parser.ShapeFactory;
 import com.dqqdo.dochart.util.LogUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static com.dqqdo.dochart.resolver.syntax.DoConstants.LINE_END_CHAR;
 
@@ -31,6 +34,11 @@ public class FormulaLine {
      * 逻辑上的图元对象，如果是普通绘制语句，那么最终返回结果就是这个。
      */
     private LogicPrimitive logicPrimitive;
+
+    /**
+     * 变量表
+     */
+    private HashMap<String,Object> variables = new HashMap<>();
 
     /**
      * 是否是有效的
@@ -118,12 +126,19 @@ public class FormulaLine {
                 if(formulaSentence instanceof EvaluationSentence){
                     logicPrimitive.setValue(((EvaluationSentence) formulaSentence).getValue());
                 }
-
             }
+
 
         }else{
             // TODO
             // 定义语句，只是需要计算，并且将变量储存到变量表中
+            FunctionManager.FuncVarDO varDO = FunctionManager
+                    .getInstance().getFuncValue(line);
+
+            String name = varDO.getName();
+            Object target = varDO.getValue();
+            variables.put(name,target);
+
         }
 
 
@@ -137,6 +152,14 @@ public class FormulaLine {
         return logicPrimitive;
     }
 
+    /**
+     * 获取变量表
+     * @return 变量集合
+     */
+    public HashMap<String,Object> getVariables(){
+
+        return variables;
+    }
 
     public String getContent() {
         return content;
