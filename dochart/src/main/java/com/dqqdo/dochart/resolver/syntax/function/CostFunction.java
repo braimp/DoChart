@@ -27,6 +27,17 @@ public class CostFunction implements IFunction{
     public double getFunctionResult(String line) {
         // TODO 筹码分布算法实现
         // 计算结果先忽略。因为需要筹码分布算法(后续添加)
+
+        // eg. 50,EAST(10,NEW(5))
+        int size = line.length();
+        StringBuilder stringBuilder = new StringBuilder(line);
+
+        // TODO  防止递归过深的处理
+        for(int i = 0; i < size; i++){
+            char nowChar = stringBuilder.charAt(i);
+
+        }
+
         return 20;
     }
 

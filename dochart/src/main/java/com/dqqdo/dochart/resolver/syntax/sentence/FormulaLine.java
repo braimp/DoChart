@@ -134,12 +134,12 @@ public class FormulaLine {
 
         }else{
             // 定义语句，只是需要计算，并且将变量储存到变量表中
-            FunctionManager.FuncVarDO varDO = FunctionManager
-                    .getInstance().getFuncValue(line);
-
-            String name = varDO.getName();
-            Object target = varDO.getValue();
-            variables.put(name,target);
+//            FunctionManager.FuncVarDO varDO = FunctionManager
+//                    .getInstance().getFuncValue(line);
+//
+//            String name = varDO.getName();
+//            Object target = varDO.getValue();
+//            variables.put(name,target);
         }
 
 

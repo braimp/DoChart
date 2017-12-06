@@ -20,7 +20,6 @@ public class EvaluationSentence extends FormulaSentence {
     public EvaluationSentence(String line) {
         super(line);
 
-        LogUtil.d("line --- " + line);
         String[] expressions ={};
         // 赋值解析 :是定义 := 是赋值
         if(line.contains(EXPRESSION_DEFINE)){

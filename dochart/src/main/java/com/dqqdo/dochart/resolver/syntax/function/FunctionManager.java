@@ -53,12 +53,9 @@ public class FunctionManager {
      * @param expression 函数表达式
      * @return 结果值
      */
-    public FuncVarDO getFuncValue(String expression){
+    public double getFuncValue(String expression){
 
-        FuncVarDO varDO = new FuncVarDO();
-        // 这里只有返回值
-        varDO.setName(null);
-        //COST(---50,EAST(10,NEW(5))---)
+        // eg. COST(---50,EAST(10,NEW(5))---)
         // 按指定模式在字符串查找
         String pattern = "(\\D+)\\((.*)\\)";
 
@@ -68,64 +65,60 @@ public class FunctionManager {
         // 现在创建 matcher 对象
         Matcher m = r.matcher(expression);
         if (m.find( )) {
-            LogUtil.d(" size ---- " + m.group().length());
-            LogUtil.d(" 1 ---- " + m.group(1));
-            LogUtil.d(" 2 ---- " + m.group(2));
-            String funcName = m.group(1);
 
+            String funcName = m.group(1);
             IFunction function = functions.get(funcName);
             if(function == null){
                 // 函数名不存在
                 LogUtil.e("函数名不存在 " + function);
-                return null;
+                return -1;
             }
 
             String funcParam = m.group(2);
             // eg. 50,EAST(10,NEW(5))
             double value = function.getFunctionResult(funcParam);
-            varDO.setValue(0.0);
-        } else {
 
+            return value;
+        } else {
+            // 没有捕获到函数字符，中断
+            return -1;
         }
 
         // TODO 这里好麻烦，需要实现等式的解析
 
-
-
-        return varDO;
     }
 
-    /**
-     * 函数返回的数据对象
-     */
-    public class FuncVarDO{
-
-        private String name;
-        private Double value;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public Double getValue() {
-            return value;
-        }
-
-        public void setValue(Double value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return "FuncVarDO{" +
-                    "name='" + name + '\'' +
-                    ", value=" + value +
-                    '}';
-        }
-    }
+//    /**
+//     * 函数返回的数据对象
+//     */
+//    public class FuncVarDO{
+//
+//        private String name;
+//        private Double value;
+//
+//        public String getName() {
+//            return name;
+//        }
+//
+//        public void setName(String name) {
+//            this.name = name;
+//        }
+//
+//        public Double getValue() {
+//            return value;
+//        }
+//
+//        public void setValue(Double value) {
+//            this.value = value;
+//        }
+//
+//        @Override
+//        public String toString() {
+//            return "FuncVarDO{" +
+//                    "name='" + name + '\'' +
+//                    ", value=" + value +
+//                    '}';
+//        }
+//    }
 
 }
