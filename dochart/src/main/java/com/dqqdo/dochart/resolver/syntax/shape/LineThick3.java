@@ -5,13 +5,13 @@ package com.dqqdo.dochart.resolver.syntax.shape;
  * 时间：2017/12/4 14:23
  * @author duqingquan
  */
-public class LineThick2 implements IShape{
+public class LineThick3 implements IShape{
 
-    public static final int WIDTH = 10;
+    public static final int WIDTH = 20;
 
     @Override
     public String toString() {
-        return "LineThick2{}";
+        return "LineThick3{}";
     }
 
 }

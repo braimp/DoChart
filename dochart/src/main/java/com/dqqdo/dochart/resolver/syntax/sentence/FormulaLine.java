@@ -124,13 +124,15 @@ public class FormulaLine {
                     logicPrimitive.setShape(((ShapeSentence) formulaSentence).getShape());
                 }
                 if(formulaSentence instanceof EvaluationSentence){
-                    logicPrimitive.setValue(((EvaluationSentence) formulaSentence).getValue());
+                    EvaluationSentence evaluationSentence = (EvaluationSentence) formulaSentence;
+                    logicPrimitive.setValue(evaluationSentence.getValue());
+                    LogUtil.d("evaluationSentence.getName()  ----  " + evaluationSentence.getName());
+                    logicPrimitive.setName(evaluationSentence.getName());
                 }
             }
 
 
         }else{
-            // TODO
             // 定义语句，只是需要计算，并且将变量储存到变量表中
             FunctionManager.FuncVarDO varDO = FunctionManager
                     .getInstance().getFuncValue(line);
@@ -138,7 +140,6 @@ public class FormulaLine {
             String name = varDO.getName();
             Object target = varDO.getValue();
             variables.put(name,target);
-
         }
 
 

@@ -13,6 +13,7 @@ public class LineDrawItem implements IDrawItem {
 
     private int mColor;
     private Paint mPaint;
+    private int strokeWidth = 10;
     private float[] coordinates;
     /**
      * 最小的坐标点数量
@@ -32,8 +33,16 @@ public class LineDrawItem implements IDrawItem {
      * @param color
      */
     public void setColor(int color){
-        mPaint.setColor(color);
         this.mColor = color;
+        mPaint.setColor(mColor);
+    }
+
+    /**
+     * 设置画笔宽度
+     * @param width
+     */
+    public void setWidth(int width){
+        mPaint.setStrokeWidth(width);
     }
 
     public void setData(float[] data){

@@ -11,6 +11,7 @@ import java.util.List;
  */
 public class ResolverResult {
 
+    private int resultCode;
     private List<IDrawItem> drawItems;
 
     public List<IDrawItem> getDrawItems() {
@@ -21,7 +22,19 @@ public class ResolverResult {
         this.drawItems = drawItems;
     }
 
+    public int getResultCode() {
+        return resultCode;
+    }
 
+    public void setResultCode(int resultCode) {
+        this.resultCode = resultCode;
+    }
 
-
+    @Override
+    public String toString() {
+        return "ResolverResult{" +
+                "resultCode=" + resultCode +
+                ", drawItems=" + drawItems +
+                '}';
+    }
 }

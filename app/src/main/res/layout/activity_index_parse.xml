@@ -5,9 +5,9 @@
               android:layout_height="match_parent">
 
     <com.dqqdo.dochart.ui.view.parse.IndexParseView
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:id="@+id/ipv_index_parse"
-        android:layout_height="match_parent"
+        android:layout_height="500dp"
         >
 
     </com.dqqdo.dochart.ui.view.parse.IndexParseView>

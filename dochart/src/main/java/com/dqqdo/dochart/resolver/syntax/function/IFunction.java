@@ -7,17 +7,20 @@ package com.dqqdo.dochart.resolver.syntax.function;
  */
 public interface IFunction {
 
+
+
     /**
-     * 获取函数的关键字
-     *
+     * 获取函数的关键字，一般为函数名
      * @return
      */
     String getFunctionKeyword();
 
     /**
-     * @return
+     * 获取返回的返回结果
+     * @param expression 参数字符串
+     * @return 计算结果
      */
-    double getFunctionResult();
+    double getFunctionResult(String expression);
 
 
 

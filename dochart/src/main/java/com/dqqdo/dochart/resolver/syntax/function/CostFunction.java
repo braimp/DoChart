@@ -24,15 +24,13 @@ public class CostFunction implements IFunction{
     }
 
     @Override
-    public double getFunctionResult() {
+    public double getFunctionResult(String line) {
         // TODO 筹码分布算法实现
         // 计算结果先忽略。因为需要筹码分布算法(后续添加)
         return 20;
     }
 
-    CostFunction(int num){
-        this.radio = num;
-    }
+
 
 
 

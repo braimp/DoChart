@@ -13,27 +13,32 @@ import static com.dqqdo.dochart.resolver.syntax.DoConstants.EXPRESSION_EQUAL;
  */
 public class EvaluationSentence extends FormulaSentence {
 
+    private double value;
+    private String variableName;
+    private String expression;
+
     public EvaluationSentence(String line) {
         super(line);
 
+        LogUtil.d("line --- " + line);
+        String[] expressions ={};
         // 赋值解析 :是定义 := 是赋值
         if(line.contains(EXPRESSION_DEFINE)){
             // 定义(自定义的图元对象)
-            String[] expressions = line.split(EXPRESSION_DEFINE);
+            expressions = line.split(EXPRESSION_DEFINE);
         }else if(line.contains(EXPRESSION_EQUAL)){
             // TODO
             // 赋值
-            String[] expressions = line.split(EXPRESSION_EQUAL);
-            if(expressions.length > 1){
-                // 至少有两部分，则合法
-                String variableName = expressions[0];
-                String expression = expressions[1];
-                double value = ExpressParser.getInstance().getExpressionValue(expression);
-                LogUtil.d(expression);
-                LogUtil.d("" + value);
-            }else{
-                // 非法，中断
-            }
+            expressions = line.split(EXPRESSION_EQUAL);
+        }
+
+        if(expressions.length > 1){
+            // 至少有两部分，则合法
+            variableName = expressions[0];
+            expression = expressions[1];
+            LogUtil.d("variableName  --- " + variableName);
+            LogUtil.d("expression  --- " + expression);
+            value = ExpressParser.getInstance().getExpressionValue(expression);
         }
 
     }
@@ -43,7 +48,11 @@ public class EvaluationSentence extends FormulaSentence {
      * @return
      */
     public double getValue(){
-        return 0.0;
+        return value;
+    }
+
+    public String getName(){
+        return variableName;
     }
 
 }
