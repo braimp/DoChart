@@ -1,5 +1,6 @@
 package com.dqqdo.dochart.resolver.syntax.sentence;
 
+import com.dqqdo.dochart.resolver.ResolverTaskDO;
 import com.dqqdo.dochart.resolver.ScriptRuntime;
 import com.dqqdo.dochart.resolver.syntax.DoConstants;
 import com.dqqdo.dochart.resolver.syntax.LogicPrimitive;
@@ -26,8 +27,14 @@ public class FormulaLine {
      */
     private String content;
 
+    /**
+     * 当前命令行的类型
+     */
     private FormulaLineType formulaLineType;
 
+    /**
+     * 命令行包含的分句
+     */
     private ArrayList<FormulaSentence> sentences = new ArrayList<>();
 
     /**
@@ -45,8 +52,15 @@ public class FormulaLine {
      */
     private boolean isValid = true;
 
-    public FormulaLine(String line){
+    /**
+     * 解析任务 对应的数据对象
+     */
+    private ResolverTaskDO resolverTaskDO;
+
+
+    public FormulaLine(String line,ResolverTaskDO taskDO){
         this.content = line;
+        this.resolverTaskDO = taskDO;
 
         if(line.contains(DoConstants.EXPRESSION_DEFINE)){
             // 计算
@@ -115,6 +129,7 @@ public class FormulaLine {
             // 分句解析完成
             int sSize = sentences.size();
             for(int i = 0 ; i < sSize;i++){
+
                 FormulaSentence formulaSentence = sentences.get(i);
 
                 if(formulaSentence instanceof ColorSentence){

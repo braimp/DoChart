@@ -3,7 +3,7 @@ package com.dqqdo.dochart.resolver;
 import java.util.List;
 
 /**
- * 股票基本信息，公司解析器需要的数据
+ * 股票基本信息，解析器需要的数据
  * 作者：duqingquan
  * 时间：2017/11/30 13:34
  */

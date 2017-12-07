@@ -7,10 +7,7 @@ package com.dqqdo.dochart.resolver;
  */
 public class ScriptEnvironment {
 
-    /**
-     * 股票信息对象
-     */
-    private StockInfo stockInfo;
+
 
     /**
      * 组件的视窗信息
@@ -23,10 +20,9 @@ public class ScriptEnvironment {
      * @param viewInfo 视窗信息
      * @return 准备工作是否成功
      */
-    public boolean prepareWork(StockInfo info,ViewPortInfo viewInfo){
+    public boolean prepareWork(ViewPortInfo viewInfo){
         // TODO 很多指标函数数据运算会用到分红、财报等数据信息。
         // TODO 数据有效性校验等待后续实现。
-        this.stockInfo = info;
         this.viewPortInfo = viewInfo;
 
         return true;

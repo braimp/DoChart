@@ -1,5 +1,6 @@
 package com.dqqdo.dochart.resolver.syntax.parser;
 
+import com.dqqdo.dochart.resolver.ResolverTaskDO;
 import com.dqqdo.dochart.resolver.syntax.sentence.ColorSentence;
 import com.dqqdo.dochart.resolver.syntax.sentence.EvaluationSentence;
 import com.dqqdo.dochart.resolver.syntax.sentence.FormulaSentence;
@@ -29,7 +30,7 @@ public class SentenceParser {
 
     private final String COLOR_KEYWORD = "color";
 
-    public FormulaSentence parseSentence(String line){
+    public FormulaSentence parseSentence(String line, ResolverTaskDO taskDO){
 
         FormulaSentence sentence;
         // 解析判断，当前分句的类型

@@ -16,8 +16,10 @@ public class PointDotDrawFunction extends AbsDrawFunction {
     }
 
     @Override
-    public double getFunctionResult() {
+    public double getFunctionResult(String expression) {
         return 0;
     }
+
+
 
 }

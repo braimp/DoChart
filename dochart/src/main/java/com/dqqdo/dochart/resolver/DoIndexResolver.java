@@ -18,9 +18,8 @@ import static com.dqqdo.dochart.resolver.syntax.DoConstants.LINE_END_CHAR;
 
 /**
  * 指标解析器对象
- * 作者：duqingquan
  * 时间：2017/11/30 11:18
- * @author hexun
+ * @author duqingquan
  */
 public class DoIndexResolver {
 
@@ -28,7 +27,7 @@ public class DoIndexResolver {
     /**
      * 解析器实例对象
      */
-    public static volatile DoIndexResolver instance;
+    private static volatile DoIndexResolver instance;
 
     /**
      * 自定义线程池
@@ -40,15 +39,20 @@ public class DoIndexResolver {
      */
     private ScriptEnvironment scriptEnvironment;
 
-    /**
-     * 股票信息
-     */
-    StockInfo stockInfo = new StockInfo();
+
     /**
      * 视窗信息
      */
     ViewPortInfo viewPortInfo = new ViewPortInfo();
 
+
+    /**
+     * 获取视窗信息对象
+     * @return
+     */
+    public ViewPortInfo getViewPortInfo(){
+        return viewPortInfo;
+    }
 
     /**
      * 获取解析器实例
@@ -81,17 +85,9 @@ public class DoIndexResolver {
         scriptEnvironment = new ScriptEnvironment();
         // 填充假数据
         // TODO 准备真实数据，数据来源工作量略大，等待后续实现。
-        scriptEnvironment.prepareWork(stockInfo,viewPortInfo);
+        scriptEnvironment.prepareWork(viewPortInfo);
     }
 
-    /**
-     * 设置股票信息
-     * @param info
-     */
-    public void setStockInfo(StockInfo info){
-        this.stockInfo = info;
-        scriptEnvironment.prepareWork(stockInfo,viewPortInfo);
-    }
 
     /**
      * 设置视窗信息
@@ -99,7 +95,7 @@ public class DoIndexResolver {
      */
     public void setViewPortInfo(ViewPortInfo info){
         this.viewPortInfo = info;
-        scriptEnvironment.prepareWork(stockInfo,viewPortInfo);
+        scriptEnvironment.prepareWork(viewPortInfo);
     }
 
 
@@ -113,7 +109,8 @@ public class DoIndexResolver {
         if(resolverTaskDO == null){
             return false;
         }else{
-            executorService.submit(new ResolverTask(resolverTaskDO,resolverCallback));
+            ResolverTask resolverTask = new ResolverTask(resolverTaskDO,resolverCallback);
+            executorService.submit(resolverTask);
             return true;
         }
 
@@ -138,10 +135,18 @@ public class DoIndexResolver {
          */
         private IResolverCallback resolverCallback;
 
-        private ResolverTask(ResolverTaskDO resolverDTO,IResolverCallback callback){
-            this.formula = resolverDTO.getFormula();
+        /**
+         * 解析任务 对应的数据对象
+         */
+        private ResolverTaskDO resolverTaskDO;
+
+        private ResolverTask(ResolverTaskDO taskDO,IResolverCallback callback){
+
+            this.resolverTaskDO = taskDO;
+            this.formula = taskDO.getFormula();
             this.scriptRuntime = new ScriptRuntime();
             this.resolverCallback = callback;
+
         }
 
 
@@ -152,7 +157,7 @@ public class DoIndexResolver {
                 return ;
             }
 
-            // 所有的命令行 打包成一个数组，验证合法后，依次解析数组
+            // 1 命令行打包成一个数组，验证合法后，依次解析数组
             String[] lines = formula.split(";");
             FormulaLine[] formulaLines = new FormulaLine[lines.length];
             if(lines.length > 0){
@@ -170,9 +175,12 @@ public class DoIndexResolver {
             }else{
                 // 无数据
                 LogUtil.d("无数据");
+                resolverCallback.onFail(-101,"无有效命令行");
+                return ;
             }
 
-            // 命令行解析完毕,进入执行阶段
+
+            // 2  命令行解析完毕,进入执行阶段
             ResolverResult resolverResult = new ResolverResult();
             List<IDrawItem> totalDrawItems = new ArrayList<>();
 
@@ -180,6 +188,7 @@ public class DoIndexResolver {
             for(int i = 0; i < formulaLines.length;i++){
 
                 FormulaLine formulaLine = formulaLines[i];
+
                 if(formulaLine.getFormulaLineType() == FormulaLineType.DRAW){
                     // 行为命令，则获取drawItem对象数据，返回给外部
                     LogicPrimitive logicPrimitive = formulaLine.getLogicPrimitive();

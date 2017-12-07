@@ -1,5 +1,8 @@
 package com.dqqdo.dochart.resolver.syntax.function;
 
+import com.dqqdo.dochart.resolver.ResolverTaskDO;
+import com.dqqdo.dochart.resolver.StockInfo;
+
 /**
  * 函数抽象类
  * 作者：duqingquan
@@ -20,7 +23,7 @@ public interface IFunction {
      * @param expression 参数字符串
      * @return 计算结果
      */
-    double getFunctionResult(String expression);
+    double getFunctionResult(String expression,StockInfo stockInfo);
 
 
 

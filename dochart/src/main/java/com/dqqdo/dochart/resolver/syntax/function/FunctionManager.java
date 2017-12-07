@@ -1,28 +1,34 @@
 package com.dqqdo.dochart.resolver.syntax.function;
 
+import com.dqqdo.dochart.resolver.ResolverTaskDO;
+import com.dqqdo.dochart.resolver.StockInfo;
+import com.dqqdo.dochart.resolver.stock.StockManager;
 import com.dqqdo.dochart.util.LogUtil;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * 包管理器
  * 时间：2017/12/5 10:26
+ *
  * @author duqingquan
  */
 public class FunctionManager {
 
     private volatile static FunctionManager instance;
 
-    private HashMap<String,IFunction> functions = new HashMap<>();
+    private HashMap<String, IFunction> functions = new HashMap<>();
 
 
     private FunctionManager() {
         // TODO 后续完善 库函数加载机制。现在只是简单实现。
 
         CostFunction costFunction = new CostFunction();
-        functions.put(costFunction.getFunctionKeyword(),costFunction);
+        functions.put(costFunction.getFunctionKeyword(), costFunction);
 
     }
 
@@ -39,7 +45,7 @@ public class FunctionManager {
 
     }
 
-    public boolean isFunc(String expression){
+    public boolean isFunc(String expression) {
 
         String pattern = "\\D+\\(.*\\)";
 
@@ -50,10 +56,11 @@ public class FunctionManager {
 
     /**
      * 获取函数的结果值
+     *
      * @param expression 函数表达式
      * @return 结果值
      */
-    public double getFuncValue(String expression){
+    public double getFuncValue(String expression, StockInfo stockInfo) {
 
         // eg. COST(---50,EAST(10,NEW(5))---)
         // 按指定模式在字符串查找
@@ -64,11 +71,11 @@ public class FunctionManager {
 
         // 现在创建 matcher 对象
         Matcher m = r.matcher(expression);
-        if (m.find( )) {
+        if (m.find()) {
 
             String funcName = m.group(1);
             IFunction function = functions.get(funcName);
-            if(function == null){
+            if (function == null) {
                 // 函数名不存在
                 LogUtil.e("函数名不存在 " + function);
                 return -1;
@@ -76,7 +83,7 @@ public class FunctionManager {
 
             String funcParam = m.group(2);
             // eg. 50,EAST(10,NEW(5))
-            double value = function.getFunctionResult(funcParam);
+            double value = function.getFunctionResult(funcParam, stockInfo);
 
             return value;
         } else {
@@ -84,41 +91,8 @@ public class FunctionManager {
             return -1;
         }
 
-        // TODO 这里好麻烦，需要实现等式的解析
 
     }
 
-//    /**
-//     * 函数返回的数据对象
-//     */
-//    public class FuncVarDO{
-//
-//        private String name;
-//        private Double value;
-//
-//        public String getName() {
-//            return name;
-//        }
-//
-//        public void setName(String name) {
-//            this.name = name;
-//        }
-//
-//        public Double getValue() {
-//            return value;
-//        }
-//
-//        public void setValue(Double value) {
-//            this.value = value;
-//        }
-//
-//        @Override
-//        public String toString() {
-//            return "FuncVarDO{" +
-//                    "name='" + name + '\'' +
-//                    ", value=" + value +
-//                    '}';
-//        }
-//    }
 
 }

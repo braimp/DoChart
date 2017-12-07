@@ -36,7 +36,16 @@ public class IndexParseView extends View{
      */
     public void setFormula(String formula){
         final ResolverTaskDO resolverTaskDO = new ResolverTaskDO();
+
         resolverTaskDO.setFormula(formula);
+        // 假装是万科A
+        resolverTaskDO.setStockId(1L);
+        // NOTE 解析器的最小时间单位是天。
+        // 设置开始时间
+        resolverTaskDO.setStartTime(20160101L);
+        // 设置结束时间
+        resolverTaskDO.setEndTime(20171101L);
+
         indexResolver.submitResolver(resolverTaskDO, new DoIndexResolver.IResolverCallback() {
             @Override
             public void onSuccess(ResolverResult result) {
@@ -46,7 +55,7 @@ public class IndexParseView extends View{
 
             @Override
             public void onFail(int errCode, String errDesc) {
-
+                LogUtil.e("errDesc ---  " + errDesc);
             }
         });
     }
