@@ -1,5 +1,6 @@
 package com.dqqdo.dochart.resolver.syntax.function.draw;
 
+import com.dqqdo.dochart.resolver.StockInfo;
 import com.dqqdo.dochart.resolver.syntax.function.AbsDrawFunction;
 
 /**
@@ -17,7 +18,9 @@ public class LineThick4DrawFunction extends AbsDrawFunction {
     }
 
     @Override
-    public double getFunctionResult() {
+    public double getFunctionResult(String expression, StockInfo stockInfo) {
         return 0;
     }
+
+
 }

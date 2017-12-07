@@ -43,8 +43,11 @@ public class StockManager {
         List<StockInfo> list = new ArrayList<>();
 
         // TODO 这里需要完成Stock列表的数据查询与管理
-        StockInfo stockInfo = new StockInfo();
-        list.add(stockInfo);
+        for(int i = 0; i < 10; i++){
+            StockInfo stockInfo = new StockInfo();
+            stockInfo.setPrice(40);
+            list.add(stockInfo);
+        }
 
         return list;
     }

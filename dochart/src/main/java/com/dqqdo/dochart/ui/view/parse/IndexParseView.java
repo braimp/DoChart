@@ -29,35 +29,17 @@ public class IndexParseView extends View{
 
 
     private DoIndexResolver indexResolver;
-    private List<IDrawItem> drawItems = new ArrayList<>(1);
+    private List<IDrawItem> drawItems = new ArrayList<>();
+    ResolverTaskDO resolverTaskDO = new ResolverTaskDO();
+    private String formula;
 
     /**
      * 设置公式
      */
     public void setFormula(String formula){
-        final ResolverTaskDO resolverTaskDO = new ResolverTaskDO();
 
-        resolverTaskDO.setFormula(formula);
-        // 假装是万科A
-        resolverTaskDO.setStockId(1L);
-        // NOTE 解析器的最小时间单位是天。
-        // 设置开始时间
-        resolverTaskDO.setStartTime(20160101L);
-        // 设置结束时间
-        resolverTaskDO.setEndTime(20171101L);
+        this.formula = formula;
 
-        indexResolver.submitResolver(resolverTaskDO, new DoIndexResolver.IResolverCallback() {
-            @Override
-            public void onSuccess(ResolverResult result) {
-                LogUtil.d("result ---  " + result);
-                drawItems = result.getDrawItems();
-            }
-
-            @Override
-            public void onFail(int errCode, String errDesc) {
-                LogUtil.e("errDesc ---  " + errDesc);
-            }
-        });
     }
 
     private void init(){
@@ -89,8 +71,39 @@ public class IndexParseView extends View{
             IndexParseView.this.getDrawingRect(viewRect);
             RectF rectF = new RectF(viewRect);
             viewPortInfo.setViewRectF(rectF);
+
+            viewPortInfo.setMaxValue(100);
+            viewPortInfo.setMinValue(10);
+            viewPortInfo.setPerValuePixel(5);
+            viewPortInfo.setPerUnitWidth(20);
+
             // 更新屏幕展示信息
             indexResolver.setViewPortInfo(viewPortInfo);
+
+
+            resolverTaskDO.setFormula(formula);
+            // 假装是万科A
+            resolverTaskDO.setStockId(1L);
+            // NOTE 解析器的最小时间单位是天。
+            // 设置开始时间
+            resolverTaskDO.setStartTime(20160101L);
+            // 设置结束时间
+            resolverTaskDO.setEndTime(20171101L);
+
+            indexResolver.submitResolver(resolverTaskDO, new DoIndexResolver.IResolverCallback() {
+                @Override
+                public void onSuccess(ResolverResult result) {
+                    drawItems = result.getDrawItems();
+                    LogUtil.d("drawItems ---  " + drawItems);
+                    postInvalidate();
+                }
+
+                @Override
+                public void onFail(int errCode, String errDesc) {
+                    LogUtil.e("errDesc ---  " + errDesc);
+                }
+            });
+
         }
     }
 

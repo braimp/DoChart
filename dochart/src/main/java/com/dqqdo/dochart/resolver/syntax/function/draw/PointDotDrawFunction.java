@@ -1,5 +1,6 @@
 package com.dqqdo.dochart.resolver.syntax.function.draw;
 
+import com.dqqdo.dochart.resolver.StockInfo;
 import com.dqqdo.dochart.resolver.syntax.function.AbsDrawFunction;
 
 /**
@@ -16,9 +17,11 @@ public class PointDotDrawFunction extends AbsDrawFunction {
     }
 
     @Override
-    public double getFunctionResult(String expression) {
+    public double getFunctionResult(String expression, StockInfo stockInfo) {
         return 0;
     }
+
+
 
 
 

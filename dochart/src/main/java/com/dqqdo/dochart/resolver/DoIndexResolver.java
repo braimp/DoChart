@@ -164,11 +164,15 @@ public class DoIndexResolver {
                 // 有数据
                 for(int i = 0; i < lines.length;i++){
 
-                    FormulaLine formulaLine = new FormulaLine(lines[i] + LINE_END_CHAR);
+                    FormulaLine formulaLine = new FormulaLine(
+                            lines[i] + LINE_END_CHAR
+                            ,resolverTaskDO);
+
                     if(!formulaLine.isValid()){
                         // 有任何行语法错误，当前公式存在异常，结束
                         break;
                     }
+
                     formulaLines[i] = formulaLine;
                 }
 
@@ -184,6 +188,7 @@ public class DoIndexResolver {
             ResolverResult resolverResult = new ResolverResult();
             List<IDrawItem> totalDrawItems = new ArrayList<>();
 
+            LogUtil.d("formulaLines.length  ---- " + formulaLines.length);
 
             for(int i = 0; i < formulaLines.length;i++){
 

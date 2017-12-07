@@ -3,6 +3,8 @@ package com.dqqdo.dochart.resolver.draw;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
+import com.dqqdo.dochart.util.LogUtil;
+
 import java.util.Arrays;
 
 /**
@@ -49,6 +51,8 @@ public class LineDrawItem implements IDrawItem {
         this.coordinates = data;
     }
 
+
+
     @Override
     public void drawSelf(Canvas canvas) {
         // 根据坐标绘制图形
@@ -59,6 +63,9 @@ public class LineDrawItem implements IDrawItem {
             return ;
         }
         if(coordinates != null && coordinates.length > MIN_POINTS_NUM){
+            for(int i = 0; i < coordinates.length; i++){
+                LogUtil.d("--- " + i + " -- " + coordinates[i]);
+            }
             canvas.drawLines(coordinates,mPaint);
         }
 

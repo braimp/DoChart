@@ -1,16 +1,16 @@
 package com.dqqdo.dochart.resolver.syntax.sentence;
 
+
 import com.dqqdo.dochart.resolver.ResolverTaskDO;
-import com.dqqdo.dochart.resolver.ScriptRuntime;
+
 import com.dqqdo.dochart.resolver.syntax.DoConstants;
 import com.dqqdo.dochart.resolver.syntax.LogicPrimitive;
-import com.dqqdo.dochart.resolver.syntax.function.FunctionManager;
 import com.dqqdo.dochart.resolver.syntax.parser.SentenceParser;
-import com.dqqdo.dochart.resolver.syntax.parser.ShapeFactory;
-import com.dqqdo.dochart.util.LogUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 import static com.dqqdo.dochart.resolver.syntax.DoConstants.LINE_END_CHAR;
 
@@ -93,7 +93,8 @@ public class FormulaLine {
                 // 不是函数内的逗号,则认为是断句符号
                 String sentence = stringBuilder.toString();
                 FormulaSentence formulaSentence =
-                        SentenceParser.getInstance().parseSentence(sentence);
+                        SentenceParser.getInstance()
+                                .parseSentence(sentence,resolverTaskDO);
 
                 if(!formulaSentence.isValid()){
                     isValid = false;
@@ -105,7 +106,10 @@ public class FormulaLine {
                 if (LINE_END_CHAR.equals(String.valueOf(chars[i]))) {
                     String sentence = stringBuilder.toString();
                     FormulaSentence formulaSentence =
-                            SentenceParser.getInstance().parseSentence(sentence);
+                            SentenceParser.getInstance().parseSentence(
+                                    sentence
+                                    ,resolverTaskDO);
+
                     if(!formulaSentence.isValid()){
                         isValid = false;
                         return ;
@@ -133,15 +137,18 @@ public class FormulaLine {
                 FormulaSentence formulaSentence = sentences.get(i);
 
                 if(formulaSentence instanceof ColorSentence){
-                    logicPrimitive.setColor(((ColorSentence) formulaSentence).getColorInt());
+                    logicPrimitive.setColor(((ColorSentence) formulaSentence)
+                            .getColorInt());
                 }
                 if(formulaSentence instanceof ShapeSentence){
-                    logicPrimitive.setShape(((ShapeSentence) formulaSentence).getShape());
+                    logicPrimitive.setShape(((ShapeSentence) formulaSentence)
+                            .getShape());
                 }
                 if(formulaSentence instanceof EvaluationSentence){
-                    EvaluationSentence evaluationSentence = (EvaluationSentence) formulaSentence;
-                    logicPrimitive.setValue(evaluationSentence.getValue());
-                    LogUtil.d("evaluationSentence.getName()  ----  " + evaluationSentence.getName());
+
+                    EvaluationSentence evaluationSentence = (EvaluationSentence)
+                            formulaSentence;
+                    logicPrimitive.setValue(evaluationSentence.getValues());
                     logicPrimitive.setName(evaluationSentence.getName());
                 }
             }

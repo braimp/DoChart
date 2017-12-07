@@ -1,13 +1,18 @@
 package com.dqqdo.dochart.resolver.syntax.sentence;
 
 
+import android.graphics.RectF;
+
+import com.dqqdo.dochart.resolver.DoIndexResolver;
 import com.dqqdo.dochart.resolver.ResolverTaskDO;
 import com.dqqdo.dochart.resolver.StockInfo;
+import com.dqqdo.dochart.resolver.ViewPortInfo;
 import com.dqqdo.dochart.resolver.stock.StockManager;
 import com.dqqdo.dochart.resolver.syntax.function.FunctionManager;
 import com.dqqdo.dochart.util.LogUtil;
 import com.dqqdo.dochart.util.StringUtil;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,11 +30,14 @@ public class EvaluationSentence extends FormulaSentence {
     private double value;
     private String variableName;
     private String expression;
-    private  ResolverTaskDO resolverTaskDO;
 
-    public EvaluationSentence(String line, ResolverTaskDO taskDO) {
+    /**
+     * 公式返回的一组数据
+     */
+    List<Double> values = new ArrayList<>();
+
+    public EvaluationSentence(String line, ResolverTaskDO resolverTaskDO) {
         super(line);
-        this.resolverTaskDO = taskDO;
 
         String[] expressions ={};
         // 赋值解析 :是定义 := 是赋值
@@ -47,30 +55,50 @@ public class EvaluationSentence extends FormulaSentence {
             variableName = expressions[0];
             expression = expressions[1];
 
+            LogUtil.d("expression  ---  " + expression);
+
+
             if(FunctionManager.getInstance().isFunc(expression)){
 
-                // 分解时间单元
-                long stockId = taskDO.getStockId();
-                long startTime = taskDO.getStartTime();
-                long endTime = taskDO.getEndTime();
+                long stockId = resolverTaskDO.getStockId();
+                long startTime = resolverTaskDO.getStartTime();
+                long endTime = resolverTaskDO.getEndTime();
 
+                values.clear();
                 List<StockInfo> list = StockManager.getInstance().getStockInfos(stockId,startTime,endTime);
-                Iterator iterator = list.iterator();
-
-                while (iterator.hasNext()){
-                    StockInfo stockInfo = (StockInfo) iterator.next();
-                    // 是函数，则交由函数管理器处理
-                    value = FunctionManager
-                            .getInstance()
-                            .getFuncValue(expression,stockInfo);
-                    // TODO 将返回的数值，转化为DrawItem对象
+                if(list != null && !list.isEmpty()){
+                    Iterator<StockInfo> infoIterator = list.iterator();
+                    while (infoIterator.hasNext()){
+                        StockInfo stockInfo = infoIterator.next();
+                        double tempValue = FunctionManager
+                                .getInstance()
+                                .getFuncValue(expression,stockInfo);
+                        values.add(tempValue);
+                    }
                 }
 
 
             }else{
                 // 数值，直接计算.只接受数值
                 if(StringUtil.isNumeric(expression)){
+
                     value = Double.parseDouble(expression);
+                    LogUtil.d("value  ---  " + value);
+                    long stockId = resolverTaskDO.getStockId();
+                    long startTime = resolverTaskDO.getStartTime();
+                    long endTime = resolverTaskDO.getEndTime();
+
+                    values.clear();
+                    List<StockInfo> list = StockManager.getInstance().getStockInfos(stockId,startTime,endTime);
+
+                    if(list != null && !list.isEmpty()){
+                        int listSize = list.size();
+                        for(int i = 0; i < listSize; i++){
+                            values.add(value);
+                        }
+                    }
+
+
                 }else{
                     LogUtil.e("非法的表达式  expression  --- " + expression);
                 }
@@ -80,13 +108,16 @@ public class EvaluationSentence extends FormulaSentence {
 
     }
 
+
+
     /**
-     * 返回表达式的结果数值
+     * 获取一组数据
      * @return
      */
-    public double getValue(){
-        return value;
+    public List<Double> getValues(){
+        return values;
     }
+
 
     public String getName(){
         return variableName;

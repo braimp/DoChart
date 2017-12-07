@@ -2,6 +2,8 @@ package com.dqqdo.dochart.resolver.syntax;
 
 import com.dqqdo.dochart.resolver.syntax.shape.IShape;
 
+import java.util.List;
+
 /**
  * 逻辑上的图元
  * 作者：duqingquan
@@ -27,7 +29,7 @@ public class LogicPrimitive {
     /**
      * 图元数值
      */
-    private double value;
+    private List<Double> value;
 
 
     public String getName() {
@@ -54,15 +56,15 @@ public class LogicPrimitive {
         this.shape = shape;
     }
 
-    public double getValue() {
+    public List<Double> getValue() {
         return value;
     }
 
-    public void setValue(double value) {
+    public void setValue(List<Double> value) {
         this.value = value;
     }
 
-    public LogicPrimitive(String name, int color, IShape shape, double value) {
+    public LogicPrimitive(String name, int color, IShape shape, List<Double> value) {
         this.name = name;
         this.color = color;
         this.shape = shape;
