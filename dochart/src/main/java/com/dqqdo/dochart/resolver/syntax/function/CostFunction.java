@@ -5,10 +5,13 @@ import com.dqqdo.dochart.resolver.ResolverTaskDO;
 import com.dqqdo.dochart.resolver.StockInfo;
 import com.dqqdo.dochart.resolver.ViewPortInfo;
 import com.dqqdo.dochart.resolver.stock.StockManager;
+import com.dqqdo.dochart.util.LogUtil;
 import com.dqqdo.dochart.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * COST函数
@@ -40,12 +43,12 @@ public class CostFunction implements IFunction{
         ArrayList<String> params = new ArrayList<>(2);
         // eg. 50,EAST(10,NEW(5))
         int size = line.length();
-        StringBuilder stringBuilder = new StringBuilder(line);
+        StringBuilder stringBuilder = new StringBuilder();
 
         // TODO  防止递归过深的处理,尚未添加
 
         for(int i = 0; i < size; i++){
-            char nowChar = stringBuilder.charAt(i);
+            char nowChar = line.charAt(i);
             if(nowChar != ','){
                 stringBuilder.append(nowChar);
             }else{
@@ -57,8 +60,8 @@ public class CostFunction implements IFunction{
                 if(stringBuilder.length() > 0){
                     String param = stringBuilder.toString();
                     params.add(param);
-                    stringBuilder.delete(0,stringBuilder.length());
                 }
+                stringBuilder.delete(0,stringBuilder.length());
             }
         }
 
@@ -72,6 +75,7 @@ public class CostFunction implements IFunction{
                 // 参数中包含函数，遍历解析
                 value = FunctionManager.getInstance().getFuncValue(param,stockInfo);
             }else{
+
                 if(StringUtil.isNumeric(param)){
                     // 是数字
                     value = Double.parseDouble(param);
@@ -84,10 +88,12 @@ public class CostFunction implements IFunction{
 
         // 成功过滤出参数,接下来根据参数去计算当天的数据。 这里只计算一天。
         // TODO 现在先只是返回最高价,实际需要计算成本函数 巴拉巴拉
+        double price = stockInfo.getPrice();
+        double randomValue = value + price;
 
+        LogUtil.d("randomValue   ----  " + randomValue);
 
-
-        return 0.0;
+        return randomValue;
     }
 
 

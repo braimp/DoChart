@@ -60,18 +60,19 @@ public class DrawItemParser {
 
         if(shape instanceof LineThick2){
 
+            LogUtil.d("LineThick2  --- ");
             IDrawItem drawItem = shape.getDrawItem(logicPrimitive);
             // 这里填充假数据
             drawItems.add(drawItem);
 
         }else if(shape instanceof LineThick3){
-
+            LogUtil.d("LineThick3  --- ");
             IDrawItem drawItem = shape.getDrawItem(logicPrimitive);
             // 这里填充假数据
             drawItems.add(drawItem);
 
         } else if(shape instanceof LineThick4){
-
+            LogUtil.d("LineThick4  --- ");
             IDrawItem drawItem = shape.getDrawItem(logicPrimitive);
             // 这里填充假数据
             drawItems.add(drawItem);

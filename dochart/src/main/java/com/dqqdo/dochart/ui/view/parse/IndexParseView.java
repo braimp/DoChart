@@ -37,9 +37,7 @@ public class IndexParseView extends View{
      * 设置公式
      */
     public void setFormula(String formula){
-
         this.formula = formula;
-
     }
 
     private void init(){
@@ -61,46 +59,56 @@ public class IndexParseView extends View{
         init();
     }
 
+    /**
+     * 视窗信息对象
+     */
+    ViewPortInfo viewPortInfo = new ViewPortInfo();
+
+    public void execute(){
+
+        viewPortInfo.setMaxValue(100);
+        viewPortInfo.setMinValue(10);
+        viewPortInfo.setPerValuePixel(20);
+        viewPortInfo.setPerUnitWidth(50);
+
+        // 更新屏幕展示信息
+        indexResolver.setViewPortInfo(viewPortInfo);
+
+        resolverTaskDO.setFormula(formula);
+        // 假装是万科A
+        resolverTaskDO.setStockId(1L);
+        // NOTE 解析器的最小时间单位是天。
+        // 设置开始时间
+        resolverTaskDO.setStartTime(20160101L);
+        // 设置结束时间
+        resolverTaskDO.setEndTime(20171101L);
+
+        indexResolver.submitResolver(resolverTaskDO, new DoIndexResolver.IResolverCallback() {
+            @Override
+            public void onSuccess(ResolverResult result) {
+                drawItems = result.getDrawItems();
+                postInvalidate();
+            }
+
+            @Override
+            public void onFail(int errCode, String errDesc) {
+                LogUtil.e("errDesc ---  " + errDesc);
+            }
+        });
+
+    }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+
         if(w != oldw || h != oldh){
-            ViewPortInfo viewPortInfo = new ViewPortInfo();
+
             Rect viewRect = new Rect();
             IndexParseView.this.getDrawingRect(viewRect);
             RectF rectF = new RectF(viewRect);
             viewPortInfo.setViewRectF(rectF);
 
-            viewPortInfo.setMaxValue(100);
-            viewPortInfo.setMinValue(10);
-            viewPortInfo.setPerValuePixel(5);
-            viewPortInfo.setPerUnitWidth(50);
-
-            // 更新屏幕展示信息
-            indexResolver.setViewPortInfo(viewPortInfo);
-
-            resolverTaskDO.setFormula(formula);
-            // 假装是万科A
-            resolverTaskDO.setStockId(1L);
-            // NOTE 解析器的最小时间单位是天。
-            // 设置开始时间
-            resolverTaskDO.setStartTime(20160101L);
-            // 设置结束时间
-            resolverTaskDO.setEndTime(20171101L);
-
-            indexResolver.submitResolver(resolverTaskDO, new DoIndexResolver.IResolverCallback() {
-                @Override
-                public void onSuccess(ResolverResult result) {
-                    drawItems = result.getDrawItems();
-                    postInvalidate();
-                }
-
-                @Override
-                public void onFail(int errCode, String errDesc) {
-                    LogUtil.e("errDesc ---  " + errDesc);
-                }
-            });
 
         }
     }

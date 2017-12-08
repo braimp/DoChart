@@ -2,6 +2,8 @@ package com.dqqdo.dochart.resolver.syntax.parser;
 
 import com.dqqdo.dochart.resolver.syntax.shape.IShape;
 import com.dqqdo.dochart.resolver.syntax.shape.LineThick2;
+import com.dqqdo.dochart.resolver.syntax.shape.LineThick3;
+import com.dqqdo.dochart.resolver.syntax.shape.LineThick4;
 
 import java.util.HashMap;
 
@@ -15,8 +17,8 @@ public class ShapeFactory {
 
     {
         shapes.put("LINETHICK2", LineThick2.class);
-        shapes.put("LINETHICK3", LineThick2.class);
-        shapes.put("LINETHICK4", LineThick2.class);
+        shapes.put("LINETHICK3", LineThick3.class);
+        shapes.put("LINETHICK4", LineThick4.class);
     }
 
     private volatile static ShapeFactory instance;

@@ -4,10 +4,26 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
+
+    <EditText
+        android:layout_width="match_parent"
+        android:id="@+id/et_index"
+        android:background="#000"
+        android:textColor="#fff"
+        android:text="中枢线:32,colorDAAF3B,LINETHICK2;
+                      中枢线1:COST(50),colorFF0000,LINETHICK4;"
+        android:layout_height="200dp"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:id="@+id/btn_index_parse"
+        android:text="解析指标"
+        android:layout_height="wrap_content"/>
+
     <com.dqqdo.dochart.ui.view.parse.IndexParseView
-        android:layout_width="300dp"
+        android:layout_width="match_parent"
         android:id="@+id/ipv_index_parse"
-        android:layout_height="500dp"
+        android:layout_height="match_parent"
         >
 
     </com.dqqdo.dochart.ui.view.parse.IndexParseView>

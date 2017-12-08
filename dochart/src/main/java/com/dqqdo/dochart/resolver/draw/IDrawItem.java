@@ -9,6 +9,10 @@ import android.graphics.Canvas;
  */
 public interface IDrawItem {
 
+    /**
+     * 绘制自身
+     * @param canvas 画板对象
+     */
     void drawSelf(Canvas canvas);
 
 }

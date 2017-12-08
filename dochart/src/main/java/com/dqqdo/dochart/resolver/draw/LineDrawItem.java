@@ -15,7 +15,6 @@ public class LineDrawItem implements IDrawItem {
 
     private int mColor;
     private Paint mPaint;
-    private int strokeWidth = 10;
     private float[] coordinates;
     /**
      * 最小的坐标点数量
@@ -28,6 +27,9 @@ public class LineDrawItem implements IDrawItem {
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setStrokeWidth(10);
+        mPaint.setStrokeJoin(Paint.Join.ROUND);
+        mPaint.setStrokeCap(Paint.Cap.ROUND);
+
     }
 
     /**
@@ -62,6 +64,7 @@ public class LineDrawItem implements IDrawItem {
         if(mPaint == null){
             return ;
         }
+        LogUtil.d("");
         if(coordinates != null && coordinates.length > MIN_POINTS_NUM){
             canvas.drawLines(coordinates,mPaint);
         }
