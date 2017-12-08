@@ -57,7 +57,6 @@ public class EvaluationSentence extends FormulaSentence {
 
             LogUtil.d("expression  ---  " + expression);
 
-
             if(FunctionManager.getInstance().isFunc(expression)){
 
                 long stockId = resolverTaskDO.getStockId();
@@ -83,7 +82,7 @@ public class EvaluationSentence extends FormulaSentence {
                 if(StringUtil.isNumeric(expression)){
 
                     value = Double.parseDouble(expression);
-                    LogUtil.d("value  ---  " + value);
+
                     long stockId = resolverTaskDO.getStockId();
                     long startTime = resolverTaskDO.getStartTime();
                     long endTime = resolverTaskDO.getEndTime();

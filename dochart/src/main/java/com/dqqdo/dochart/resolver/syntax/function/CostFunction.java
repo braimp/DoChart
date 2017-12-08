@@ -13,8 +13,8 @@ import java.util.List;
 /**
  * COST函数
  * 股票平均成本函数，根据输入的N，返回N%的获利股票的平均成本
- * 作者：duqingquan
  * 时间：2017/11/30 17:44
+ * @author duqingquan
  */
 public class CostFunction implements IFunction{
 
@@ -83,7 +83,6 @@ public class CostFunction implements IFunction{
         }
 
         // 成功过滤出参数,接下来根据参数去计算当天的数据。 这里只计算一天。
-
         // TODO 现在先只是返回最高价,实际需要计算成本函数 巴拉巴拉
 
 

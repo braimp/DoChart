@@ -63,9 +63,6 @@ public class LineDrawItem implements IDrawItem {
             return ;
         }
         if(coordinates != null && coordinates.length > MIN_POINTS_NUM){
-            for(int i = 0; i < coordinates.length; i++){
-                LogUtil.d("--- " + i + " -- " + coordinates[i]);
-            }
             canvas.drawLines(coordinates,mPaint);
         }
 

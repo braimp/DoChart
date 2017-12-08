@@ -8,6 +8,9 @@ import com.dqqdo.dochart.resolver.syntax.sentence.FormulaLineType;
 import com.dqqdo.dochart.util.LogUtil;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
@@ -177,8 +180,7 @@ public class DoIndexResolver {
                 }
 
             }else{
-                // 无数据
-                LogUtil.d("无数据");
+                // 解析完成，无有效命令行
                 resolverCallback.onFail(-101,"无有效命令行");
                 return ;
             }
@@ -186,9 +188,7 @@ public class DoIndexResolver {
 
             // 2  命令行解析完毕,进入执行阶段
             ResolverResult resolverResult = new ResolverResult();
-            List<IDrawItem> totalDrawItems = new ArrayList<>();
-
-            LogUtil.d("formulaLines.length  ---- " + formulaLines.length);
+            HashMap<String,List<IDrawItem>> totalDrawItems = new HashMap<>(16);
 
             for(int i = 0; i < formulaLines.length;i++){
 
@@ -198,12 +198,22 @@ public class DoIndexResolver {
                     // 行为命令，则获取drawItem对象数据，返回给外部
                     LogicPrimitive logicPrimitive = formulaLine.getLogicPrimitive();
 
+                    String logicPrimitiveName = logicPrimitive.getName();
                     List<IDrawItem> drawItems = DrawItemParser
                             .getInstance()
                             .parseLogicPrimitive(logicPrimitive);
 
+                    // 将逻辑图元储存到本地变量集合，以备后续使用
+                    boolean result = scriptRuntime.putVariable(logicPrimitiveName,logicPrimitive);
+
+                    if(!result){
+                        // 已经存在相同的定义，简单的输出日志
+                        totalDrawItems.remove(logicPrimitiveName);
+                        LogUtil.d("存在相关的定义，并且已自动覆盖：  " + logicPrimitiveName);
+                    }
+
                     if(drawItems != null){
-                        totalDrawItems.addAll(drawItems);
+                        totalDrawItems.put(logicPrimitiveName,drawItems);
                     }
 
                 }else{
@@ -213,8 +223,18 @@ public class DoIndexResolver {
 
             }
 
+            LogUtil.d("totalDrawItems：  " + totalDrawItems.size());
+
             resolverResult.setResultCode(0);
-            resolverResult.setDrawItems(totalDrawItems);
+            List<IDrawItem> resultList = new ArrayList();
+            Collection<List<IDrawItem>> drawListCollection = totalDrawItems.values();
+            Iterator<List<IDrawItem>> listIterator = drawListCollection.iterator();
+            while (listIterator.hasNext()){
+                List<IDrawItem> list = listIterator.next();
+                resultList.addAll(list);
+            }
+
+            resolverResult.setDrawItems(resultList);
             // 解析完成，给予成功回调
             resolverCallback.onSuccess(resolverResult);
 

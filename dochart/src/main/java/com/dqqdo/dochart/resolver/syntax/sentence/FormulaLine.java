@@ -72,7 +72,6 @@ public class FormulaLine {
             return ;
         }
 
-
         char[] chars = line.toCharArray();
 
         StringBuilder stringBuilder = new StringBuilder();

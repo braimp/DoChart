@@ -75,11 +75,10 @@ public class IndexParseView extends View{
             viewPortInfo.setMaxValue(100);
             viewPortInfo.setMinValue(10);
             viewPortInfo.setPerValuePixel(5);
-            viewPortInfo.setPerUnitWidth(20);
+            viewPortInfo.setPerUnitWidth(50);
 
             // 更新屏幕展示信息
             indexResolver.setViewPortInfo(viewPortInfo);
-
 
             resolverTaskDO.setFormula(formula);
             // 假装是万科A
@@ -94,7 +93,6 @@ public class IndexParseView extends View{
                 @Override
                 public void onSuccess(ResolverResult result) {
                     drawItems = result.getDrawItems();
-                    LogUtil.d("drawItems ---  " + drawItems);
                     postInvalidate();
                 }
 

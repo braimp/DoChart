@@ -14,15 +14,14 @@ import java.util.List;
  * 时间：2017/12/4 14:23
  * @author duqingquan
  */
-public class LineThick2 implements IShape{
+public class LineThick4 implements IShape{
 
-    private static final int WIDTH = 10;
+    private static final int WIDTH = 30;
 
     @Override
     public String toString() {
-        return "LineThick2{}";
+        return "LineThick4{}";
     }
-
 
     @Override
     public IDrawItem getDrawItem(LogicPrimitive logicPrimitive) {
@@ -76,6 +75,4 @@ public class LineThick2 implements IShape{
 
         return lineDrawItem;
     }
-
-
 }

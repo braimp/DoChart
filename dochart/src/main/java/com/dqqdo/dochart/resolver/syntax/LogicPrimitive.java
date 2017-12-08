@@ -1,13 +1,15 @@
 package com.dqqdo.dochart.resolver.syntax;
 
+import android.text.TextUtils;
+
 import com.dqqdo.dochart.resolver.syntax.shape.IShape;
 
 import java.util.List;
 
 /**
  * 逻辑上的图元
- * 作者：duqingquan
  * 时间：2017/12/4 17:16
+ * @author duqingquan
  */
 public class LogicPrimitive {
 
@@ -37,7 +39,10 @@ public class LogicPrimitive {
     }
 
     public void setName(String name) {
-        this.name = name;
+        if(!TextUtils.isEmpty(name)){
+            this.name = name.trim();
+        }
+
     }
 
     public int getColor() {
@@ -65,12 +70,16 @@ public class LogicPrimitive {
     }
 
     public LogicPrimitive(String name, int color, IShape shape, List<Double> value) {
-        this.name = name;
+        if(!TextUtils.isEmpty(name)){
+            this.name = name.trim();
+        }
         this.color = color;
         this.shape = shape;
         this.value = value;
     }
 
     public LogicPrimitive() {
+
     }
+
 }

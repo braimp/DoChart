@@ -1,5 +1,7 @@
 package com.dqqdo.dochart.resolver;
 
+import com.dqqdo.dochart.util.LogUtil;
+
 import java.util.HashMap;
 
 /**
@@ -29,9 +31,20 @@ public class ScriptRuntime {
      */
     public boolean putVariable(String varName,Object varObject){
 
-        scriptVariables.put(varName,varObject);
 
-        return true;
+        String trimName = varName.trim();
+
+        if(scriptVariables.containsKey(trimName)){
+            // 已经存在相关的定义，替换之并且返回false
+            scriptVariables.put(trimName,varObject);
+            return false;
+        }else{
+            // 未存在相关定义。添加并且返回false
+            scriptVariables.put(trimName,varObject);
+            return true;
+        }
+
+
     }
 
     public boolean putVariables(HashMap<String,Object> varObjects){
