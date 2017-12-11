@@ -28,10 +28,26 @@ import java.util.List;
 public class IndexParseView extends View{
 
 
+    /**
+     * 解析器对象
+     */
     private DoIndexResolver indexResolver;
+    /**
+     * 待绘制对象集合
+     */
     private List<IDrawItem> drawItems = new ArrayList<>();
+    /**
+     * 解析器任务对象
+     */
     ResolverTaskDO resolverTaskDO = new ResolverTaskDO();
+    /**
+     * 公式
+     */
     private String formula;
+    /**
+     * 视窗信息对象
+     */
+    ViewPortInfo viewPortInfo = new ViewPortInfo();
 
     /**
      * 设置公式
@@ -40,6 +56,9 @@ public class IndexParseView extends View{
         this.formula = formula;
     }
 
+    /**
+     * 初始化函数
+     */
     private void init(){
         indexResolver = DoIndexResolver.getInstance();
     }
@@ -59,11 +78,10 @@ public class IndexParseView extends View{
         init();
     }
 
-    /**
-     * 视窗信息对象
-     */
-    ViewPortInfo viewPortInfo = new ViewPortInfo();
 
+    /**
+     * 执行解析任务
+     */
     public void execute(){
 
         viewPortInfo.setMaxValue(100);
@@ -73,6 +91,7 @@ public class IndexParseView extends View{
 
         // 更新屏幕展示信息
         indexResolver.setViewPortInfo(viewPortInfo);
+
 
         resolverTaskDO.setFormula(formula);
         // 假装是万科A
@@ -108,7 +127,6 @@ public class IndexParseView extends View{
             IndexParseView.this.getDrawingRect(viewRect);
             RectF rectF = new RectF(viewRect);
             viewPortInfo.setViewRectF(rectF);
-
 
         }
     }

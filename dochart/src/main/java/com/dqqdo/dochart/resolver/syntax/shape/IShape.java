@@ -4,8 +4,8 @@ import com.dqqdo.dochart.resolver.draw.IDrawItem;
 import com.dqqdo.dochart.resolver.syntax.LogicPrimitive;
 
 /**
- * 作者：duqingquan
  * 时间：2017/12/4 14:20
+ * @author duqingquan
  */
 public interface IShape {
 

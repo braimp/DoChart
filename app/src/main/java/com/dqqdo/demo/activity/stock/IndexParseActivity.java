@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -36,13 +37,6 @@ public class IndexParseActivity extends Activity {
         etIndex = (EditText) findViewById(R.id.et_index);
         btn_index_parse = (Button) findViewById(R.id.btn_index_parse);
 
-//        String formula = readAssetsTxt("formula1.do");
-//
-//        if(!TextUtils.isEmpty(formula)){
-//            indexParseView.setFormula(formula);
-//        }else{
-//            LogUtil.e("formula  ----  null " + formula);
-//        }
 
         btn_index_parse.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,16 +57,12 @@ public class IndexParseActivity extends Activity {
     private String readAssetsTxt(String fileName) {
 
         try {
-            //Return an AssetManager instance for your application's package
             InputStream is = getAssets().open(fileName);
             int size = is.available();
-            // Read the entire asset into a local byte buffer.
             byte[] buffer = new byte[size];
             is.read(buffer);
             is.close();
-            // Convert the buffer into a string.
             String text = new String(buffer, "utf-8");
-            // Finally stick the string into the text view.
             return text;
         } catch (IOException e) {
             e.printStackTrace();

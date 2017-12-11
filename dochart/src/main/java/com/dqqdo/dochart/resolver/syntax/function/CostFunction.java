@@ -91,9 +91,8 @@ public class CostFunction implements IFunction{
         double price = stockInfo.getPrice();
         double randomValue = value + price;
 
-        LogUtil.d("randomValue   ----  " + randomValue);
-
         return randomValue;
+
     }
 
 

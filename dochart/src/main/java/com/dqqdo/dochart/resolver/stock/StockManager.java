@@ -31,10 +31,10 @@ public class StockManager {
         // TODO 这里需要完成Stock列表的数据查询与管理
         for(int i = 0; i < 20; i++){
             StockInfo stockInfo = new StockInfo();
-
             stockInfo.setPrice(random.nextInt(40) + 10);
             list.add(stockInfo);
         }
+
     }
 
     /**
@@ -42,7 +42,7 @@ public class StockManager {
      * @param id
      * @return
      */
-    public StockInfo getStockInfo(long id){
+    public StockInfo getStockInfo(long id,long time){
 
         // TODO 这里需要完成Stock信息的数据查询与管理
         StockInfo stockInfo = new StockInfo();

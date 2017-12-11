@@ -62,11 +62,12 @@ public class FormulaLine {
         this.content = line;
         this.resolverTaskDO = taskDO;
 
+
         if(line.contains(DoConstants.EXPRESSION_DEFINE)){
-            // 计算
+            // 计算语句
             formulaLineType = FormulaLineType.NORMAL;
         }else if(line.contains(DoConstants.EXPRESSION_EQUAL)){
-            // 定义
+            // 定义语句
             formulaLineType = FormulaLineType.DRAW;
         }else{
             return ;

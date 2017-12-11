@@ -15,13 +15,13 @@ public class ShapeSentence extends FormulaSentence{
         super(line);
 
         // 解析图形函数
-        Class<? extends IShape> classz = ShapeFactory
+        Class<? extends IShape> classZ = ShapeFactory
                 .getInstance()
                 .getShapeClass(line);
 
-        if(classz != null){
+        if(classZ != null){
             try {
-                shape = classz.newInstance();
+                shape = classZ.newInstance();
             } catch (InstantiationException e) {
                 e.printStackTrace();
                 shape = null;

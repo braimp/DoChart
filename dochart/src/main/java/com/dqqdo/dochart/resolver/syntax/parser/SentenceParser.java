@@ -11,14 +11,18 @@ import com.dqqdo.dochart.resolver.syntax.sentence.ShapeSentence;
 import com.dqqdo.dochart.util.LogUtil;
 
 /**
- * 作者：duqingquan
+ * 公式-分句 解析器
  * 时间：2017/12/1 15:43
+ * @author duqingquan
  */
 public class SentenceParser {
 
-    private volatile static  SentenceParser instance;
+    public static final String COLOR_KEYWORD = "color";
+
+    private static volatile SentenceParser instance;
 
     public static SentenceParser getInstance(){
+
         if(instance == null){
             instance = new SentenceParser();
         }
@@ -29,7 +33,7 @@ public class SentenceParser {
 
     }
 
-    private final String COLOR_KEYWORD = "color";
+
 
     public FormulaSentence parseSentence(String line, ResolverTaskDO resolverTaskDO){
 
@@ -37,6 +41,7 @@ public class SentenceParser {
         // 解析判断，当前分句的类型
         if(line.startsWith(COLOR_KEYWORD.toLowerCase())
                 || line.startsWith(COLOR_KEYWORD.toUpperCase())){
+            // 颜色
             sentence = new ColorSentence(line);
         }else if(DrawFunctionUtils.isDrawFunction(line)){
             // 绘图

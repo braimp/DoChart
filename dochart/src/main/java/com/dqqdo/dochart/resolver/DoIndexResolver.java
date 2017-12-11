@@ -143,6 +143,11 @@ public class DoIndexResolver {
          */
         private ResolverTaskDO resolverTaskDO;
 
+        /**
+         * 构造器
+         * @param taskDO 任务对象
+         * @param callback 任务执行回调
+         */
         private ResolverTask(ResolverTaskDO taskDO,IResolverCallback callback){
 
             this.resolverTaskDO = taskDO;
@@ -173,7 +178,8 @@ public class DoIndexResolver {
 
                     if(!formulaLine.isValid()){
                         // 有任何行语法错误，当前公式存在异常，结束
-                        break;
+                        LogUtil.e("公式解析失败 ： " + formulaLine);
+                        return ;
                     }
 
                     formulaLines[i] = formulaLine;
@@ -195,6 +201,7 @@ public class DoIndexResolver {
                 FormulaLine formulaLine = formulaLines[i];
 
                 if(formulaLine.getFormulaLineType() == FormulaLineType.DRAW){
+
                     // 行为命令，则获取drawItem对象数据，返回给外部
                     LogicPrimitive logicPrimitive = formulaLine.getLogicPrimitive();
 
