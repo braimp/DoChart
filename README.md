@@ -12,7 +12,7 @@ Android 平台自定义图表开源组件。
 
 kline index解析 
 
-
+QQ群： 241300694 程序人生
 www.dqqdo.com
 
 基本使用:
